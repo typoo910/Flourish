@@ -33,7 +33,7 @@ internal class Program
                 ConfigureHost();
 
                 var app = Fetch<App>();
-            }
+            
         );
 
         return 0;
