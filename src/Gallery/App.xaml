@@ -4,6 +4,11 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 >
   <Application.Resources>
-    <Style x:Key="Test" />
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Flourish;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="/Flourish;component/Themes/Controls.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
   </Application.Resources>
 </Application>
