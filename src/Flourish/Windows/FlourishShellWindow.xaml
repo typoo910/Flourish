@@ -1,6 +1,5 @@
 <Window
   x:Class="Flourish.Windows.FlourishShellWindow"
-  x:ClassModifier="internal"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,17 +9,20 @@
   Height="720"
   MinWidth="820"
   MinHeight="560"
+  x:ClassModifier="internal"
   Background="{StaticResource AppBackgroundBrush}"
   WindowStartupLocation="CenterScreen"
   WindowStyle="None"
-  mc:Ignorable="d">
+  mc:Ignorable="d"
+>
   <shell:WindowChrome.WindowChrome>
     <shell:WindowChrome
       CaptionHeight="0"
       CornerRadius="0"
       GlassFrameThickness="0"
       ResizeBorderThickness="6"
-      UseAeroCaptionButtons="False" />
+      UseAeroCaptionButtons="False"
+    />
   </shell:WindowChrome.WindowChrome>
 
   <Window.Resources>
@@ -41,12 +43,7 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Grid
-        x:Name="AppTitleBar"
-        Grid.Row="0"
-        Height="54"
-        Margin="6,4,6,0"
-        Background="Transparent">
+      <Grid x:Name="AppTitleBar" Grid.Row="0" Height="54" Margin="6,4,6,0" Background="Transparent">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
@@ -66,7 +63,8 @@
           Click="TitleBar_BackRequested"
           IsEnabled="False"
           Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Back">
+          ToolTip="Back"
+        >
           <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="14" Text="&#xE72B;" />
         </Button>
 
@@ -76,7 +74,8 @@
           Margin="2,8"
           Click="TitleBar_PaneToggleRequested"
           Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Toggle navigation">
+          ToolTip="Toggle navigation"
+        >
           <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE700;" />
         </Button>
 
@@ -85,25 +84,24 @@
           Margin="10,0,16,0"
           VerticalAlignment="Center"
           MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-          Orientation="Horizontal">
+          Orientation="Horizontal"
+        >
           <Border
             Width="32"
             Height="32"
             Background="{StaticResource AccentSoftBrush}"
-            CornerRadius="8">
+            CornerRadius="8"
+          >
             <Grid>
-              <Image
-                x:Name="AppLogoImage"
-                Margin="5"
-                Stretch="Uniform"
-                Visibility="Collapsed" />
+              <Image x:Name="AppLogoImage" Margin="5" Stretch="Uniform" Visibility="Collapsed" />
               <TextBlock
                 x:Name="AppLogoFallback"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontSize="15"
                 FontWeight="SemiBold"
-                Foreground="{StaticResource AccentBrush}" />
+                Foreground="{StaticResource AccentBrush}"
+              />
             </Grid>
           </Border>
           <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
@@ -111,19 +109,22 @@
               x:Name="AppTitleText"
               FontSize="15"
               FontWeight="SemiBold"
-              Foreground="{StaticResource PrimaryTextBrush}" />
+              Foreground="{StaticResource PrimaryTextBrush}"
+            />
             <TextBlock
               x:Name="AppSubtitleText"
               Margin="0,1,0,0"
               FontSize="11"
-              Foreground="{StaticResource MutedTextBrush}" />
+              Foreground="{StaticResource MutedTextBrush}"
+            />
           </StackPanel>
         </StackPanel>
 
         <Border
           Grid.Column="3"
           Background="Transparent"
-          MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" />
+          MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+        />
 
         <Border
           x:Name="SearchBoxHost"
@@ -136,7 +137,8 @@
           Background="White"
           BorderBrush="{StaticResource CardBorderBrush}"
           BorderThickness="1"
-          CornerRadius="8">
+          CornerRadius="8"
+        >
           <Grid>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" />
@@ -146,7 +148,8 @@
               VerticalAlignment="Center"
               FontFamily="Segoe MDL2 Assets"
               Foreground="{StaticResource MutedTextBrush}"
-              Text="&#xE721;" />
+              Text="&#xE721;"
+            />
             <TextBox
               x:Name="SearchBox"
               Grid.Column="1"
@@ -154,7 +157,8 @@
               VerticalContentAlignment="Center"
               Background="Transparent"
               BorderThickness="0"
-              Foreground="{StaticResource PrimaryTextBrush}" />
+              Foreground="{StaticResource PrimaryTextBrush}"
+            />
           </Grid>
         </Border>
 
@@ -165,21 +169,24 @@
           Margin="0,0,12,0"
           VerticalAlignment="Center"
           Background="#E0F2FE"
-          CornerRadius="15">
+          CornerRadius="15"
+        >
           <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="12"
             FontWeight="SemiBold"
             Foreground="#0369A1"
-            Text="JD" />
+            Text="JD"
+          />
         </Border>
 
         <Button
           Grid.Column="6"
           Click="MinimizeButton_Click"
           Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Minimize">
+          ToolTip="Minimize"
+        >
           <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE921;" />
         </Button>
 
@@ -187,19 +194,22 @@
           Grid.Column="7"
           Click="MaximizeButton_Click"
           Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Maximize">
+          ToolTip="Maximize"
+        >
           <TextBlock
             x:Name="MaximizeButtonIcon"
             FontFamily="Segoe MDL2 Assets"
             FontSize="11"
-            Text="&#xE922;" />
+            Text="&#xE922;"
+          />
         </Button>
 
         <Button
           Grid.Column="8"
           Click="CloseButton_Click"
           Style="{StaticResource FlourishCloseButtonStyle}"
-          ToolTip="Close">
+          ToolTip="Close"
+        >
           <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE8BB;" />
         </Button>
       </Grid>
@@ -212,21 +222,24 @@
         Background="{StaticResource CardBackgroundBrush}"
         BorderBrush="{StaticResource CardBorderBrush}"
         BorderThickness="1"
-        CornerRadius="8">
+        CornerRadius="8"
+      >
         <StackPanel x:Name="ToolbarItemsHost" Orientation="Horizontal" />
       </Border>
 
       <Border
-        Grid.Row="2"
         x:Name="BreadcrumbHost"
+        Grid.Row="2"
         Margin="12,0,12,8"
         Padding="12,0"
-        Background="Transparent">
+        Background="Transparent"
+      >
         <TextBlock
           x:Name="BreadcrumbText"
           VerticalAlignment="Center"
           FontSize="12"
-          Foreground="{StaticResource MutedTextBrush}" />
+          Foreground="{StaticResource MutedTextBrush}"
+        />
       </Border>
 
       <Border
@@ -236,7 +249,8 @@
         BorderBrush="{StaticResource CardBorderBrush}"
         BorderThickness="1"
         ClipToBounds="True"
-        CornerRadius="8">
+        CornerRadius="8"
+      >
         <Grid x:Name="WorkAreaGrid">
           <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="PaneColumn" Width="220" />
@@ -248,7 +262,8 @@
             Grid.Column="0"
             Background="#FBFCFE"
             BorderBrush="{StaticResource CardBorderBrush}"
-            BorderThickness="0,0,1,0">
+            BorderThickness="0,0,1,0"
+          >
             <DockPanel LastChildFill="True">
               <TextBlock
                 x:Name="PaneTitle"
@@ -256,7 +271,8 @@
                 DockPanel.Dock="Top"
                 FontSize="12"
                 FontWeight="SemiBold"
-                Foreground="{StaticResource MutedTextBrush}" />
+                Foreground="{StaticResource MutedTextBrush}"
+              />
 
               <StackPanel x:Name="NavigationItemsHost" DockPanel.Dock="Top" />
             </DockPanel>
@@ -267,7 +283,8 @@
             Grid.Column="1"
             Focusable="False"
             JournalOwnership="OwnsJournal"
-            NavigationUIVisibility="Hidden" />
+            NavigationUIVisibility="Hidden"
+          />
         </Grid>
       </Border>
 
@@ -276,7 +293,8 @@
         Padding="12,10"
         Background="{StaticResource CardSecondaryBackgroundBrush}"
         BorderBrush="{StaticResource CardBorderBrush}"
-        BorderThickness="0,1,0,0">
+        BorderThickness="0,1,0,0"
+      >
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -286,7 +304,8 @@
           <TextBlock
             x:Name="StatusTextBlock"
             VerticalAlignment="Center"
-            Foreground="{StaticResource MutedTextBrush}" />
+            Foreground="{StaticResource MutedTextBrush}"
+          />
 
           <StackPanel x:Name="StatusItemsHost" Grid.Column="1" Orientation="Horizontal" />
         </Grid>
