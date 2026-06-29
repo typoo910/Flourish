@@ -2,7 +2,7 @@ using System.Windows.Controls;
 
 namespace Flourish.Models;
 
-public sealed record FlourishNavigationItem(
+internal sealed record FlourishNavigationItem(
     string Key,
     string Label,
     string IconGlyph,

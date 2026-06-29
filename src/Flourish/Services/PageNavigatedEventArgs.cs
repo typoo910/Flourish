@@ -2,7 +2,7 @@ using System.Windows.Controls;
 
 namespace Flourish.Services;
 
-public sealed class PageNavigatedEventArgs : EventArgs
+internal sealed class PageNavigatedEventArgs : EventArgs
 {
     public PageNavigatedEventArgs(Type sourcePageType, Page page, object? parameter)
     {

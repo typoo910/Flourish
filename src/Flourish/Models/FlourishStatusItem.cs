@@ -1,3 +1,3 @@
 namespace Flourish.Models;
 
-public sealed record FlourishStatusItem(string Text, string IconGlyph);
+internal sealed record FlourishStatusItem(string Text, string IconGlyph);

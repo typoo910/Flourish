@@ -2,11 +2,10 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <RootNamespace>Vistara.Wpf</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <StartupObject>Vistara.Wpf.Program</StartupObject>
+    <StartupObject>Vistara.Program</StartupObject>
     <Platforms>x86;x64;ARM64</Platforms>
   </PropertyGroup>
 

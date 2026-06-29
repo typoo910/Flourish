@@ -1,12 +1,13 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AcksheedSys.Flourish.Abstract;
 using Flourish.Models;
 using Flourish.Services;
 
 namespace Flourish.Windows;
 
-public partial class FlourishShellWindow : Window
+internal partial class FlourishShellWindow : Window
 {
     private readonly INavigationService navigationService;
     private readonly FlourishShellOptions options;
@@ -44,7 +45,13 @@ public partial class FlourishShellWindow : Window
         PaneTitle.Text = options.PaneTitle;
         SearchBox.Text = options.SearchPlaceholder;
         StatusTextBlock.Text = options.StatusText;
-        PaneColumn.Width = new GridLength(options.OpenPaneWidth);
+        SearchBoxHost.Visibility = options.IsTitlebarSearchEnabled ? Visibility.Visible : Visibility.Collapsed;
+        NavigationPaneBorder.Visibility = options.IsNavigationPanelEnabled ? Visibility.Visible : Visibility.Collapsed;
+        PaneToggleButton.Visibility = options.IsNavigationPanelEnabled ? Visibility.Visible : Visibility.Collapsed;
+        BreadcrumbHost.Visibility = options.IsBreadcrumbEnabled ? Visibility.Visible : Visibility.Collapsed;
+
+        ApplyNavigationPanelPlacement();
+        SetPaneWidth(options.IsNavigationPanelEnabled ? options.OpenPaneWidth : 0);
 
         if (options.LogoSource is not null)
         {
@@ -60,11 +67,41 @@ public partial class FlourishShellWindow : Window
         AppLogoFallback.Visibility = Visibility.Visible;
     }
 
-    private void BuildToolbarItems()
+    private void ApplyNavigationPanelPlacement()
+    {
+        if (options.NavigationPanelDirection == NavigationPanelDirection.Right)
+        {
+            Grid.SetColumn(RootFrame, 0);
+            Grid.SetColumn(NavigationPaneBorder, 1);
+            NavigationPaneBorder.BorderThickness = new Thickness(1, 0, 0, 0);
+            return;
+        }
+
+        Grid.SetColumn(NavigationPaneBorder, 0);
+        Grid.SetColumn(RootFrame, 1);
+        NavigationPaneBorder.BorderThickness = new Thickness(0, 0, 1, 0);
+    }
+
+    private void SetPaneWidth(double width)
+    {
+        if (options.NavigationPanelDirection == NavigationPanelDirection.Right)
+        {
+            PaneColumn.Width = new GridLength(1, GridUnitType.Star);
+            ContentColumn.Width = new GridLength(width);
+            return;
+        }
+
+        PaneColumn.Width = new GridLength(width);
+        ContentColumn.Width = new GridLength(1, GridUnitType.Star);
+    }
+
+    private void BuildToolbarItems(Type? pageType = null)
     {
         ToolbarItemsHost.Children.Clear();
+        var toolbarItems = GetToolbarItems(pageType);
+        ToolbarHostBorder.Visibility = toolbarItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        foreach (var item in options.ToolbarItems)
+        foreach (var item in toolbarItems)
         {
             var button = new Button
             {
@@ -80,6 +117,20 @@ public partial class FlourishShellWindow : Window
 
             ToolbarItemsHost.Children.Add(button);
         }
+    }
+
+    private IReadOnlyList<FlourishCommandItem> GetToolbarItems(Type? pageType)
+    {
+        if (
+            options.IsDynamicToolbarEnabled
+            && pageType is not null
+            && options.DynamicToolbarItems.TryGetValue(pageType, out var dynamicItems)
+        )
+        {
+            return dynamicItems;
+        }
+
+        return options.ToolbarItems;
     }
 
     private void BuildNavigationItems()
@@ -201,7 +252,11 @@ public partial class FlourishShellWindow : Window
     private void NavigateToInitialPage()
     {
         var initialKey =
-            options.InitialNavigationKey ?? options.NavigationItems.FirstOrDefault()?.Key;
+            options.InitialNavigationPageType is null
+                ? options.InitialNavigationKey ?? options.NavigationItems.FirstOrDefault()?.Key
+                : options
+                    .NavigationItems.FirstOrDefault(item => item.PageType == options.InitialNavigationPageType)
+                    ?.Key;
         if (initialKey is null)
         {
             return;
@@ -229,9 +284,7 @@ public partial class FlourishShellWindow : Window
     private void TitleBar_PaneToggleRequested(object sender, RoutedEventArgs e)
     {
         isPaneOpen = !isPaneOpen;
-        PaneColumn.Width = new GridLength(
-            isPaneOpen ? options.OpenPaneWidth : options.ClosedPaneWidth
-        );
+        SetPaneWidth(isPaneOpen ? options.OpenPaneWidth : options.ClosedPaneWidth);
         PaneTitle.Visibility = isPaneOpen ? Visibility.Visible : Visibility.Collapsed;
 
         foreach (var label in paneLabels)
@@ -251,11 +304,38 @@ public partial class FlourishShellWindow : Window
     private void RootFrame_Navigated(object? sender, PageNavigatedEventArgs e)
     {
         BackButton.IsEnabled = navigationService.CanGoBack;
+        BuildToolbarItems(e.SourcePageType);
+        UpdateBreadcrumb(e.SourcePageType);
 
         if (navigationButtonsByPage.TryGetValue(e.SourcePageType, out var navigationItem))
         {
             navigationItem.IsChecked = true;
         }
+    }
+
+    private void UpdateBreadcrumb(Type sourcePageType)
+    {
+        if (!options.IsBreadcrumbEnabled || options.BreadcrumbShowOption == BreadcrumbShowOption.Hidden)
+        {
+            BreadcrumbHost.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        if (
+            options.BreadcrumbShowOption == BreadcrumbShowOption.OnlyAvailable
+            && !navigationService.CanGoBack
+        )
+        {
+            BreadcrumbHost.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var label =
+            options.NavigationItems.FirstOrDefault(item => item.PageType == sourcePageType)?.Label
+            ?? sourcePageType.Name;
+
+        BreadcrumbText.Text = $"{options.Title} / {label}";
+        BreadcrumbHost.Visibility = Visibility.Visible;
     }
 
     private void NavigateToKey(string key, bool addToBackStack)

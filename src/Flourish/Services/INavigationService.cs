@@ -2,7 +2,7 @@ using System.Windows.Controls;
 
 namespace Flourish.Services;
 
-public interface INavigationService
+internal interface INavigationService
 {
     event EventHandler<PageNavigatedEventArgs>? Navigated;
 

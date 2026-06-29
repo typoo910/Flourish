@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace Vistara.Wpf.Views;
+namespace Vistara.Views;
 
 public partial class EditorPage : Page
 {

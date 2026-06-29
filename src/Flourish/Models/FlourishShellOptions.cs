@@ -1,8 +1,9 @@
 using System.Windows.Media;
+using AcksheedSys.Flourish.Abstract;
 
 namespace Flourish.Models;
 
-public sealed class FlourishShellOptions
+internal sealed class FlourishShellOptions
 {
     public string Title { get; set; } = "Flourish";
 
@@ -18,15 +19,31 @@ public sealed class FlourishShellOptions
 
     public string LogoFallbackText { get; set; } = "F";
 
+    public bool IsNavigationPanelEnabled { get; set; } = true;
+
+    public NavigationPanelDirection NavigationPanelDirection { get; set; } = NavigationPanelDirection.Left;
+
+    public bool IsTitlebarSearchEnabled { get; set; } = true;
+
+    public bool IsDynamicToolbarEnabled { get; set; }
+
+    public bool IsBreadcrumbEnabled { get; set; }
+
+    public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.OnlyAvailable;
+
     public double OpenPaneWidth { get; set; } = 220;
 
     public double ClosedPaneWidth { get; set; } = 56;
 
     public string? InitialNavigationKey { get; set; }
 
-    public IReadOnlyList<FlourishNavigationItem> NavigationItems { get; set; } = [];
+    public Type? InitialNavigationPageType { get; set; }
 
-    public IReadOnlyList<FlourishCommandItem> ToolbarItems { get; set; } = [];
+    public List<FlourishNavigationItem> NavigationItems { get; } = [];
 
-    public IReadOnlyList<FlourishStatusItem> StatusItems { get; set; } = [];
+    public List<FlourishCommandItem> ToolbarItems { get; } = [];
+
+    public Dictionary<Type, IReadOnlyList<FlourishCommandItem>> DynamicToolbarItems { get; } = [];
+
+    public List<FlourishStatusItem> StatusItems { get; } = [];
 }

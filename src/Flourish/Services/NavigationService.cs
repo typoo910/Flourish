@@ -2,7 +2,7 @@ using System.Windows.Controls;
 
 namespace Flourish.Services;
 
-public sealed class NavigationService : INavigationService
+internal sealed class NavigationService : INavigationService
 {
     private readonly IServiceProvider serviceProvider;
     private readonly PageHistoryService pageHistoryService;

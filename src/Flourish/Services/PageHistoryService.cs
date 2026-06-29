@@ -1,6 +1,6 @@
 namespace Flourish.Services;
 
-public sealed class PageHistoryService
+internal sealed class PageHistoryService
 {
     private readonly Stack<PageStackEntry> backStack = new();
 
