@@ -10,14 +10,21 @@ public static class FlourishServiceCollectionExtensions
         this IServiceCollection services,
         string displayName,
         string iconGlyph,
-        bool isInitial = false
+        bool isInitial = false,
+        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
     )
         where TPage : Page
     {
         services.AddTransient<TPage>();
         GetOrCreateState(services)
             .NavigablePages.Add(
-                new NavigablePageRegistration(typeof(TPage), displayName, iconGlyph, isInitial)
+                new NavigablePageRegistration(
+                    typeof(TPage),
+                    displayName,
+                    iconGlyph,
+                    isInitial,
+                    cacheMode
+                )
             );
 
         return services;
@@ -28,7 +35,8 @@ public static class FlourishServiceCollectionExtensions
         Type pageType,
         string displayName,
         string iconGlyph,
-        bool isInitial = false
+        bool isInitial = false,
+        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
     )
     {
         if (!typeof(Page).IsAssignableFrom(pageType))
@@ -42,7 +50,7 @@ public static class FlourishServiceCollectionExtensions
         services.AddTransient(pageType);
         GetOrCreateState(services)
             .NavigablePages.Add(
-                new NavigablePageRegistration(pageType, displayName, iconGlyph, isInitial)
+                new NavigablePageRegistration(pageType, displayName, iconGlyph, isInitial, cacheMode)
             );
 
         return services;

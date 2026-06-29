@@ -25,14 +25,6 @@
     />
   </shell:WindowChrome.WindowChrome>
 
-  <Window.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Flourish;component/Themes/Controls.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
-  </Window.Resources>
-
   <Border BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
     <Grid>
       <Grid.RowDefinitions>
@@ -274,7 +266,60 @@
                 Foreground="{StaticResource MutedTextBrush}"
               />
 
-              <StackPanel x:Name="NavigationItemsHost" DockPanel.Dock="Top" />
+              <ListBox
+                x:Name="NavigationItemsHost"
+                DockPanel.Dock="Top"
+                ItemContainerStyle="{StaticResource FlourishNavigationListBoxItemStyle}"
+                ItemsSource="{Binding}"
+                ScrollViewer.CanContentScroll="True"
+                SelectionChanged="NavigationItemsHost_SelectionChanged"
+                Style="{StaticResource FlourishNavigationListBoxStyle}"
+                Tag="True"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                VirtualizingStackPanel.VirtualizationMode="Recycling"
+              >
+                <ListBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                  </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="16"
+                        Text="{Binding IconGlyph}"
+                      />
+                      <TextBlock
+                        x:Name="NavigationItemLabel"
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding Label}"
+                      />
+                    </Grid>
+                    <DataTemplate.Triggers>
+                      <DataTrigger
+                        Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        Value="False"
+                      >
+                        <Setter
+                          TargetName="NavigationItemLabel"
+                          Property="Visibility"
+                          Value="Collapsed"
+                        />
+                      </DataTrigger>
+                    </DataTemplate.Triggers>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
             </DockPanel>
           </Border>
 

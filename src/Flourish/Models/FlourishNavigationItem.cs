@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using AcksheedSys.Flourish.Abstract;
 
 namespace AcksheedSys.Flourish.Models;
 
@@ -6,7 +7,8 @@ internal sealed record FlourishNavigationItem(
     string Key,
     string Label,
     string IconGlyph,
-    Type PageType
+    Type PageType,
+    FlourishPageCacheMode CacheMode
 )
 {
     public void Validate()

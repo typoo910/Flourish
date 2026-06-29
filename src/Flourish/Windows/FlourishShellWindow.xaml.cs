@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Flourish.Models;
 using AcksheedSys.Flourish.Services;
@@ -17,9 +18,18 @@ internal partial class FlourishShellWindow : Window
     private readonly Dictionary<string, FlourishNavigationItem> navigationItemsByKey = new(
         StringComparer.Ordinal
     );
-    private readonly Dictionary<Type, RadioButton> navigationButtonsByPage = new();
-    private readonly List<TextBlock> paneLabels = [];
+    private readonly Dictionary<Type, FlourishNavigationItem> navigationItemsByPage = [];
+    private readonly Dictionary<Type, IReadOnlyList<Button>> toolbarButtonsByPageType = [];
+    private IReadOnlyList<Button>? defaultToolbarButtons;
+    private FlourishNavigationItem? firstNavigationItem;
+    private Style toolbarButtonStyle = null!;
+    private Style navigationListBoxItemStyle = null!;
+    private Brush mutedTextBrush = null!;
+    private FontFamily iconFontFamily = null!;
+    private Type? activeToolbarPageType;
+    private bool isDefaultToolbarActive;
     private bool isPaneOpen = true;
+    private bool suppressNavigationSelection;
 
     public FlourishShellWindow(
         INavigationService navigationService,
@@ -37,6 +47,7 @@ internal partial class FlourishShellWindow : Window
         this.statusService = statusService;
         this.options = options;
 
+        CacheResources();
         ApplyOptions();
         BuildToolbarItems();
         BuildNavigationItems();
@@ -47,6 +58,14 @@ internal partial class FlourishShellWindow : Window
         navigationService.Navigated += RootFrame_Navigated;
 
         NavigateToInitialPage();
+    }
+
+    private void CacheResources()
+    {
+        toolbarButtonStyle = (Style)FindResource("FlourishToolbarButtonStyle");
+        navigationListBoxItemStyle = (Style)FindResource("FlourishNavigationListBoxItemStyle");
+        mutedTextBrush = (Brush)FindResource("MutedTextBrush");
+        iconFontFamily = new FontFamily("Segoe MDL2 Assets");
     }
 
     private void ApplyOptions()
@@ -117,61 +136,76 @@ internal partial class FlourishShellWindow : Window
 
     private void BuildToolbarItems(Type? pageType = null)
     {
-        ToolbarItemsHost.Children.Clear();
-        var toolbarItems = toolbarService.GetToolbarItems(pageType);
-        ToolbarHostBorder.Visibility =
-            toolbarItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-
-        foreach (var item in toolbarItems)
+        if (activeToolbarPageType == pageType && isDefaultToolbarActive == (pageType is null))
         {
-            var button = new Button
-            {
-                Content = CreateIconTextContent(item.IconGlyph, item.DisplayName),
-                Style = (Style)FindResource("FlourishToolbarButtonStyle"),
-                Tag = item.CommandKey,
-            };
+            return;
+        }
 
-            if (ToolbarItemsHost.Children.Count > 0)
-            {
-                button.Margin = new Thickness(6, 0, 0, 0);
-            }
+        ToolbarItemsHost.Children.Clear();
+        var toolbarButtons = GetToolbarButtons(pageType);
+        ToolbarHostBorder.Visibility =
+            toolbarButtons.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
+        foreach (var button in toolbarButtons)
+        {
             ToolbarItemsHost.Children.Add(button);
         }
+
+        activeToolbarPageType = pageType;
+        isDefaultToolbarActive = pageType is null;
+    }
+
+    private IReadOnlyList<Button> GetToolbarButtons(Type? pageType)
+    {
+        if (pageType is null)
+        {
+            return defaultToolbarButtons ??= CreateToolbarButtons(toolbarService.GetToolbarItems());
+        }
+
+        if (!toolbarButtonsByPageType.TryGetValue(pageType, out var toolbarButtons))
+        {
+            toolbarButtons = CreateToolbarButtons(toolbarService.GetToolbarItems(pageType));
+            toolbarButtonsByPageType[pageType] = toolbarButtons;
+        }
+
+        return toolbarButtons;
+    }
+
+    private IReadOnlyList<Button> CreateToolbarButtons(IReadOnlyList<FlourishToolbarItem> items)
+    {
+        var buttons = new List<Button>(items.Count);
+        foreach (var item in items)
+        {
+            buttons.Add(
+                new Button
+                {
+                    Content = CreateIconTextContent(item.IconGlyph, item.DisplayName),
+                    Margin = buttons.Count > 0 ? new Thickness(6, 0, 0, 0) : new Thickness(),
+                    Style = toolbarButtonStyle,
+                    Tag = item.CommandKey,
+                }
+            );
+        }
+
+        return buttons;
     }
 
     private void BuildNavigationItems()
     {
-        NavigationItemsHost.Children.Clear();
         navigationItemsByKey.Clear();
-        navigationButtonsByPage.Clear();
-        paneLabels.Clear();
+        navigationItemsByPage.Clear();
+        firstNavigationItem = null;
 
         foreach (var item in options.NavigationItems)
         {
             item.Validate();
-
-            var label = new TextBlock
-            {
-                Margin = new Thickness(10, 0, 0, 0),
-                VerticalAlignment = VerticalAlignment.Center,
-                Text = item.Label,
-            };
-            paneLabels.Add(label);
-
-            var button = new RadioButton
-            {
-                Content = CreateNavigationContent(item.IconGlyph, label),
-                GroupName = "RootNavigation",
-                Style = (Style)FindResource("FlourishNavigationItemStyle"),
-                Tag = item.Key,
-            };
-            button.Click += NavigationItem_Click;
-
+            firstNavigationItem ??= item;
             navigationItemsByKey[item.Key] = item;
-            navigationButtonsByPage[item.PageType] = button;
-            NavigationItemsHost.Children.Add(button);
+            navigationItemsByPage[item.PageType] = item;
         }
+
+        NavigationItemsHost.ItemContainerStyle = navigationListBoxItemStyle;
+        NavigationItemsHost.ItemsSource = options.NavigationItems;
     }
 
     private void BuildStatusItems()
@@ -192,8 +226,8 @@ internal partial class FlourishShellWindow : Window
                 new TextBlock
                 {
                     VerticalAlignment = VerticalAlignment.Center,
-                    FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
-                    Foreground = (System.Windows.Media.Brush)FindResource("MutedTextBrush"),
+                    FontFamily = iconFontFamily,
+                    Foreground = mutedTextBrush,
                     Text = item.IconGlyph,
                 }
             );
@@ -210,14 +244,14 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private static StackPanel CreateIconTextContent(string iconGlyph, string label)
+    private StackPanel CreateIconTextContent(string iconGlyph, string label)
     {
         var content = new StackPanel { Orientation = Orientation.Horizontal };
         content.Children.Add(
             new TextBlock
             {
                 VerticalAlignment = VerticalAlignment.Center,
-                FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
+                FontFamily = iconFontFamily,
                 Text = iconGlyph,
             }
         );
@@ -232,53 +266,25 @@ internal partial class FlourishShellWindow : Window
         return content;
     }
 
-    private static Grid CreateNavigationContent(string iconGlyph, TextBlock label)
-    {
-        var content = new Grid();
-        content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
-        content.ColumnDefinitions.Add(
-            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
-        );
-
-        content.Children.Add(
-            new TextBlock
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
-                FontSize = 16,
-                Text = iconGlyph,
-            }
-        );
-
-        Grid.SetColumn(label, 1);
-        content.Children.Add(label);
-        return content;
-    }
-
     private void NavigateToInitialPage()
     {
-        var initialKey = options.InitialNavigationPageType is null
-            ? options.InitialNavigationKey ?? options.NavigationItems.FirstOrDefault()?.Key
-            : options
-                .NavigationItems.FirstOrDefault(item =>
-                    item.PageType == options.InitialNavigationPageType
-                )
-                ?.Key;
-        if (initialKey is null)
+        var initialItem =
+            options.InitialNavigationPageType is null
+                ? GetNavigationItem(options.InitialNavigationKey) ?? firstNavigationItem
+                : navigationItemsByPage.GetValueOrDefault(options.InitialNavigationPageType);
+
+        if (initialItem is null)
         {
             return;
         }
 
-        if (
-            navigationItemsByKey.TryGetValue(initialKey, out var initialItem)
-            && navigationButtonsByPage.TryGetValue(initialItem.PageType, out var initialButton)
-        )
-        {
-            initialButton.IsChecked = true;
-        }
+        SelectNavigationItem(initialItem);
+        NavigateToKey(initialItem.Key, false);
+    }
 
-        NavigateToKey(initialKey, false);
+    private FlourishNavigationItem? GetNavigationItem(string? key)
+    {
+        return key is not null && navigationItemsByKey.TryGetValue(key, out var item) ? item : null;
     }
 
     private void TitleBar_BackRequested(object sender, RoutedEventArgs e)
@@ -294,19 +300,20 @@ internal partial class FlourishShellWindow : Window
         isPaneOpen = !isPaneOpen;
         SetPaneWidth(isPaneOpen ? options.OpenPaneWidth : options.ClosedPaneWidth);
         PaneTitle.Visibility = isPaneOpen ? Visibility.Visible : Visibility.Collapsed;
-
-        foreach (var label in paneLabels)
-        {
-            label.Visibility = isPaneOpen ? Visibility.Visible : Visibility.Collapsed;
-        }
+        NavigationItemsHost.Tag = isPaneOpen;
     }
 
-    private void NavigationItem_Click(object sender, RoutedEventArgs e)
+    private void NavigationItemsHost_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is FrameworkElement { Tag: string key })
+        if (
+            suppressNavigationSelection
+            || NavigationItemsHost.SelectedItem is not FlourishNavigationItem item
+        )
         {
-            NavigateToKey(key, true);
+            return;
         }
+
+        NavigateToKey(item.Key, true);
     }
 
     private void RootFrame_Navigated(object? sender, FlourishNavigatedEventArgs e)
@@ -315,10 +322,7 @@ internal partial class FlourishShellWindow : Window
         BuildToolbarItems(e.SourcePageType);
         UpdateBreadcrumb(e.SourcePageType);
 
-        if (navigationButtonsByPage.TryGetValue(e.SourcePageType, out var navigationItem))
-        {
-            navigationItem.IsChecked = true;
-        }
+        SelectNavigationItem(e.SourcePageType);
     }
 
     private void UpdateBreadcrumb(Type sourcePageType)
@@ -342,7 +346,7 @@ internal partial class FlourishShellWindow : Window
         }
 
         var label =
-            options.NavigationItems.FirstOrDefault(item => item.PageType == sourcePageType)?.Label
+            navigationItemsByPage.GetValueOrDefault(sourcePageType)?.Label
             ?? sourcePageType.Name;
 
         BreadcrumbText.Text = $"{options.Title} / {label}";
@@ -353,7 +357,7 @@ internal partial class FlourishShellWindow : Window
     {
         if (!navigationItemsByKey.TryGetValue(key, out var targetItem))
         {
-            targetItem = options.NavigationItems.FirstOrDefault();
+            targetItem = firstNavigationItem;
         }
 
         if (targetItem is null || navigationService.CurrentSourcePageType == targetItem.PageType)
@@ -410,5 +414,26 @@ internal partial class FlourishShellWindow : Window
     {
         WindowState =
             WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void SelectNavigationItem(Type pageType)
+    {
+        if (navigationItemsByPage.TryGetValue(pageType, out var item))
+        {
+            SelectNavigationItem(item);
+        }
+    }
+
+    private void SelectNavigationItem(FlourishNavigationItem item)
+    {
+        suppressNavigationSelection = true;
+        try
+        {
+            NavigationItemsHost.SelectedItem = item;
+        }
+        finally
+        {
+            suppressNavigationSelection = false;
+        }
     }
 }

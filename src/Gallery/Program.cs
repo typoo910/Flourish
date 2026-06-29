@@ -7,6 +7,7 @@ namespace AcksheedSys.Gallery;
 internal static class Program
 {
     private static IFlourish? flourish;
+
     public static IFlourish Flourish =>
         flourish ?? throw new InvalidOperationException("Flourish has not been built.");
 

@@ -4,7 +4,7 @@ using AcksheedSys.Flourish.Abstract;
 namespace AcksheedSys.Flourish.Services;
 
 internal sealed class NavigationService(
-    IServiceProvider serviceProvider,
+    PageCacheService pageCacheService,
     PageHistoryService pageHistoryService
 ) : INavigationService, IFrameNavigationService
 {
@@ -69,23 +69,12 @@ internal sealed class NavigationService(
             );
         }
 
-        var page = CreatePage(sourcePageType);
+        var page = pageCacheService.GetPage(sourcePageType);
         contentFrame.Navigate(page);
         CurrentSourcePageType = sourcePageType;
         currentParameter = parameter;
 
         Navigated?.Invoke(this, new FlourishNavigatedEventArgs(sourcePageType, page, parameter));
         return true;
-    }
-
-    private Page CreatePage(Type sourcePageType)
-    {
-        var page =
-            serviceProvider.GetService(sourcePageType) ?? Activator.CreateInstance(sourcePageType);
-
-        return page as Page
-            ?? throw new InvalidOperationException(
-                $"{sourcePageType.FullName} must derive from System.Windows.Controls.Page."
-            );
     }
 }

@@ -87,7 +87,13 @@ internal sealed class FlourishCompositionRoot(
             }
 
             shellOptions.NavigationItems.Add(
-                new FlourishNavigationItem(key, page.DisplayName, page.IconGlyph, page.PageType)
+                new FlourishNavigationItem(
+                    key,
+                    page.DisplayName,
+                    page.IconGlyph,
+                    page.PageType,
+                    page.CacheMode
+                )
             );
 
             if (page.IsInitial)
@@ -113,6 +119,7 @@ internal sealed class FlourishCompositionRoot(
         services.AddSingleton<IFlourishPageHistoryService>(provider =>
             provider.GetRequiredService<PageHistoryService>()
         );
+        services.AddSingleton<PageCacheService>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(provider =>
             provider.GetRequiredService<NavigationService>()
