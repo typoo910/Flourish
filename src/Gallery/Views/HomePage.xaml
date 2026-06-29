@@ -1,29 +1,29 @@
 <Page
-  x:Class="Vistara.Views.HomePage"
+  x:Class="Gallery.Views.HomePage"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   Background="Transparent"
-  mc:Ignorable="d">
+  mc:Ignorable="d"
+>
   <Grid>
-    <StackPanel
-      Width="520"
-      HorizontalAlignment="Center"
-      VerticalAlignment="Center">
+    <StackPanel Width="520" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Border
         Width="88"
         Height="88"
         HorizontalAlignment="Center"
         Background="{StaticResource AccentSoftBrush}"
-        CornerRadius="24">
+        CornerRadius="24"
+      >
         <TextBlock
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
           FontFamily="Segoe MDL2 Assets"
           FontSize="42"
           Foreground="{StaticResource AccentBrush}"
-          Text="&#xE80F;" />
+          Text="&#xE80F;"
+        />
       </Border>
 
       <TextBlock
@@ -32,7 +32,8 @@
         FontSize="28"
         FontWeight="SemiBold"
         Foreground="{StaticResource PrimaryTextBrush}"
-        Text="欢迎使用 Vistara" />
+        Text="欢迎使用 Flourish Gallery"
+      />
 
       <TextBlock
         Margin="0,10,0,0"
@@ -40,7 +41,8 @@
         Foreground="{StaticResource MutedTextBrush}"
         Text="这里是首页占位内容。后续可以在这里展示最近项目、快速操作和图库概览。"
         TextAlignment="Center"
-        TextWrapping="Wrap" />
+        TextWrapping="Wrap"
+      />
     </StackPanel>
   </Grid>
 </Page>

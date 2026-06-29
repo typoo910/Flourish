@@ -9,8 +9,6 @@ public interface IFlourishBuilder
 
     IFlourishBuilder ConfigureShell(Action<HostBuilderContext, IFlourishShellBuilder> configureShell);
 
-    IFlourishBuilder ConfigureNavigation(Action<HostBuilderContext, IFlourishNavigationBuilder> configureNavigation);
-
     IFlourishBuilder ConfigureDynamicToolbar(Action<HostBuilderContext, IFlourishDynamicToolbarBuilder> configureToolbar);
 
     IFlourishBuilder ConfigureStatus(Action<HostBuilderContext, IFlourishStatusBuilder> configureStatus);

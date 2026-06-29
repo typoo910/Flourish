@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace Vistara.Views;
+namespace Gallery.Views;
 
 public partial class GalleryPage : Page
 {

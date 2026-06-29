@@ -21,7 +21,6 @@ internal sealed class DefaultFlourishBuilder : IFlourishBuilder
     private readonly FlourishShellOptions shellOptions = new();
     private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurations = [];
     private readonly List<Action<HostBuilderContext, IFlourishShellBuilder>> shellConfigurations = [];
-    private readonly List<Action<HostBuilderContext, IFlourishNavigationBuilder>> navigationConfigurations = [];
     private readonly List<Action<HostBuilderContext, IFlourishDynamicToolbarBuilder>> toolbarConfigurations = [];
     private readonly List<Action<HostBuilderContext, IFlourishStatusBuilder>> statusConfigurations = [];
 
@@ -30,31 +29,33 @@ internal sealed class DefaultFlourishBuilder : IFlourishBuilder
         hostBuilder = Host.CreateDefaultBuilder(args);
     }
 
-    public IFlourishBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureServices)
+    public IFlourishBuilder ConfigureServices(
+        Action<HostBuilderContext, IServiceCollection> configureServices
+    )
     {
         serviceConfigurations.Add(configureServices);
         return this;
     }
 
-    public IFlourishBuilder ConfigureShell(Action<HostBuilderContext, IFlourishShellBuilder> configureShell)
+    public IFlourishBuilder ConfigureShell(
+        Action<HostBuilderContext, IFlourishShellBuilder> configureShell
+    )
     {
         shellConfigurations.Add(configureShell);
         return this;
     }
 
-    public IFlourishBuilder ConfigureNavigation(Action<HostBuilderContext, IFlourishNavigationBuilder> configureNavigation)
-    {
-        navigationConfigurations.Add(configureNavigation);
-        return this;
-    }
-
-    public IFlourishBuilder ConfigureDynamicToolbar(Action<HostBuilderContext, IFlourishDynamicToolbarBuilder> configureToolbar)
+    public IFlourishBuilder ConfigureDynamicToolbar(
+        Action<HostBuilderContext, IFlourishDynamicToolbarBuilder> configureToolbar
+    )
     {
         toolbarConfigurations.Add(configureToolbar);
         return this;
     }
 
-    public IFlourishBuilder ConfigureStatus(Action<HostBuilderContext, IFlourishStatusBuilder> configureStatus)
+    public IFlourishBuilder ConfigureStatus(
+        Action<HostBuilderContext, IFlourishStatusBuilder> configureStatus
+    )
     {
         statusConfigurations.Add(configureStatus);
         return this;
@@ -71,6 +72,7 @@ internal sealed class DefaultFlourishBuilder : IFlourishBuilder
                 }
 
                 ApplyFlourishConfigurations(context);
+                ApplyServiceCollectionRegistrations(services);
 
                 services.AddSingleton(shellOptions);
                 services.AddSingleton<FlourishShellWindow>();
@@ -90,12 +92,6 @@ internal sealed class DefaultFlourishBuilder : IFlourishBuilder
             configureShell(context, shellBuilder);
         }
 
-        var navigationBuilder = new FlourishNavigationBuilder(shellOptions);
-        foreach (var configureNavigation in navigationConfigurations)
-        {
-            configureNavigation(context, navigationBuilder);
-        }
-
         var toolbarBuilder = new FlourishDynamicToolbarBuilder(shellOptions);
         foreach (var configureToolbar in toolbarConfigurations)
         {
@@ -106,6 +102,39 @@ internal sealed class DefaultFlourishBuilder : IFlourishBuilder
         foreach (var configureStatus in statusConfigurations)
         {
             configureStatus(context, statusBuilder);
+        }
+    }
+
+    private void ApplyServiceCollectionRegistrations(IServiceCollection services)
+    {
+        var state = services
+            .FirstOrDefault(descriptor =>
+                descriptor.ServiceType == typeof(FlourishServiceCollectionState)
+                && descriptor.ImplementationInstance is FlourishServiceCollectionState
+            )
+            ?.ImplementationInstance as FlourishServiceCollectionState;
+
+        if (state is null)
+        {
+            return;
+        }
+
+        foreach (var page in state.NavigablePages)
+        {
+            var key = page.PageType.FullName ?? page.DisplayName;
+            if (shellOptions.NavigationItems.Any(item => item.Key == key))
+            {
+                continue;
+            }
+
+            shellOptions.NavigationItems.Add(
+                new FlourishNavigationItem(key, page.DisplayName, page.IconGlyph, page.PageType)
+            );
+
+            if (page.IsInitial)
+            {
+                shellOptions.InitialNavigationPageType = page.PageType;
+            }
         }
     }
 }

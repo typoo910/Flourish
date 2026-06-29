@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Vistara;
+namespace Gallery;
 
 public partial class App : Application
 {
