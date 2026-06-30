@@ -1,3 +1,4 @@
+using System.Windows;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Gallery.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,7 @@ internal static class Program
                         .SetTitle("Gallery")
                         .SetWindowSize(1536, 864)
                         .SetWindowMinSize(1280, 720)
+                        //.SetWindowPosition(WindowStartupLocation.CenterScreen);
                         .SetSubtitle("图片管理器")
                         .UseNavigationPanel(
                             enabled: true,

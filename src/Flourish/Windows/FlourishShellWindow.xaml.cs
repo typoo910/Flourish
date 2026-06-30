@@ -138,14 +138,14 @@ internal partial class FlourishShellWindow : Window
     {
         if (options.NavigationPanelDirection == NavigationPanelDirection.Right)
         {
-            Grid.SetColumn(RootFrame, 0);
+            Grid.SetColumn(ContentAreaGrid, 0);
             Grid.SetColumn(NavigationPaneBorder, 1);
             NavigationPaneBorder.BorderThickness = new Thickness(1, 0, 0, 0);
             return;
         }
 
         Grid.SetColumn(NavigationPaneBorder, 0);
-        Grid.SetColumn(RootFrame, 1);
+        Grid.SetColumn(ContentAreaGrid, 1);
         NavigationPaneBorder.BorderThickness = new Thickness(0, 0, 1, 0);
     }
 

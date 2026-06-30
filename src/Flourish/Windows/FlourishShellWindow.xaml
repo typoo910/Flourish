@@ -29,8 +29,6 @@
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
         <RowDefinition Height="*" />
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
@@ -208,35 +206,7 @@
       </Grid>
 
       <Border
-        x:Name="ToolbarHostBorder"
         Grid.Row="1"
-        Margin="12,0,12,8"
-        Padding="6"
-        Background="{StaticResource CardBackgroundBrush}"
-        BorderBrush="{StaticResource CardBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="8"
-      >
-        <StackPanel x:Name="ToolbarItemsHost" Orientation="Horizontal" />
-      </Border>
-
-      <Border
-        x:Name="BreadcrumbHost"
-        Grid.Row="2"
-        Margin="12,0,12,8"
-        Padding="12,0"
-        Background="Transparent"
-      >
-        <TextBlock
-          x:Name="BreadcrumbText"
-          VerticalAlignment="Center"
-          FontSize="12"
-          Foreground="{StaticResource MutedTextBrush}"
-        />
-      </Border>
-
-      <Border
-        Grid.Row="3"
         Margin="12,0,12,8"
         Background="{StaticResource CardBackgroundBrush}"
         BorderBrush="{StaticResource CardBorderBrush}"
@@ -324,18 +294,54 @@
             </DockPanel>
           </Border>
 
-          <Frame
-            x:Name="RootFrame"
-            Grid.Column="1"
-            Focusable="False"
-            JournalOwnership="OwnsJournal"
-            NavigationUIVisibility="Hidden"
-          />
+          <Grid x:Name="ContentAreaGrid" Grid.Column="1">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border
+              x:Name="ToolbarHostBorder"
+              Grid.Row="0"
+              Margin="12,12,12,8"
+              Padding="6"
+              Background="{StaticResource CardBackgroundBrush}"
+              BorderBrush="{StaticResource CardBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="8"
+            >
+              <StackPanel x:Name="ToolbarItemsHost" Orientation="Horizontal" />
+            </Border>
+
+            <Border
+              x:Name="BreadcrumbHost"
+              Grid.Row="1"
+              Margin="12,0,12,8"
+              Padding="12,0"
+              Background="Transparent"
+            >
+              <TextBlock
+                x:Name="BreadcrumbText"
+                VerticalAlignment="Center"
+                FontSize="12"
+                Foreground="{StaticResource MutedTextBrush}"
+              />
+            </Border>
+
+            <Frame
+              x:Name="RootFrame"
+              Grid.Row="2"
+              Focusable="False"
+              JournalOwnership="OwnsJournal"
+              NavigationUIVisibility="Hidden"
+            />
+          </Grid>
         </Grid>
       </Border>
 
       <Border
-        Grid.Row="4"
+        Grid.Row="2"
         Padding="12,10"
         Background="{StaticResource CardSecondaryBackgroundBrush}"
         BorderBrush="{StaticResource CardBorderBrush}"
