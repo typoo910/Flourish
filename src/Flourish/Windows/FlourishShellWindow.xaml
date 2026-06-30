@@ -42,12 +42,10 @@
 
       <Border
         Grid.Row="1"
-        Margin="12,0,12,8"
-        Background="{StaticResource CardBackgroundBrush}"
-        BorderBrush="{StaticResource CardBorderBrush}"
-        BorderThickness="1"
+        Margin="0"
+        Background="Transparent"
+        BorderThickness="0"
         ClipToBounds="True"
-        CornerRadius="8"
       >
         <Grid x:Name="WorkAreaGrid">
           <Grid.ColumnDefinitions>
@@ -58,7 +56,7 @@
           <Border
             x:Name="NavigationPaneBorder"
             Grid.Column="0"
-            Background="#CCFBFCFE"
+            Background="Transparent"
             BorderBrush="{StaticResource CardBorderBrush}"
             BorderThickness="0,0,1,0"
           >
@@ -177,7 +175,7 @@
 
       <Border
         Grid.Row="2"
-        Padding="12,10"
+        Padding="10,4"
         Background="{StaticResource CardSecondaryBackgroundBrush}"
         BorderBrush="{StaticResource CardBorderBrush}"
         BorderThickness="0,1,0,0"
@@ -191,10 +189,16 @@
           <TextBlock
             x:Name="StatusTextBlock"
             VerticalAlignment="Center"
+            FontSize="{DynamicResource FlourishFontSizeCaption}"
             Foreground="{StaticResource MutedTextBrush}"
           />
 
-          <StackPanel x:Name="StatusItemsHost" Grid.Column="1" Orientation="Horizontal" />
+          <StackPanel
+            x:Name="StatusItemsHost"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+          />
         </Grid>
       </Border>
     </Grid>

@@ -265,6 +265,7 @@ internal partial class FlourishShellWindow : Window
     private void BuildStatusItems()
     {
         StatusItemsHost.Children.Clear();
+        var statusFontSize = (double)FindResource("FlourishFontSizeCaption");
 
         foreach (var item in statusService.StatusItems)
         {
@@ -272,7 +273,7 @@ internal partial class FlourishShellWindow : Window
             {
                 Margin =
                     StatusItemsHost.Children.Count > 0
-                        ? new Thickness(20, 0, 0, 0)
+                        ? new Thickness(14, 0, 0, 0)
                         : new Thickness(),
                 Orientation = Orientation.Horizontal,
             };
@@ -281,6 +282,7 @@ internal partial class FlourishShellWindow : Window
                 {
                     VerticalAlignment = VerticalAlignment.Center,
                     FontFamily = iconFontFamily,
+                    FontSize = statusFontSize,
                     Foreground = mutedTextBrush,
                     Text = item.IconGlyph,
                 }
@@ -288,8 +290,9 @@ internal partial class FlourishShellWindow : Window
             status.Children.Add(
                 new TextBlock
                 {
-                    Margin = new Thickness(7, 0, 0, 0),
+                    Margin = new Thickness(5, 0, 0, 0),
                     VerticalAlignment = VerticalAlignment.Center,
+                    FontSize = statusFontSize,
                     Text = item.Text,
                 }
             );
