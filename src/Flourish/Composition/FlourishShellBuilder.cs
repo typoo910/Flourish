@@ -59,6 +59,20 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
+    public IFlourishShellBuilder SetWindowPosition(
+        WindowStartupLocation startupLocation
+    )
+    {
+        options.WindowStartupLocation = startupLocation;
+        if (startupLocation != WindowStartupLocation.Manual)
+        {
+            options.WindowLeft = null;
+            options.WindowTop = null;
+        }
+
+        return this;
+    }
+
     public IFlourishShellBuilder SetWindowPosition(double left, double top)
     {
         ValidateFinite(left, nameof(left));
@@ -67,14 +81,6 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         options.WindowLeft = left;
         options.WindowTop = top;
         options.WindowStartupLocation = WindowStartupLocation.Manual;
-        return this;
-    }
-
-    public IFlourishShellBuilder SetWindowStartupLocation(
-        WindowStartupLocation startupLocation
-    )
-    {
-        options.WindowStartupLocation = startupLocation;
         return this;
     }
 

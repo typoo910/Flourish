@@ -16,11 +16,11 @@ public interface IFlourishShellBuilder
 
     IFlourishShellBuilder SetWindowMaxSize(double maxWidth, double maxHeight);
 
-    IFlourishShellBuilder SetWindowPosition(double left, double top);
-
-    IFlourishShellBuilder SetWindowStartupLocation(
+    IFlourishShellBuilder SetWindowPosition(
         WindowStartupLocation startupLocation
     );
+
+    IFlourishShellBuilder SetWindowPosition(double left, double top);
 
     IFlourishShellBuilder SetWindowState(WindowState windowState);
 
