@@ -10,14 +10,15 @@ public interface IFlourishShellBuilder
 
     IFlourishShellBuilder SetLogo(string packUri);
 
-    IFlourishShellBuilder UseFlourishTitlebar(
+    IFlourishShellBuilder UseTitlebar(
         bool EnableSearch = true,
-        bool EnableHistoryArrow = true,
+        bool EnableBreadcrumb = true,
         bool EnableNavToggle = true,
         bool EnableLogo = true,
         bool EnableTitle = true,
         bool EnableSubTitle = true,
-        bool EnableProfile = true
+        bool EnableProfile = true,
+        bool EnableTrayExit = false
     );
 
     IFlourishShellBuilder SetSearchPlaceholder(string placeholder);
@@ -28,9 +29,7 @@ public interface IFlourishShellBuilder
 
     IFlourishShellBuilder SetWindowMaxSize(double maxWidth, double maxHeight);
 
-    IFlourishShellBuilder SetWindowPosition(
-        WindowStartupLocation startupLocation
-    );
+    IFlourishShellBuilder SetWindowPosition(WindowStartupLocation startupLocation);
 
     IFlourishShellBuilder SetWindowPosition(double left, double top);
 
@@ -50,8 +49,7 @@ public interface IFlourishShellBuilder
 
     IFlourishShellBuilder UseDynamicToolbar(bool enabled = true);
 
-    IFlourishShellBuilder UseBreadcrumb(
-        bool enabled = true,
-        BreadcrumbShowOption mode = BreadcrumbShowOption.OnlyAvailable
+    IFlourishShellBuilder SetBreadcrumbBehavior(
+        BreadcrumbShowOption behavior = BreadcrumbShowOption.Auto
     );
 }

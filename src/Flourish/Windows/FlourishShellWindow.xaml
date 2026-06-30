@@ -37,8 +37,7 @@
       <control:FlourishTitlebar
         x:Name="Titlebar"
         Grid.Row="0"
-        Height="54"
-        Margin="6,4,6,0"
+        Height="40"
       />
 
       <Border

@@ -47,13 +47,13 @@ internal sealed class FlourishShellOptions
 
     public bool WindowShowInTaskbar { get; set; } = true;
 
+    public bool IsTrayExitEnabled { get; set; }
+
     public bool IsNavigationPanelEnabled { get; set; } = true;
 
     public NavigationPanelDirection NavigationPanelDirection { get; set; } = NavigationPanelDirection.Left;
 
     public bool IsTitlebarSearchEnabled { get; set; } = true;
-
-    public bool IsTitlebarHistoryArrowEnabled { get; set; } = true;
 
     public bool IsTitlebarNavigationToggleEnabled { get; set; } = true;
 
@@ -67,9 +67,9 @@ internal sealed class FlourishShellOptions
 
     public bool IsDynamicToolbarEnabled { get; set; }
 
-    public bool IsBreadcrumbEnabled { get; set; }
+    public bool IsBreadcrumbEnabled { get; set; } = true;
 
-    public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.OnlyAvailable;
+    public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.Auto;
 
     public double OpenPaneWidth { get; set; } = 220;
 

@@ -1,9 +1,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.ComponentModel;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Flourish.Models;
 using AcksheedSys.Flourish.Services;
+using Brush = System.Windows.Media.Brush;
+using Button = System.Windows.Controls.Button;
+using FontFamily = System.Windows.Media.FontFamily;
+using Orientation = System.Windows.Controls.Orientation;
 
 namespace AcksheedSys.Flourish.Windows;
 
@@ -13,6 +18,7 @@ internal partial class FlourishShellWindow : Window
     private readonly IFrameNavigationService frameNavigationService;
     private readonly IFlourishToolbarService toolbarService;
     private readonly IFlourishStatusService statusService;
+    private readonly ITrayIconService trayIconService;
     private readonly FlourishShellOptions options;
     private readonly Dictionary<string, FlourishNavigationItem> navigationItemsByKey = new(
         StringComparer.Ordinal
@@ -35,6 +41,7 @@ internal partial class FlourishShellWindow : Window
         IFrameNavigationService frameNavigationService,
         IFlourishToolbarService toolbarService,
         IFlourishStatusService statusService,
+        ITrayIconService trayIconService,
         FlourishShellOptions options
     )
     {
@@ -44,6 +51,7 @@ internal partial class FlourishShellWindow : Window
         this.frameNavigationService = frameNavigationService;
         this.toolbarService = toolbarService;
         this.statusService = statusService;
+        this.trayIconService = trayIconService;
         this.options = options;
 
         CacheResources();
@@ -54,6 +62,7 @@ internal partial class FlourishShellWindow : Window
         AttachTitlebarEvents();
 
         StateChanged += MainWindow_StateChanged;
+        Closing += ShellWindow_Closing;
         frameNavigationService.Initialize(RootFrame);
         navigationService.Navigated += RootFrame_Navigated;
 
@@ -78,7 +87,7 @@ internal partial class FlourishShellWindow : Window
         Titlebar.SetLogo(options.LogoSource, options.LogoFallbackText);
         Titlebar.ConfigureVisibility(
             options.IsTitlebarSearchEnabled,
-            options.IsTitlebarHistoryArrowEnabled,
+            IsBreadcrumbFeatureEnabled(),
             options.IsTitlebarNavigationToggleEnabled && options.IsNavigationPanelEnabled,
             options.IsTitlebarLogoEnabled,
             options.IsTitlebarTitleEnabled,
@@ -90,12 +99,14 @@ internal partial class FlourishShellWindow : Window
         NavigationPaneBorder.Visibility = options.IsNavigationPanelEnabled
             ? Visibility.Visible
             : Visibility.Collapsed;
-        BreadcrumbHost.Visibility = options.IsBreadcrumbEnabled
+        BreadcrumbHost.Visibility = IsBreadcrumbFeatureEnabled()
             ? Visibility.Visible
             : Visibility.Collapsed;
+        UpdateTitlebarBreadcrumbNavigation();
 
         ApplyNavigationPanelPlacement();
         SetPaneWidth(options.IsNavigationPanelEnabled ? options.OpenPaneWidth : 0);
+        trayIconService.Initialize(this, options.Title);
     }
 
     private void ApplyWindowOptions()
@@ -128,6 +139,7 @@ internal partial class FlourishShellWindow : Window
     private void AttachTitlebarEvents()
     {
         Titlebar.BackRequested += Titlebar_BackRequested;
+        Titlebar.ForwardRequested += Titlebar_ForwardRequested;
         Titlebar.NavigationToggleRequested += Titlebar_NavigationToggleRequested;
         Titlebar.MinimizeRequested += Titlebar_MinimizeRequested;
         Titlebar.MaximizeRequested += Titlebar_MaximizeRequested;
@@ -325,6 +337,14 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
+    private void Titlebar_ForwardRequested(object? sender, EventArgs e)
+    {
+        if (navigationService.CanGoForward)
+        {
+            navigationService.GoForward();
+        }
+    }
+
     private void Titlebar_NavigationToggleRequested(object? sender, EventArgs e)
     {
         isPaneOpen = !isPaneOpen;
@@ -348,7 +368,7 @@ internal partial class FlourishShellWindow : Window
 
     private void RootFrame_Navigated(object? sender, FlourishNavigatedEventArgs e)
     {
-        Titlebar.SetBackEnabled(navigationService.CanGoBack);
+        UpdateTitlebarBreadcrumbNavigation();
         BuildToolbarItems(e.SourcePageType);
         UpdateBreadcrumb(e.SourcePageType);
 
@@ -358,8 +378,7 @@ internal partial class FlourishShellWindow : Window
     private void UpdateBreadcrumb(Type sourcePageType)
     {
         if (
-            !options.IsBreadcrumbEnabled
-            || options.BreadcrumbShowOption == BreadcrumbShowOption.Hidden
+            !IsBreadcrumbFeatureEnabled()
         )
         {
             BreadcrumbHost.Visibility = Visibility.Collapsed;
@@ -367,8 +386,8 @@ internal partial class FlourishShellWindow : Window
         }
 
         if (
-            options.BreadcrumbShowOption == BreadcrumbShowOption.OnlyAvailable
-            && !navigationService.CanGoBack
+            options.BreadcrumbShowOption == BreadcrumbShowOption.Auto
+            && !HasBreadcrumbNavigation()
         )
         {
             BreadcrumbHost.Visibility = Visibility.Collapsed;
@@ -400,8 +419,34 @@ internal partial class FlourishShellWindow : Window
         if (!addToBackStack && navigationService.CanGoBack)
         {
             navigationService.ClearBackStack();
-            Titlebar.SetBackEnabled(false);
+            UpdateTitlebarBreadcrumbNavigation();
         }
+    }
+
+    private bool IsBreadcrumbFeatureEnabled()
+    {
+        return options.IsBreadcrumbEnabled
+            && options.BreadcrumbShowOption != BreadcrumbShowOption.Hidden;
+    }
+
+    private bool HasBreadcrumbNavigation()
+    {
+        return navigationService.CanGoBack || navigationService.CanGoForward;
+    }
+
+    private void UpdateTitlebarBreadcrumbNavigation()
+    {
+        var isVisible = IsBreadcrumbFeatureEnabled()
+            && (
+                options.BreadcrumbShowOption == BreadcrumbShowOption.Always
+                || HasBreadcrumbNavigation()
+            );
+
+        Titlebar.SetBreadcrumbNavigationState(
+            isVisible,
+            navigationService.CanGoBack,
+            navigationService.CanGoForward
+        );
     }
 
     private void Titlebar_DragRequested(object? sender, EventArgs e)
@@ -431,7 +476,22 @@ internal partial class FlourishShellWindow : Window
 
     private void Titlebar_CloseRequested(object? sender, EventArgs e)
     {
+        if (trayIconService.MinimizeToTray())
+        {
+            return;
+        }
+
         Close();
+    }
+
+    private void ShellWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        if (!trayIconService.IsEnabled || trayIconService.IsExitRequested)
+        {
+            return;
+        }
+
+        e.Cancel = trayIconService.MinimizeToTray();
     }
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)

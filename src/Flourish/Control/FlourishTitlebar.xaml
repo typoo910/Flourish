@@ -20,22 +20,45 @@
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
 
-    <Button
-      x:Name="BackButton"
+    <StackPanel
+      x:Name="BreadcrumbNavigationHost"
       Grid.Column="0"
-      Margin="2,8"
-      Click="BackButton_Click"
-      IsEnabled="False"
-      Style="{StaticResource FlourishIconButtonStyle}"
-      ToolTip="Back"
+      Margin="4,0,0,0"
+      Orientation="Horizontal"
     >
-      <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="14" Text="&#xE72B;" />
-    </Button>
+      <Button
+        x:Name="BackButton"
+        Width="38"
+        Height="32"
+        Margin="0,4,2,4"
+        Click="BackButton_Click"
+        IsEnabled="False"
+        Style="{StaticResource FlourishIconButtonStyle}"
+        ToolTip="Back"
+      >
+        <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="14" Text="&#xE72B;" />
+      </Button>
+
+      <Button
+        x:Name="ForwardButton"
+        Width="38"
+        Height="32"
+        Margin="2,4"
+        Click="ForwardButton_Click"
+        IsEnabled="False"
+        Style="{StaticResource FlourishIconButtonStyle}"
+        ToolTip="Forward"
+      >
+        <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="14" Text="&#xE72A;" />
+      </Button>
+    </StackPanel>
 
     <Button
       x:Name="NavigationToggleButton"
       Grid.Column="1"
-      Margin="2,8"
+      Width="38"
+      Height="32"
+      Margin="2,4"
       Click="NavigationToggleButton_Click"
       Style="{StaticResource FlourishIconButtonStyle}"
       ToolTip="Toggle navigation"
@@ -46,41 +69,48 @@
     <StackPanel
       x:Name="BrandHost"
       Grid.Column="2"
-      Margin="10,0,16,0"
+      Margin="8,0,14,0"
       VerticalAlignment="Center"
       MouseLeftButtonDown="Titlebar_MouseLeftButtonDown"
       Orientation="Horizontal"
     >
       <Border
         x:Name="LogoHost"
-        Width="32"
-        Height="32"
+        Width="26"
+        Height="26"
         Background="{StaticResource AccentSoftBrush}"
-        CornerRadius="8"
+        CornerRadius="6"
       >
         <Grid>
-          <Image x:Name="LogoImage" Margin="5" Stretch="Uniform" Visibility="Collapsed" />
+          <Image x:Name="LogoImage" Margin="4" Stretch="Uniform" />
           <TextBlock
             x:Name="LogoFallback"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            FontSize="15"
+            FontSize="13"
             FontWeight="SemiBold"
             Foreground="{StaticResource AccentBrush}"
           />
         </Grid>
       </Border>
-      <StackPanel x:Name="TitleTextHost" Margin="10,0,0,0" VerticalAlignment="Center">
+      <StackPanel
+        x:Name="TitleTextHost"
+        Margin="8,0,0,0"
+        VerticalAlignment="Center"
+        Orientation="Horizontal"
+      >
         <TextBlock
           x:Name="TitleText"
-          FontSize="15"
+          VerticalAlignment="Center"
+          FontSize="13"
           FontWeight="SemiBold"
           Foreground="{StaticResource PrimaryTextBrush}"
         />
         <TextBlock
           x:Name="SubtitleText"
-          Margin="0,1,0,0"
-          FontSize="11"
+          Margin="8,1,0,0"
+          VerticalAlignment="Center"
+          FontSize="10"
           Foreground="{StaticResource MutedTextBrush}"
         />
       </StackPanel>
@@ -96,8 +126,8 @@
       x:Name="SearchBoxHost"
       Grid.Column="4"
       Width="320"
-      Height="34"
-      Margin="8,0,12,0"
+      Height="28"
+      Margin="8,0,10,0"
       Padding="10,0"
       VerticalAlignment="Center"
       Background="White"
@@ -142,12 +172,12 @@
     <Border
       x:Name="ProfileHost"
       Grid.Column="5"
-      Width="30"
-      Height="30"
-      Margin="0,0,12,0"
+      Width="26"
+      Height="26"
+      Margin="0,0,10,0"
       VerticalAlignment="Center"
       Background="#E0F2FE"
-      CornerRadius="15"
+      CornerRadius="13"
     >
       <TextBlock
         HorizontalAlignment="Center"
@@ -162,7 +192,7 @@
     <Button
       Grid.Column="6"
       Click="MinimizeButton_Click"
-      Style="{StaticResource FlourishIconButtonStyle}"
+      Style="{StaticResource FlourishWindowCaptionButtonStyle}"
       ToolTip="Minimize"
     >
       <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE921;" />
@@ -172,7 +202,7 @@
       x:Name="MaximizeButton"
       Grid.Column="7"
       Click="MaximizeButton_Click"
-      Style="{StaticResource FlourishIconButtonStyle}"
+      Style="{StaticResource FlourishWindowCaptionButtonStyle}"
       ToolTip="Maximize"
     >
       <TextBlock
@@ -186,7 +216,7 @@
     <Button
       Grid.Column="8"
       Click="CloseButton_Click"
-      Style="{StaticResource FlourishCloseButtonStyle}"
+      Style="{StaticResource FlourishWindowCaptionCloseButtonStyle}"
       ToolTip="Close"
     >
       <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE8BB;" />

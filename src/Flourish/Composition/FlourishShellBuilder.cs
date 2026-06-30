@@ -25,23 +25,25 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
-    public IFlourishShellBuilder UseFlourishTitlebar(
+    public IFlourishShellBuilder UseTitlebar(
         bool EnableSearch = true,
-        bool EnableHistoryArrow = true,
+        bool EnableBreadcrumb = true,
         bool EnableNavToggle = true,
         bool EnableLogo = true,
         bool EnableTitle = true,
         bool EnableSubTitle = true,
-        bool EnableProfile = true
+        bool EnableProfile = true,
+        bool EnableTrayExit = false
     )
     {
         options.IsTitlebarSearchEnabled = EnableSearch;
-        options.IsTitlebarHistoryArrowEnabled = EnableHistoryArrow;
+        options.IsBreadcrumbEnabled = EnableBreadcrumb;
         options.IsTitlebarNavigationToggleEnabled = EnableNavToggle;
         options.IsTitlebarLogoEnabled = EnableLogo;
         options.IsTitlebarTitleEnabled = EnableTitle;
         options.IsTitlebarSubtitleEnabled = EnableSubTitle;
         options.IsTitlebarProfileEnabled = EnableProfile;
+        options.IsTrayExitEnabled = EnableTrayExit;
         return this;
     }
 
@@ -85,9 +87,7 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
-    public IFlourishShellBuilder SetWindowPosition(
-        WindowStartupLocation startupLocation
-    )
+    public IFlourishShellBuilder SetWindowPosition(WindowStartupLocation startupLocation)
     {
         options.WindowStartupLocation = startupLocation;
         if (startupLocation != WindowStartupLocation.Manual)
@@ -152,13 +152,11 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
-    public IFlourishShellBuilder UseBreadcrumb(
-        bool enabled = true,
-        BreadcrumbShowOption mode = BreadcrumbShowOption.OnlyAvailable
+    public IFlourishShellBuilder SetBreadcrumbBehavior(
+        BreadcrumbShowOption behavior = BreadcrumbShowOption.Auto
     )
     {
-        options.IsBreadcrumbEnabled = enabled;
-        options.BreadcrumbShowOption = mode;
+        options.BreadcrumbShowOption = behavior;
         return this;
     }
 
@@ -167,7 +165,11 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         ValidateFinite(value, parameterName);
         if (value <= 0)
         {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than 0.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                value,
+                "Value must be greater than 0."
+            );
         }
     }
 
@@ -175,7 +177,11 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
     {
         if (double.IsNaN(value) || value <= 0)
         {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than 0.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                value,
+                "Value must be greater than 0."
+            );
         }
     }
 
@@ -187,19 +193,35 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         }
     }
 
-    private static void EnsureMinDoesNotExceedMax(double minValue, double maxValue, string parameterName)
+    private static void EnsureMinDoesNotExceedMax(
+        double minValue,
+        double maxValue,
+        string parameterName
+    )
     {
         if (minValue > maxValue)
         {
-            throw new ArgumentOutOfRangeException(parameterName, minValue, "Minimum size cannot exceed maximum size.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                minValue,
+                "Minimum size cannot exceed maximum size."
+            );
         }
     }
 
-    private static void EnsureMaxIsNotBelowMin(double maxValue, double minValue, string parameterName)
+    private static void EnsureMaxIsNotBelowMin(
+        double maxValue,
+        double minValue,
+        string parameterName
+    )
     {
         if (maxValue < minValue)
         {
-            throw new ArgumentOutOfRangeException(parameterName, maxValue, "Maximum size cannot be below minimum size.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                maxValue,
+                "Maximum size cannot be below minimum size."
+            );
         }
     }
 }

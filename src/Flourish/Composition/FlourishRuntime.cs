@@ -3,6 +3,7 @@ using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Flourish.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Application = System.Windows.Application;
 
 namespace AcksheedSys.Flourish.Composition;
 

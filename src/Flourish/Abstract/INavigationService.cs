@@ -8,6 +8,8 @@ public interface INavigationService
 
     bool CanGoBack { get; }
 
+    bool CanGoForward { get; }
+
     Type? CurrentSourcePageType { get; }
 
     bool Navigate(Type sourcePageType, object? parameter = null, bool addToBackStack = true);
@@ -16,6 +18,8 @@ public interface INavigationService
         where TPage : Page;
 
     bool GoBack();
+
+    bool GoForward();
 
     void ClearBackStack();
 }

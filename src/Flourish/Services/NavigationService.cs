@@ -15,6 +15,8 @@ internal sealed class NavigationService(
 
     public bool CanGoBack => pageHistoryService.CanGoBack;
 
+    public bool CanGoForward => pageHistoryService.CanGoForward;
+
     public Type? CurrentSourcePageType { get; private set; }
 
     public void Initialize(Frame contentFrame)
@@ -35,12 +37,46 @@ internal sealed class NavigationService(
 
     public bool GoBack()
     {
-        if (!pageHistoryService.TryPop(out var entry))
+        if (!pageHistoryService.TryPopBack(out var entry))
         {
             return false;
         }
 
-        return NavigateCore(entry.SourcePageType, entry.Parameter, false);
+        if (CreateCurrentEntry() is { } currentEntry)
+        {
+            pageHistoryService.PushForward(currentEntry);
+        }
+
+        if (NavigateCore(entry.SourcePageType, entry.Parameter, false))
+        {
+            return true;
+        }
+
+        pageHistoryService.TryPopForward(out _);
+        pageHistoryService.Push(entry);
+        return false;
+    }
+
+    public bool GoForward()
+    {
+        if (!pageHistoryService.TryPopForward(out var entry))
+        {
+            return false;
+        }
+
+        if (CreateCurrentEntry() is { } currentEntry)
+        {
+            pageHistoryService.Push(currentEntry);
+        }
+
+        if (NavigateCore(entry.SourcePageType, entry.Parameter, false))
+        {
+            return true;
+        }
+
+        pageHistoryService.TryPopBack(out _);
+        pageHistoryService.PushForward(entry);
+        return false;
     }
 
     public void ClearBackStack()
@@ -67,6 +103,7 @@ internal sealed class NavigationService(
             pageHistoryService.Push(
                 new FlourishPageStackEntry(CurrentSourcePageType, currentParameter)
             );
+            pageHistoryService.ClearForward();
         }
 
         var page = pageCacheService.GetPage(sourcePageType);
@@ -76,5 +113,12 @@ internal sealed class NavigationService(
 
         Navigated?.Invoke(this, new FlourishNavigatedEventArgs(sourcePageType, page, parameter));
         return true;
+    }
+
+    private FlourishPageStackEntry? CreateCurrentEntry()
+    {
+        return CurrentSourcePageType is null
+            ? null
+            : new FlourishPageStackEntry(CurrentSourcePageType, currentParameter);
     }
 }

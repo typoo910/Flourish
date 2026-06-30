@@ -5,17 +5,27 @@ namespace AcksheedSys.Flourish.Services;
 internal sealed class PageHistoryService : IFlourishPageHistoryService
 {
     private readonly Stack<FlourishPageStackEntry> backStack = new();
+    private readonly Stack<FlourishPageStackEntry> forwardStack = new();
 
     public bool CanGoBack => backStack.Count > 0;
 
+    public bool CanGoForward => forwardStack.Count > 0;
+
     public IReadOnlyCollection<FlourishPageStackEntry> BackStack => backStack;
+
+    public IReadOnlyCollection<FlourishPageStackEntry> ForwardStack => forwardStack;
 
     public void Push(FlourishPageStackEntry entry)
     {
         backStack.Push(entry);
     }
 
-    public bool TryPop(out FlourishPageStackEntry entry)
+    public void PushForward(FlourishPageStackEntry entry)
+    {
+        forwardStack.Push(entry);
+    }
+
+    public bool TryPopBack(out FlourishPageStackEntry entry)
     {
         if (backStack.Count == 0)
         {
@@ -27,8 +37,26 @@ internal sealed class PageHistoryService : IFlourishPageHistoryService
         return true;
     }
 
+    public bool TryPopForward(out FlourishPageStackEntry entry)
+    {
+        if (forwardStack.Count == 0)
+        {
+            entry = default!;
+            return false;
+        }
+
+        entry = forwardStack.Pop();
+        return true;
+    }
+
+    public void ClearForward()
+    {
+        forwardStack.Clear();
+    }
+
     public void Clear()
     {
         backStack.Clear();
+        forwardStack.Clear();
     }
 }

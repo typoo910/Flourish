@@ -1,18 +1,27 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using TextChangedEventArgs = System.Windows.Controls.TextChangedEventArgs;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace AcksheedSys.Flourish.Control;
 
 internal partial class FlourishTitlebar : UserControl
 {
+    private const string DefaultIconUri = "pack://application:,,,/Flourish;component/Assets/favicon.ico";
+    private static readonly ImageSource? DefaultLogoSource = CreateDefaultLogoSource();
+
     public FlourishTitlebar()
     {
         InitializeComponent();
     }
 
     public event EventHandler? BackRequested;
+
+    public event EventHandler? ForwardRequested;
 
     public event EventHandler? NavigationToggleRequested;
 
@@ -44,9 +53,10 @@ internal partial class FlourishTitlebar : UserControl
 
     public void SetLogo(ImageSource? logoSource, string fallbackText)
     {
-        if (logoSource is not null)
+        var effectiveLogoSource = logoSource ?? DefaultLogoSource;
+        if (effectiveLogoSource is not null)
         {
-            LogoImage.Source = logoSource;
+            LogoImage.Source = effectiveLogoSource;
             LogoImage.Visibility = Visibility.Visible;
             LogoFallback.Visibility = Visibility.Collapsed;
             return;
@@ -57,9 +67,17 @@ internal partial class FlourishTitlebar : UserControl
         LogoFallback.Visibility = Visibility.Visible;
     }
 
-    public void SetBackEnabled(bool enabled)
+    public void SetBreadcrumbNavigationState(
+        bool isVisible,
+        bool canGoBack,
+        bool canGoForward
+    )
     {
-        BackButton.IsEnabled = enabled;
+        BreadcrumbNavigationHost.Visibility = ToVisibility(isVisible);
+        BackButton.Visibility = ToVisibility(isVisible && (canGoBack || !canGoForward));
+        BackButton.IsEnabled = canGoBack;
+        ForwardButton.Visibility = ToVisibility(isVisible && canGoForward);
+        ForwardButton.IsEnabled = canGoForward;
     }
 
     public void SetMaximizeEnabled(bool enabled)
@@ -74,7 +92,7 @@ internal partial class FlourishTitlebar : UserControl
 
     public void ConfigureVisibility(
         bool enableSearch,
-        bool enableHistoryArrow,
+        bool enableBreadcrumb,
         bool enableNavToggle,
         bool enableLogo,
         bool enableTitle,
@@ -82,11 +100,13 @@ internal partial class FlourishTitlebar : UserControl
         bool enableProfile
     )
     {
-        BackButton.Visibility = ToVisibility(enableHistoryArrow);
+        BreadcrumbNavigationHost.Visibility = ToVisibility(enableBreadcrumb);
         NavigationToggleButton.Visibility = ToVisibility(enableNavToggle);
         LogoHost.Visibility = ToVisibility(enableLogo);
         TitleText.Visibility = ToVisibility(enableTitle);
         SubtitleText.Visibility = ToVisibility(enableSubTitle);
+        SubtitleText.Margin =
+            enableTitle && enableSubTitle ? new Thickness(8, 1, 0, 0) : new Thickness();
         TitleTextHost.Visibility = ToVisibility(enableTitle || enableSubTitle);
         BrandHost.Visibility = ToVisibility(enableLogo || enableTitle || enableSubTitle);
         SearchBoxHost.Visibility = ToVisibility(enableSearch);
@@ -96,6 +116,11 @@ internal partial class FlourishTitlebar : UserControl
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {
         BackRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ForwardButton_Click(object sender, RoutedEventArgs e)
+    {
+        ForwardRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void NavigationToggleButton_Click(object sender, RoutedEventArgs e)
@@ -152,6 +177,32 @@ internal partial class FlourishTitlebar : UserControl
     private static Visibility ToVisibility(bool visible)
     {
         return visible ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private static ImageSource? CreateDefaultLogoSource()
+    {
+        try
+        {
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(DefaultIconUri, UriKind.Absolute);
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.EndInit();
+            image.Freeze();
+            return image;
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+        catch (NotSupportedException)
+        {
+            return null;
+        }
     }
 
     private void UpdateSearchPlaceholderVisibility()

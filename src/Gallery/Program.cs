@@ -38,14 +38,15 @@ internal static class Program
                 (_, shell) =>
                 {
                     shell
-                        .UseFlourishTitlebar(
+                        .UseTitlebar(
                             EnableSearch: true,
-                            EnableHistoryArrow: true,
+                            EnableBreadcrumb: true,
                             EnableNavToggle: true,
                             EnableLogo: true,
                             EnableTitle: true,
                             EnableSubTitle: true,
-                            EnableProfile: true
+                            EnableProfile: true,
+                            EnableTrayExit: false
                         )
                         .UseNavigationPanel(
                             enabled: true,
@@ -53,7 +54,7 @@ internal static class Program
                             title: "导航"
                         )
                         .UseDynamicToolbar()
-                        .UseBreadcrumb(enabled: true, mode: BreadcrumbShowOption.OnlyAvailable)
+                        .SetBreadcrumbBehavior(BreadcrumbShowOption.Auto)
                         .SetTitle("Gallery")
                         .SetSubtitle("图片管理器")
                         .SetSearchPlaceholder("搜索图片")
