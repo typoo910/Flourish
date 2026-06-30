@@ -1,4 +1,5 @@
 using System.Windows.Media;
+using System.Windows;
 using AcksheedSys.Flourish.Abstract;
 
 namespace AcksheedSys.Flourish.Models;
@@ -18,6 +19,33 @@ internal sealed class FlourishShellOptions
     public ImageSource? LogoSource { get; set; }
 
     public string LogoFallbackText { get; set; } = "F";
+
+    public double WindowWidth { get; set; } = 1100;
+
+    public double WindowHeight { get; set; } = 720;
+
+    public double WindowMinWidth { get; set; } = 820;
+
+    public double WindowMinHeight { get; set; } = 560;
+
+    public double WindowMaxWidth { get; set; } = double.PositiveInfinity;
+
+    public double WindowMaxHeight { get; set; } = double.PositiveInfinity;
+
+    public double? WindowLeft { get; set; }
+
+    public double? WindowTop { get; set; }
+
+    public WindowStartupLocation WindowStartupLocation { get; set; } =
+        WindowStartupLocation.CenterScreen;
+
+    public WindowState WindowState { get; set; } = WindowState.Normal;
+
+    public ResizeMode WindowResizeMode { get; set; } = ResizeMode.CanResize;
+
+    public bool WindowTopmost { get; set; }
+
+    public bool WindowShowInTaskbar { get; set; } = true;
 
     public bool IsNavigationPanelEnabled { get; set; } = true;
 

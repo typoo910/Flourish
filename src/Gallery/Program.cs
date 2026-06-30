@@ -38,6 +38,8 @@ internal static class Program
                 {
                     shell
                         .SetTitle("Gallery")
+                        .SetWindowSize(1536, 864)
+                        .SetWindowMinSize(1280, 720)
                         .SetSubtitle("图片管理器")
                         .UseNavigationPanel(
                             enabled: true,

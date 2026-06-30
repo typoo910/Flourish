@@ -183,6 +183,7 @@
         </Button>
 
         <Button
+          x:Name="MaximizeButton"
           Grid.Column="7"
           Click="MaximizeButton_Click"
           Style="{StaticResource FlourishIconButtonStyle}"

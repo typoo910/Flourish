@@ -1,3 +1,5 @@
+using System.Windows;
+
 namespace AcksheedSys.Flourish.Abstract;
 
 public interface IFlourishShellBuilder
@@ -7,6 +9,26 @@ public interface IFlourishShellBuilder
     IFlourishShellBuilder SetSubtitle(string subtitle);
 
     IFlourishShellBuilder SetLogo(string packUri);
+
+    IFlourishShellBuilder SetWindowSize(double width, double height);
+
+    IFlourishShellBuilder SetWindowMinSize(double minWidth, double minHeight);
+
+    IFlourishShellBuilder SetWindowMaxSize(double maxWidth, double maxHeight);
+
+    IFlourishShellBuilder SetWindowPosition(double left, double top);
+
+    IFlourishShellBuilder SetWindowStartupLocation(
+        WindowStartupLocation startupLocation
+    );
+
+    IFlourishShellBuilder SetWindowState(WindowState windowState);
+
+    IFlourishShellBuilder SetWindowResizeMode(ResizeMode resizeMode);
+
+    IFlourishShellBuilder UseTopmost(bool enabled = true);
+
+    IFlourishShellBuilder ShowInTaskbar(bool enabled = true);
 
     IFlourishShellBuilder UseNavigationPanel(
         bool enabled = true,

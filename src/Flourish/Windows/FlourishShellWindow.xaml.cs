@@ -70,6 +70,7 @@ internal partial class FlourishShellWindow : Window
 
     private void ApplyOptions()
     {
+        ApplyWindowOptions();
         Title = options.Title;
         AppTitleText.Text = options.Title;
         AppSubtitleText.Text = options.Subtitle;
@@ -104,6 +105,33 @@ internal partial class FlourishShellWindow : Window
             ? "F"
             : options.LogoFallbackText[..1];
         AppLogoFallback.Visibility = Visibility.Visible;
+    }
+
+    private void ApplyWindowOptions()
+    {
+        MinWidth = options.WindowMinWidth;
+        MinHeight = options.WindowMinHeight;
+        MaxWidth = options.WindowMaxWidth;
+        MaxHeight = options.WindowMaxHeight;
+        Width = options.WindowWidth;
+        Height = options.WindowHeight;
+        WindowStartupLocation = options.WindowStartupLocation;
+        ResizeMode = options.WindowResizeMode;
+        Topmost = options.WindowTopmost;
+        ShowInTaskbar = options.WindowShowInTaskbar;
+
+        if (options.WindowLeft is { } left)
+        {
+            Left = left;
+        }
+
+        if (options.WindowTop is { } top)
+        {
+            Top = top;
+        }
+
+        WindowState = options.WindowState;
+        MaximizeButton.IsEnabled = ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip;
     }
 
     private void ApplyNavigationPanelPlacement()
@@ -397,6 +425,11 @@ internal partial class FlourishShellWindow : Window
 
     private void MaximizeButton_Click(object sender, RoutedEventArgs e)
     {
+        if (ResizeMode is not (ResizeMode.CanResize or ResizeMode.CanResizeWithGrip))
+        {
+            return;
+        }
+
         ToggleWindowState();
     }
 
@@ -412,6 +445,11 @@ internal partial class FlourishShellWindow : Window
 
     private void ToggleWindowState()
     {
+        if (ResizeMode is not (ResizeMode.CanResize or ResizeMode.CanResizeWithGrip))
+        {
+            return;
+        }
+
         WindowState =
             WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     }
