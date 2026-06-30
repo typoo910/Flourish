@@ -25,6 +25,32 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
+    public IFlourishShellBuilder UseFlourishTitlebar(
+        bool EnableSearch = true,
+        bool EnableHistoryArrow = true,
+        bool EnableNavToggle = true,
+        bool EnableLogo = true,
+        bool EnableTitle = true,
+        bool EnableSubTitle = true,
+        bool EnableProfile = true
+    )
+    {
+        options.IsTitlebarSearchEnabled = EnableSearch;
+        options.IsTitlebarHistoryArrowEnabled = EnableHistoryArrow;
+        options.IsTitlebarNavigationToggleEnabled = EnableNavToggle;
+        options.IsTitlebarLogoEnabled = EnableLogo;
+        options.IsTitlebarTitleEnabled = EnableTitle;
+        options.IsTitlebarSubtitleEnabled = EnableSubTitle;
+        options.IsTitlebarProfileEnabled = EnableProfile;
+        return this;
+    }
+
+    public IFlourishShellBuilder SetSearchPlaceholder(string placeholder)
+    {
+        options.SearchPlaceholder = placeholder;
+        return this;
+    }
+
     public IFlourishShellBuilder SetWindowSize(double width, double height)
     {
         ValidatePositiveFinite(width, nameof(width));
@@ -117,16 +143,6 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         options.IsNavigationPanelEnabled = enabled;
         options.NavigationPanelDirection = direction;
         options.PaneTitle = title;
-        return this;
-    }
-
-    public IFlourishShellBuilder UseSearchOnTitlebar(
-        bool enabled = true,
-        string placeholder = "Search"
-    )
-    {
-        options.IsTitlebarSearchEnabled = enabled;
-        options.SearchPlaceholder = placeholder;
         return this;
     }
 

@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Flourish.Models;
@@ -52,6 +51,7 @@ internal partial class FlourishShellWindow : Window
         BuildToolbarItems();
         BuildNavigationItems();
         BuildStatusItems();
+        AttachTitlebarEvents();
 
         StateChanged += MainWindow_StateChanged;
         frameNavigationService.Initialize(RootFrame);
@@ -72,18 +72,22 @@ internal partial class FlourishShellWindow : Window
     {
         ApplyWindowOptions();
         Title = options.Title;
-        AppTitleText.Text = options.Title;
-        AppSubtitleText.Text = options.Subtitle;
+        Titlebar.SetTitle(options.Title);
+        Titlebar.SetSubtitle(options.Subtitle);
+        Titlebar.SetSearchPlaceholder(options.SearchPlaceholder);
+        Titlebar.SetLogo(options.LogoSource, options.LogoFallbackText);
+        Titlebar.ConfigureVisibility(
+            options.IsTitlebarSearchEnabled,
+            options.IsTitlebarHistoryArrowEnabled,
+            options.IsTitlebarNavigationToggleEnabled && options.IsNavigationPanelEnabled,
+            options.IsTitlebarLogoEnabled,
+            options.IsTitlebarTitleEnabled,
+            options.IsTitlebarSubtitleEnabled,
+            options.IsTitlebarProfileEnabled
+        );
         PaneTitle.Text = options.PaneTitle;
-        SearchBox.Text = options.SearchPlaceholder;
         StatusTextBlock.Text = statusService.StatusText;
-        SearchBoxHost.Visibility = options.IsTitlebarSearchEnabled
-            ? Visibility.Visible
-            : Visibility.Collapsed;
         NavigationPaneBorder.Visibility = options.IsNavigationPanelEnabled
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        PaneToggleButton.Visibility = options.IsNavigationPanelEnabled
             ? Visibility.Visible
             : Visibility.Collapsed;
         BreadcrumbHost.Visibility = options.IsBreadcrumbEnabled
@@ -92,19 +96,6 @@ internal partial class FlourishShellWindow : Window
 
         ApplyNavigationPanelPlacement();
         SetPaneWidth(options.IsNavigationPanelEnabled ? options.OpenPaneWidth : 0);
-
-        if (options.LogoSource is not null)
-        {
-            AppLogoImage.Source = options.LogoSource;
-            AppLogoImage.Visibility = Visibility.Visible;
-            AppLogoFallback.Visibility = Visibility.Collapsed;
-            return;
-        }
-
-        AppLogoFallback.Text = string.IsNullOrWhiteSpace(options.LogoFallbackText)
-            ? "F"
-            : options.LogoFallbackText[..1];
-        AppLogoFallback.Visibility = Visibility.Visible;
     }
 
     private void ApplyWindowOptions()
@@ -131,7 +122,18 @@ internal partial class FlourishShellWindow : Window
         }
 
         WindowState = options.WindowState;
-        MaximizeButton.IsEnabled = ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip;
+        Titlebar.SetMaximizeEnabled(ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip);
+    }
+
+    private void AttachTitlebarEvents()
+    {
+        Titlebar.BackRequested += Titlebar_BackRequested;
+        Titlebar.NavigationToggleRequested += Titlebar_NavigationToggleRequested;
+        Titlebar.MinimizeRequested += Titlebar_MinimizeRequested;
+        Titlebar.MaximizeRequested += Titlebar_MaximizeRequested;
+        Titlebar.CloseRequested += Titlebar_CloseRequested;
+        Titlebar.DragRequested += Titlebar_DragRequested;
+        Titlebar.ToggleWindowStateRequested += Titlebar_ToggleWindowStateRequested;
     }
 
     private void ApplyNavigationPanelPlacement()
@@ -315,7 +317,7 @@ internal partial class FlourishShellWindow : Window
         return key is not null && navigationItemsByKey.TryGetValue(key, out var item) ? item : null;
     }
 
-    private void TitleBar_BackRequested(object sender, RoutedEventArgs e)
+    private void Titlebar_BackRequested(object? sender, EventArgs e)
     {
         if (navigationService.CanGoBack)
         {
@@ -323,7 +325,7 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private void TitleBar_PaneToggleRequested(object sender, RoutedEventArgs e)
+    private void Titlebar_NavigationToggleRequested(object? sender, EventArgs e)
     {
         isPaneOpen = !isPaneOpen;
         SetPaneWidth(isPaneOpen ? options.OpenPaneWidth : options.ClosedPaneWidth);
@@ -346,7 +348,7 @@ internal partial class FlourishShellWindow : Window
 
     private void RootFrame_Navigated(object? sender, FlourishNavigatedEventArgs e)
     {
-        BackButton.IsEnabled = navigationService.CanGoBack;
+        Titlebar.SetBackEnabled(navigationService.CanGoBack);
         BuildToolbarItems(e.SourcePageType);
         UpdateBreadcrumb(e.SourcePageType);
 
@@ -398,32 +400,26 @@ internal partial class FlourishShellWindow : Window
         if (!addToBackStack && navigationService.CanGoBack)
         {
             navigationService.ClearBackStack();
-            BackButton.IsEnabled = false;
+            Titlebar.SetBackEnabled(false);
         }
     }
 
-    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void Titlebar_DragRequested(object? sender, EventArgs e)
     {
-        if (e.ButtonState != MouseButtonState.Pressed)
-        {
-            return;
-        }
-
-        if (e.ClickCount == 2)
-        {
-            ToggleWindowState();
-            return;
-        }
-
         DragMove();
     }
 
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    private void Titlebar_ToggleWindowStateRequested(object? sender, EventArgs e)
+    {
+        ToggleWindowState();
+    }
+
+    private void Titlebar_MinimizeRequested(object? sender, EventArgs e)
     {
         WindowState = WindowState.Minimized;
     }
 
-    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+    private void Titlebar_MaximizeRequested(object? sender, EventArgs e)
     {
         if (ResizeMode is not (ResizeMode.CanResize or ResizeMode.CanResizeWithGrip))
         {
@@ -433,14 +429,14 @@ internal partial class FlourishShellWindow : Window
         ToggleWindowState();
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    private void Titlebar_CloseRequested(object? sender, EventArgs e)
     {
         Close();
     }
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
-        MaximizeButtonIcon.Text = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+        Titlebar.SetMaximized(WindowState == WindowState.Maximized);
     }
 
     private void ToggleWindowState()

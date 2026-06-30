@@ -53,6 +53,18 @@ internal sealed class FlourishShellOptions
 
     public bool IsTitlebarSearchEnabled { get; set; } = true;
 
+    public bool IsTitlebarHistoryArrowEnabled { get; set; } = true;
+
+    public bool IsTitlebarNavigationToggleEnabled { get; set; } = true;
+
+    public bool IsTitlebarLogoEnabled { get; set; } = true;
+
+    public bool IsTitlebarTitleEnabled { get; set; } = true;
+
+    public bool IsTitlebarSubtitleEnabled { get; set; } = true;
+
+    public bool IsTitlebarProfileEnabled { get; set; } = true;
+
     public bool IsDynamicToolbarEnabled { get; set; }
 
     public bool IsBreadcrumbEnabled { get; set; }

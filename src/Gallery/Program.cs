@@ -38,19 +38,28 @@ internal static class Program
                 (_, shell) =>
                 {
                     shell
-                        .SetTitle("Gallery")
-                        .SetWindowSize(1536, 864)
-                        .SetWindowMinSize(1280, 720)
-                        .SetWindowPosition(WindowStartupLocation.CenterScreen)
-                        .SetSubtitle("图片管理器")
+                        .UseFlourishTitlebar(
+                            EnableSearch: true,
+                            EnableHistoryArrow: true,
+                            EnableNavToggle: true,
+                            EnableLogo: true,
+                            EnableTitle: true,
+                            EnableSubTitle: true,
+                            EnableProfile: true
+                        )
                         .UseNavigationPanel(
                             enabled: true,
                             direction: NavigationPanelDirection.Left,
                             title: "导航"
                         )
-                        .UseSearchOnTitlebar(enabled: true, placeholder: "搜索图片")
                         .UseDynamicToolbar()
-                        .UseBreadcrumb(enabled: true, mode: BreadcrumbShowOption.OnlyAvailable);
+                        .UseBreadcrumb(enabled: true, mode: BreadcrumbShowOption.OnlyAvailable)
+                        .SetTitle("Gallery")
+                        .SetSubtitle("图片管理器")
+                        .SetSearchPlaceholder("搜索图片")
+                        .SetWindowSize(1536, 864)
+                        .SetWindowMinSize(1280, 720)
+                        .SetWindowPosition(WindowStartupLocation.CenterScreen);
                 }
             )
             .ConfigureDynamicToolbar(

@@ -10,6 +10,18 @@ public interface IFlourishShellBuilder
 
     IFlourishShellBuilder SetLogo(string packUri);
 
+    IFlourishShellBuilder UseFlourishTitlebar(
+        bool EnableSearch = true,
+        bool EnableHistoryArrow = true,
+        bool EnableNavToggle = true,
+        bool EnableLogo = true,
+        bool EnableTitle = true,
+        bool EnableSubTitle = true,
+        bool EnableProfile = true
+    );
+
+    IFlourishShellBuilder SetSearchPlaceholder(string placeholder);
+
     IFlourishShellBuilder SetWindowSize(double width, double height);
 
     IFlourishShellBuilder SetWindowMinSize(double minWidth, double minHeight);
@@ -35,8 +47,6 @@ public interface IFlourishShellBuilder
         NavigationPanelDirection direction = NavigationPanelDirection.Left,
         string title = "Navigation"
     );
-
-    IFlourishShellBuilder UseSearchOnTitlebar(bool enabled = true, string placeholder = "Search");
 
     IFlourishShellBuilder UseDynamicToolbar(bool enabled = true);
 

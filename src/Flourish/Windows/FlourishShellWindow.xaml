@@ -4,6 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:control="clr-namespace:AcksheedSys.Flourish.Control"
   xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
   Width="1100"
   Height="720"
@@ -33,177 +34,12 @@
         <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
 
-      <Grid x:Name="AppTitleBar" Grid.Row="0" Height="54" Margin="6,4,6,0" Background="Transparent">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="*" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-        <Button
-          x:Name="BackButton"
-          Grid.Column="0"
-          Margin="2,8"
-          Click="TitleBar_BackRequested"
-          IsEnabled="False"
-          Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Back"
-        >
-          <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="14" Text="&#xE72B;" />
-        </Button>
-
-        <Button
-          x:Name="PaneToggleButton"
-          Grid.Column="1"
-          Margin="2,8"
-          Click="TitleBar_PaneToggleRequested"
-          Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Toggle navigation"
-        >
-          <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE700;" />
-        </Button>
-
-        <StackPanel
-          Grid.Column="2"
-          Margin="10,0,16,0"
-          VerticalAlignment="Center"
-          MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-          Orientation="Horizontal"
-        >
-          <Border
-            Width="32"
-            Height="32"
-            Background="{StaticResource AccentSoftBrush}"
-            CornerRadius="8"
-          >
-            <Grid>
-              <Image x:Name="AppLogoImage" Margin="5" Stretch="Uniform" Visibility="Collapsed" />
-              <TextBlock
-                x:Name="AppLogoFallback"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontSize="15"
-                FontWeight="SemiBold"
-                Foreground="{StaticResource AccentBrush}"
-              />
-            </Grid>
-          </Border>
-          <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
-            <TextBlock
-              x:Name="AppTitleText"
-              FontSize="15"
-              FontWeight="SemiBold"
-              Foreground="{StaticResource PrimaryTextBrush}"
-            />
-            <TextBlock
-              x:Name="AppSubtitleText"
-              Margin="0,1,0,0"
-              FontSize="11"
-              Foreground="{StaticResource MutedTextBrush}"
-            />
-          </StackPanel>
-        </StackPanel>
-
-        <Border
-          Grid.Column="3"
-          Background="Transparent"
-          MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-        />
-
-        <Border
-          x:Name="SearchBoxHost"
-          Grid.Column="4"
-          Width="320"
-          Height="34"
-          Margin="8,0,12,0"
-          Padding="10,0"
-          VerticalAlignment="Center"
-          Background="White"
-          BorderBrush="{StaticResource CardBorderBrush}"
-          BorderThickness="1"
-          CornerRadius="8"
-        >
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-              VerticalAlignment="Center"
-              FontFamily="Segoe MDL2 Assets"
-              Foreground="{StaticResource MutedTextBrush}"
-              Text="&#xE721;"
-            />
-            <TextBox
-              x:Name="SearchBox"
-              Grid.Column="1"
-              Margin="8,0,0,0"
-              VerticalContentAlignment="Center"
-              Background="Transparent"
-              BorderThickness="0"
-              Foreground="{StaticResource PrimaryTextBrush}"
-            />
-          </Grid>
-        </Border>
-
-        <Border
-          Grid.Column="5"
-          Width="30"
-          Height="30"
-          Margin="0,0,12,0"
-          VerticalAlignment="Center"
-          Background="#E0F2FE"
-          CornerRadius="15"
-        >
-          <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontSize="12"
-            FontWeight="SemiBold"
-            Foreground="#0369A1"
-            Text="JD"
-          />
-        </Border>
-
-        <Button
-          Grid.Column="6"
-          Click="MinimizeButton_Click"
-          Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Minimize"
-        >
-          <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE921;" />
-        </Button>
-
-        <Button
-          x:Name="MaximizeButton"
-          Grid.Column="7"
-          Click="MaximizeButton_Click"
-          Style="{StaticResource FlourishIconButtonStyle}"
-          ToolTip="Maximize"
-        >
-          <TextBlock
-            x:Name="MaximizeButtonIcon"
-            FontFamily="Segoe MDL2 Assets"
-            FontSize="11"
-            Text="&#xE922;"
-          />
-        </Button>
-
-        <Button
-          Grid.Column="8"
-          Click="CloseButton_Click"
-          Style="{StaticResource FlourishCloseButtonStyle}"
-          ToolTip="Close"
-        >
-          <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="11" Text="&#xE8BB;" />
-        </Button>
-      </Grid>
+      <control:FlourishTitlebar
+        x:Name="Titlebar"
+        Grid.Row="0"
+        Height="54"
+        Margin="6,4,6,0"
+      />
 
       <Border
         Grid.Row="1"
