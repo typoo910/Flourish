@@ -63,11 +63,12 @@
             <DockPanel LastChildFill="True">
               <TextBlock
                 x:Name="PaneTitle"
-                Margin="20,16,16,8"
+                Margin="16,10,12,6"
                 DockPanel.Dock="Top"
-                FontSize="{DynamicResource FlourishFontSizeCaption}"
-                FontWeight="SemiBold"
+                FontSize="{DynamicResource FlourishFontSizeSmall}"
+                FontWeight="Normal"
                 Foreground="{StaticResource MutedTextBrush}"
+                Opacity="0.72"
               />
 
               <ListBox
@@ -89,22 +90,25 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                   <DataTemplate>
-                    <Grid>
+                    <Grid x:Name="NavigationItemLayout">
                       <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="20" />
                         <ColumnDefinition Width="*" />
                       </Grid.ColumnDefinitions>
                       <TextBlock
+                        x:Name="NavigationItemIcon"
+                        Width="20"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         FontFamily="{DynamicResource FlourishIconFontFamily}"
                         FontSize="{DynamicResource FlourishFontSizeNavigationIcon}"
+                        TextAlignment="Center"
                         Text="{Binding IconGlyph}"
                       />
                       <TextBlock
                         x:Name="NavigationItemLabel"
                         Grid.Column="1"
-                        Margin="10,0,0,0"
+                        Margin="8,0,0,0"
                         VerticalAlignment="Center"
                         Text="{Binding Label}"
                       />
@@ -118,6 +122,11 @@
                           TargetName="NavigationItemLabel"
                           Property="Visibility"
                           Value="Collapsed"
+                        />
+                        <Setter
+                          TargetName="NavigationItemLayout"
+                          Property="Width"
+                          Value="20"
                         />
                       </DataTrigger>
                     </DataTemplate.Triggers>

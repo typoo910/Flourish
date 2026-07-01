@@ -81,7 +81,7 @@ internal sealed class FontService(FlourishShellOptions options) : IFlourishFontS
         SetResource(window, "FlourishFontSizeBase", baseSize);
         SetResource(window, "FlourishFontSizeTitle", baseSize);
         SetResource(window, "FlourishFontSizeTitlebarIcon", ClampFontSize(baseSize + 1));
-        SetResource(window, "FlourishFontSizeNavigationIcon", ClampFontSize(baseSize + 3));
+        SetResource(window, "FlourishFontSizeNavigationIcon", ClampFontSize(baseSize + 1));
         SetResource(window, "FlourishFontSizeWindowButtonIcon", ClampFontSize(baseSize - 2));
     }
 

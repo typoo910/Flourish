@@ -28,7 +28,7 @@
   <sys:Double
     x:Key="FlourishFontSizeNavigationIcon"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  >16</sys:Double>
+  >14</sys:Double>
   <sys:Double
     x:Key="FlourishFontSizeWindowButtonIcon"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
