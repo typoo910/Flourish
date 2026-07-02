@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.ComponentModel;
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 using AcksheedSys.Flourish.Services;
 using Brush = System.Windows.Media.Brush;
 using Button = System.Windows.Controls.Button;
@@ -16,9 +16,9 @@ internal partial class FlourishShellWindow : Window
 {
     private readonly INavigationService navigationService;
     private readonly IFrameNavigationService frameNavigationService;
-    private readonly IFlourishToolbarService toolbarService;
-    private readonly IFlourishStatusService statusService;
-    private readonly ITrayIconService trayIconService;
+    private readonly FlourishToolbarService toolbarService;
+    private readonly FlourishStatusService statusService;
+    private readonly TrayIconService trayIconService;
     private readonly CommandParser commandParser;
     private readonly FontService fontService;
     private readonly MaterialEffectService materialEffectService;
@@ -44,9 +44,9 @@ internal partial class FlourishShellWindow : Window
     public FlourishShellWindow(
         INavigationService navigationService,
         IFrameNavigationService frameNavigationService,
-        IFlourishToolbarService toolbarService,
-        IFlourishStatusService statusService,
-        ITrayIconService trayIconService,
+        FlourishToolbarService toolbarService,
+        FlourishStatusService statusService,
+        TrayIconService trayIconService,
         CommandParser commandParser,
         FontService fontService,
         MaterialEffectService materialEffectService,

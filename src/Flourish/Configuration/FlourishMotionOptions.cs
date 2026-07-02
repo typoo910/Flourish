@@ -1,6 +1,6 @@
 using AcksheedSys.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Models;
+namespace AcksheedSys.Flourish.Configuration;
 
 internal sealed class FlourishMotionOptions
 {

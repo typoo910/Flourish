@@ -1,9 +1,9 @@
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 
 namespace AcksheedSys.Flourish.Services;
 
-internal sealed class FlourishToolbarService(FlourishShellOptions options) : IFlourishToolbarService
+internal sealed class FlourishToolbarService(FlourishShellOptions options)
 {
     public IReadOnlyList<FlourishToolbarItem> GetToolbarItems(Type? pageType = null)
     {

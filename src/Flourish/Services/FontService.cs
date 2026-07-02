@@ -1,12 +1,12 @@
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 using Application = System.Windows.Application;
 using FontFamily = System.Windows.Media.FontFamily;
 using Window = System.Windows.Window;
 
 namespace AcksheedSys.Flourish.Services;
 
-internal sealed class FontService(FlourishShellOptions options) : IFlourishFontService
+internal sealed class FontService(FlourishShellOptions options)
 {
     private Window? owner;
 

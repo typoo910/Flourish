@@ -6,8 +6,7 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Flourish;component/Themes/Colors.xaml" />
-        <ResourceDictionary Source="/Flourish;component/Themes/Controls.xaml" />
+        <ResourceDictionary Source="/Flourish;component/Themes/Generic.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

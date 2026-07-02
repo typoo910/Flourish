@@ -1,9 +1,9 @@
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 
 namespace AcksheedSys.Flourish.Services;
 
-internal sealed class FlourishStatusService(FlourishShellOptions options) : IFlourishStatusService
+internal sealed class FlourishStatusService(FlourishShellOptions options)
 {
     public string StatusText => options.StatusText;
 

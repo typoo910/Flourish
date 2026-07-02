@@ -1,13 +1,13 @@
 using System.Drawing;
 using System.Windows;
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 using Application = System.Windows.Application;
 using Forms = System.Windows.Forms;
 
 namespace AcksheedSys.Flourish.Services;
 
-internal sealed class TrayIconService(FlourishShellOptions options) : ITrayIconService, IDisposable
+internal sealed class TrayIconService(FlourishShellOptions options) : IDisposable
 {
     private const string DefaultIconUri = "pack://application:,,,/Flourish;component/Assets/favicon.ico";
 

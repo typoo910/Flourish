@@ -1,6 +1,5 @@
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Internal;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 using AcksheedSys.Flourish.Services;
 using AcksheedSys.Flourish.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -108,29 +107,14 @@ internal sealed class FlourishCompositionRoot(
         services.AddSingleton(shellOptions);
         services.AddSingleton<FlourishShellWindow>();
         services.AddSingleton<FlourishToolbarService>();
-        services.AddSingleton<IFlourishToolbarService>(provider =>
-            provider.GetRequiredService<FlourishToolbarService>()
-        );
         services.AddSingleton<FlourishStatusService>();
-        services.AddSingleton<IFlourishStatusService>(provider =>
-            provider.GetRequiredService<FlourishStatusService>()
-        );
         services.AddSingleton<TrayIconService>();
-        services.AddSingleton<ITrayIconService>(provider =>
-            provider.GetRequiredService<TrayIconService>()
-        );
         services.AddSingleton<FontService>();
-        services.AddSingleton<IFlourishFontService>(provider =>
-            provider.GetRequiredService<FontService>()
-        );
         services.AddSingleton<CommandParser>();
         services.AddSingleton<MaterialEffectService>();
         services.AddSingleton<FlourishMotionService>();
         services.AddSingleton<WindowFrameFixService>();
         services.AddSingleton<PageHistoryService>();
-        services.AddSingleton<IFlourishPageHistoryService>(provider =>
-            provider.GetRequiredService<PageHistoryService>()
-        );
         services.AddSingleton<PageCacheService>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(provider =>

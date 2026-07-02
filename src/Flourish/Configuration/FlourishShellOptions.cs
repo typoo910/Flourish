@@ -2,7 +2,7 @@ using System.Windows.Media;
 using System.Windows;
 using AcksheedSys.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Models;
+namespace AcksheedSys.Flourish.Configuration;
 
 internal sealed class FlourishShellOptions
 {

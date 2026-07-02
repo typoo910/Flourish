@@ -1,7 +1,7 @@
 using System.Windows.Controls;
 using AcksheedSys.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Models;
+namespace AcksheedSys.Flourish.Configuration;
 
 internal sealed record FlourishNavigationItem(
     string Key,

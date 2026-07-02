@@ -7,7 +7,7 @@ using System.Windows.Media.Imaging;
 using TextChangedEventArgs = System.Windows.Controls.TextChangedEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 
-namespace AcksheedSys.Flourish.Control;
+namespace AcksheedSys.Flourish.Controls;
 
 internal partial class FlourishTitlebar : UserControl
 {

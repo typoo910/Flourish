@@ -1,5 +1,5 @@
 using System.Windows.Controls;
-using AcksheedSys.Flourish.Internal;
+using AcksheedSys.Flourish.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AcksheedSys.Flourish.Abstract;

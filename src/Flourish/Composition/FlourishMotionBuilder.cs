@@ -1,5 +1,5 @@
 using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Models;
+using AcksheedSys.Flourish.Configuration;
 
 namespace AcksheedSys.Flourish.Composition;
 

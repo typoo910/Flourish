@@ -43,9 +43,7 @@ internal sealed class FlourishRuntime(IHost host) : IFlourish
 
     private static void EnsureApplicationResources(Application application)
     {
-        AddResourceDictionary(application, "/Flourish;component/Themes/Typography.xaml");
-        AddResourceDictionary(application, "/Flourish;component/Themes/Colors.xaml");
-        AddResourceDictionary(application, "/Flourish;component/Themes/Controls.xaml");
+        AddResourceDictionary(application, "/Flourish;component/Themes/Generic.xaml");
     }
 
     private static void AddResourceDictionary(Application application, string source)

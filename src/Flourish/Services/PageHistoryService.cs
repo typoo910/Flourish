@@ -1,8 +1,6 @@
-using AcksheedSys.Flourish.Abstract;
-
 namespace AcksheedSys.Flourish.Services;
 
-internal sealed class PageHistoryService : IFlourishPageHistoryService
+internal sealed class PageHistoryService
 {
     private readonly Stack<FlourishPageStackEntry> backStack = new();
     private readonly Stack<FlourishPageStackEntry> forwardStack = new();
