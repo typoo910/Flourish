@@ -14,5 +14,7 @@ internal sealed class FlourishMotionOptions
     public FlourishNavigationPanelTransition NavigationPanelTransition { get; set; } =
         FlourishNavigationPanelTransition.Resize;
 
+    public bool IsHoverRevealEnabled { get; set; } = true;
+
     public bool RespectSystemReducedMotion { get; set; } = true;
 }

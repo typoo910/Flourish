@@ -11,6 +11,11 @@ internal sealed class FlourishMotionBuilder(FlourishMotionOptions options) : IFl
         return this;
     }
 
+    public IFlourishMotionBuilder SetDuration()
+    {
+        return SetDuration(TimeSpan.FromMilliseconds(180));
+    }
+
     public IFlourishMotionBuilder SetDuration(TimeSpan duration)
     {
         if (duration <= TimeSpan.Zero)
@@ -39,6 +44,12 @@ internal sealed class FlourishMotionBuilder(FlourishMotionOptions options) : IFl
     )
     {
         options.NavigationPanelTransition = transition;
+        return this;
+    }
+
+    public IFlourishMotionBuilder SetHoverReveal(bool enabled = true)
+    {
+        options.IsHoverRevealEnabled = enabled;
         return this;
     }
 

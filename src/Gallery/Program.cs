@@ -1,4 +1,3 @@
-using System.Windows;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Gallery.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +28,7 @@ internal static class Program
                     services.AddSingleton<App>();
                     services.AddSingleton<ICommandParser, GalleryCommandParser>();
 
-                    services.AddNavigable<HomePage>("首页", "\uE80F", isInitial: true);
+                    services.AddNavigable<HomePage>("首页", "\uE80F");
                     services.AddNavigable<GalleryPage>("图库", "\uE91B");
                     services.AddNavigable<EditorPage>("编辑", "\uE70F");
                     services.AddNavigable<SettingsPage>("设置", "\uE713");
@@ -68,20 +67,18 @@ internal static class Program
                             (_, motion) =>
                             {
                                 motion
-                                    .SetDuration(TimeSpan.FromMilliseconds(180))
+                                    .SetDuration()
+                                    .SetHoverReveal()
                                     .SetNavigationPanelTransition()
                                     .SetPageTransition();
                             }
                         )
-                        .UseMaterialEffect(MaterialEffect.Mica)
-                        .SetGlobalFont("Microsoft YaHei", 14)
+                        .UseMaterialEffect()
+                        .SetGlobalFont("Microsoft YaHei")
                         .SetWindowProperty(
                             (_, window) =>
                             {
-                                window
-                                    .SetWindowSize(1536, 864)
-                                    .SetWindowMinSize(1280, 720)
-                                    .SetWindowPosition(WindowStartupLocation.CenterScreen);
+                                window.SetWindowSize().SetWindowMinSize().SetWindowPosition();
                             }
                         );
                 }
@@ -90,16 +87,14 @@ internal static class Program
                 (_, tool) =>
                 {
                     tool.CreateToolbarItems<HomePage>(
-                        true,
-                        new("打开", "\uE8E5", "home.open"),
-                        new("保存", "\uE74E", "home.save")
+                        new FlourishToolbarItem("打开", "\uE8E5", "home.open"),
+                        new FlourishToolbarItem("保存", "\uE74E", "home.save")
                     );
 
                     tool.CreateToolbarItems<GalleryPage>(
-                        true,
-                        new("打开", "\uE8E5", "gallery.open"),
-                        new("保存", "\uE74E", "gallery.save"),
-                        new("导入", "\uE898", "gallery.import")
+                        new FlourishToolbarItem("打开", "\uE8E5", "gallery.open"),
+                        new FlourishToolbarItem("保存", "\uE74E", "gallery.save"),
+                        new FlourishToolbarItem("导入", "\uE898", "gallery.import")
                     );
                 }
             )

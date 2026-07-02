@@ -32,7 +32,7 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options, HostBui
         return this;
     }
 
-    public IFlourishShellBuilder SetGlobalFont(string fontFamily, double fontSize)
+    public IFlourishShellBuilder SetGlobalFont(string fontFamily, double fontSize = 14)
     {
         options.FontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
         ValidatePositiveFinite(fontSize, nameof(fontSize));

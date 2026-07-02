@@ -4,19 +4,24 @@ namespace AcksheedSys.Flourish.Abstract;
 
 public interface IFlourishWindowPropertyBuilder
 {
-    IFlourishWindowPropertyBuilder SetWindowSize(double width, double height);
+    IFlourishWindowPropertyBuilder SetWindowSize(double width = 1536, double height = 864);
 
-    IFlourishWindowPropertyBuilder SetWindowMinSize(double minWidth, double minHeight);
+    IFlourishWindowPropertyBuilder SetWindowMinSize(double minWidth = 1280, double minHeight = 720);
 
-    IFlourishWindowPropertyBuilder SetWindowMaxSize(double maxWidth, double maxHeight);
+    IFlourishWindowPropertyBuilder SetWindowMaxSize(
+        double maxWidth = double.PositiveInfinity,
+        double maxHeight = double.PositiveInfinity
+    );
 
-    IFlourishWindowPropertyBuilder SetWindowPosition(WindowStartupLocation startupLocation);
+    IFlourishWindowPropertyBuilder SetWindowPosition(
+        WindowStartupLocation startupLocation = WindowStartupLocation.CenterScreen
+    );
 
-    IFlourishWindowPropertyBuilder SetWindowPosition(double left, double top);
+    IFlourishWindowPropertyBuilder SetManualWindowPosition(double left = 0, double top = 0);
 
-    IFlourishWindowPropertyBuilder SetWindowState(WindowState windowState);
+    IFlourishWindowPropertyBuilder SetWindowState(WindowState windowState = WindowState.Normal);
 
-    IFlourishWindowPropertyBuilder SetWindowResizeMode(ResizeMode resizeMode);
+    IFlourishWindowPropertyBuilder SetWindowResizeMode(ResizeMode resizeMode = ResizeMode.CanResize);
 
     IFlourishWindowPropertyBuilder UseTopmost(bool enabled = true);
 

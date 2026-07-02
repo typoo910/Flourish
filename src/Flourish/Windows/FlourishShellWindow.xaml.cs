@@ -119,6 +119,7 @@ internal partial class FlourishShellWindow : Window
             ? Visibility.Visible
             : Visibility.Collapsed;
         UpdateTitlebarBreadcrumbNavigation();
+        ApplyMotionResources();
 
         ApplyNavigationPanelPlacement();
         isPaneOpen = options.IsNavigationPanelInitiallyOpen;
@@ -126,6 +127,17 @@ internal partial class FlourishShellWindow : Window
         windowFrameFixService.Attach(this);
         materialEffectService.Attach(this, options.MaterialEffect);
         trayIconService.Initialize(this, options.Title);
+    }
+
+    private void ApplyMotionResources()
+    {
+        Resources["FlourishHoverRevealEnabled"] =
+            options.Motion.IsEnabled
+            && options.Motion.IsHoverRevealEnabled
+            && (
+                !options.Motion.RespectSystemReducedMotion
+                || SystemParameters.ClientAreaAnimation
+            );
     }
 
     private void ApplyWindowOptions()

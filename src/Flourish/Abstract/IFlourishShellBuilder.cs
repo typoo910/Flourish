@@ -16,7 +16,7 @@ public interface IFlourishShellBuilder
         Action<HostBuilderContext, IFlourishWindowPropertyBuilder> configureWindow
     );
 
-    IFlourishShellBuilder SetGlobalFont(string fontFamily, double fontSize);
+    IFlourishShellBuilder SetGlobalFont(string fontFamily, double fontSize = 14);
 
     IFlourishShellBuilder UseMaterialEffect(MaterialEffect effect = MaterialEffect.Mica);
 

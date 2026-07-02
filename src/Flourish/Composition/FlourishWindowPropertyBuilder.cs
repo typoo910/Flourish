@@ -7,7 +7,7 @@ namespace AcksheedSys.Flourish.Composition;
 internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options)
     : IFlourishWindowPropertyBuilder
 {
-    public IFlourishWindowPropertyBuilder SetWindowSize(double width, double height)
+    public IFlourishWindowPropertyBuilder SetWindowSize(double width = 1536, double height = 864)
     {
         ValidatePositiveFinite(width, nameof(width));
         ValidatePositiveFinite(height, nameof(height));
@@ -17,7 +17,10 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowMinSize(double minWidth, double minHeight)
+    public IFlourishWindowPropertyBuilder SetWindowMinSize(
+        double minWidth = 1280,
+        double minHeight = 720
+    )
     {
         ValidatePositiveFinite(minWidth, nameof(minWidth));
         ValidatePositiveFinite(minHeight, nameof(minHeight));
@@ -29,7 +32,10 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowMaxSize(double maxWidth, double maxHeight)
+    public IFlourishWindowPropertyBuilder SetWindowMaxSize(
+        double maxWidth = double.PositiveInfinity,
+        double maxHeight = double.PositiveInfinity
+    )
     {
         ValidatePositiveSize(maxWidth, nameof(maxWidth));
         ValidatePositiveSize(maxHeight, nameof(maxHeight));
@@ -41,7 +47,9 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowPosition(WindowStartupLocation startupLocation)
+    public IFlourishWindowPropertyBuilder SetWindowPosition(
+        WindowStartupLocation startupLocation = WindowStartupLocation.CenterScreen
+    )
     {
         options.WindowStartupLocation = startupLocation;
         if (startupLocation != WindowStartupLocation.Manual)
@@ -53,7 +61,7 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowPosition(double left, double top)
+    public IFlourishWindowPropertyBuilder SetManualWindowPosition(double left = 0, double top = 0)
     {
         ValidateFinite(left, nameof(left));
         ValidateFinite(top, nameof(top));
@@ -64,13 +72,17 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowState(WindowState windowState)
+    public IFlourishWindowPropertyBuilder SetWindowState(
+        WindowState windowState = WindowState.Normal
+    )
     {
         options.WindowState = windowState;
         return this;
     }
 
-    public IFlourishWindowPropertyBuilder SetWindowResizeMode(ResizeMode resizeMode)
+    public IFlourishWindowPropertyBuilder SetWindowResizeMode(
+        ResizeMode resizeMode = ResizeMode.CanResize
+    )
     {
         options.WindowResizeMode = resizeMode;
         return this;
