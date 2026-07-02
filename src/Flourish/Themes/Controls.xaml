@@ -24,14 +24,14 @@
             <Border x:Name="Chrome" Background="{TemplateBinding Background}" CornerRadius="6" />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               CornerRadius="6"
               IsHitTestVisible="False"
               Opacity="0"
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -61,6 +61,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -74,11 +84,11 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Chrome" Property="Background" Value="#D8E3F2" />
-              <Setter TargetName="HoverChrome" Property="Background" Value="#D8E3F2" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
+              <Setter TargetName="HoverChrome" Property="Background" Value="#D6E8FF" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Opacity" Value="0.35" />
@@ -110,14 +120,14 @@
             <Border x:Name="Chrome" Background="{TemplateBinding Background}" CornerRadius="6" />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               CornerRadius="6"
               IsHitTestVisible="False"
               Opacity="0"
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -150,6 +160,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -163,12 +183,12 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
               <Setter Property="Foreground" Value="White" />
-              <Setter TargetName="Chrome" Property="Background" Value="#B91C1C" />
-              <Setter TargetName="HoverChrome" Property="Background" Value="#B91C1C" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
+              <Setter TargetName="HoverChrome" Property="Background" Value="#D6E8FF" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -199,13 +219,13 @@
             <Border x:Name="Chrome" Background="{TemplateBinding Background}" />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               IsHitTestVisible="False"
               Opacity="0"
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -235,6 +255,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -248,11 +278,11 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Chrome" Property="Background" Value="#D8E3F2" />
-              <Setter TargetName="HoverChrome" Property="Background" Value="#D8E3F2" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
+              <Setter TargetName="HoverChrome" Property="Background" Value="#D6E8FF" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Opacity" Value="0.35" />
@@ -286,13 +316,13 @@
             <Border x:Name="Chrome" Background="{TemplateBinding Background}" />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               IsHitTestVisible="False"
               Opacity="0"
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -325,6 +355,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -338,12 +378,12 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
               <Setter Property="Foreground" Value="White" />
-              <Setter TargetName="Chrome" Property="Background" Value="#B91C1C" />
-              <Setter TargetName="HoverChrome" Property="Background" Value="#B91C1C" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
+              <Setter TargetName="HoverChrome" Property="Background" Value="#D6E8FF" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -379,7 +419,7 @@
             />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
               CornerRadius="5"
@@ -388,7 +428,7 @@
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter
@@ -422,6 +462,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -435,11 +485,11 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
-              <Setter TargetName="Chrome" Property="Background" Value="#EEF3F8" />
-              <Setter TargetName="HoverChrome" Property="Background" Value="#EEF3F8" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
+              <Setter TargetName="HoverChrome" Property="Background" Value="#D6E8FF" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -484,7 +534,7 @@
             />
             <Border
               x:Name="HoverChrome"
-              Background="#EF4444"
+              Background="#D6E8FF"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
               CornerRadius="5"
@@ -493,7 +543,7 @@
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter
@@ -527,6 +577,16 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>                    <DoubleAnimation
+                      Storyboard.TargetName="HoverRevealScale"
+                      Storyboard.TargetProperty="ScaleY"
+                      From="0"
+                      To="1"
+                      Duration="0:0:0.14"
+                    >
+                      <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut" />
+                      </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                   </Storyboard>
                 </BeginStoryboard>
@@ -540,7 +600,7 @@
                 <Condition Property="IsMouseOver" Value="True" />
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
-              <Setter TargetName="Chrome" Property="Background" Value="#EF4444" />
+              <Setter TargetName="Chrome" Property="Background" Value="#D6E8FF" />
             </MultiTrigger>
             <Trigger Property="IsSelected" Value="True">
               <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
