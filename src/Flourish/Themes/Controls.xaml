@@ -392,12 +392,12 @@
   </Style>
 
   <Style x:Key="FlourishToolbarButtonStyle" TargetType="{x:Type Button}">
-    <Setter Property="Height" Value="30" />
-    <Setter Property="MinWidth" Value="30" />
-    <Setter Property="Padding" Value="8,0" />
-    <Setter Property="Background" Value="White" />
-    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="MinWidth" Value="28" />
+    <Setter Property="Padding" Value="7,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
     <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
@@ -462,7 +462,8 @@
                       <DoubleAnimation.EasingFunction>
                         <CubicEase EasingMode="EaseOut" />
                       </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>                    <DoubleAnimation
+                    </DoubleAnimation>
+                    <DoubleAnimation
                       Storyboard.TargetName="HoverRevealScale"
                       Storyboard.TargetProperty="ScaleY"
                       From="0"

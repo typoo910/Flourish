@@ -146,8 +146,8 @@
             <Border
               x:Name="ToolbarHostBorder"
               Grid.Row="0"
-              Margin="8,8,8,6"
-              Padding="4"
+              Margin="8,0,8,4"
+              Padding="2"
               Background="{StaticResource CardBackgroundBrush}"
               BorderBrush="{StaticResource CardBorderBrush}"
               BorderThickness="1"

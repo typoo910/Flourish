@@ -326,7 +326,7 @@ internal partial class FlourishShellWindow : Window
                 Content = useIconOnly
                     ? CreateIconContent(item.IconGlyph)
                     : CreateIconTextContent(item.IconGlyph, item.DisplayName),
-                Margin = buttons.Count > 0 ? new Thickness(4, 0, 0, 0) : new Thickness(),
+                Margin = buttons.Count > 0 ? new Thickness(2, 0, 0, 0) : new Thickness(),
                 ToolTip = item.DisplayName,
                 Style = toolbarButtonStyle,
                 Tag = item.CommandKey,
