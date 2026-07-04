@@ -235,7 +235,7 @@ internal partial class FlourishShellWindow : Window
                 ? options.OpenPaneWidth
                 : options.ClosedPaneWidth;
 
-        if (isOpen)
+        if (isOpen || animate)
         {
             ApplyNavigationPaneChrome(isOpen);
         }
