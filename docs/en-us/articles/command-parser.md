@@ -1,0 +1,100 @@
+---
+title: Command parser
+description: Handle command keys raised by Flourish UI surfaces.
+---
+
+# Command parser
+
+`ICommandParser` is the public extension point for command keys raised by Flourish UI surfaces, especially dynamic toolbar items. A toolbar item stores a `CommandKey`; when the user invokes that item, Flourish asks registered parsers whether they can handle the key.
+
+## Register a parser
+
+Register parser implementations in `ConfigureServices`.
+
+```csharp
+builder.ConfigureServices((_, services) =>
+{
+    services.AddSingleton<ICommandParser, AppCommandParser>();
+});
+```
+
+You can register more than one parser. Each parser returns `true` when it handled the command and `false` when the key is unknown to that parser.
+
+## Implement TryParse
+
+```csharp
+internal sealed class AppCommandParser : ICommandParser
+{
+    public bool TryParse(string commandKey)
+    {
+        return commandKey switch
+        {
+            "home.open" => OpenHome(),
+            "home.save" => SaveHome(),
+            "gallery.import" => ImportGallery(),
+            _ => false
+        };
+    }
+
+    private static bool OpenHome()
+    {
+        MessageBox.Show("Open from Home");
+        return true;
+    }
+
+    private static bool SaveHome()
+    {
+        return true;
+    }
+
+    private static bool ImportGallery()
+    {
+        return true;
+    }
+}
+```
+
+`TryParse` should be fast and explicit. Avoid routing by display text; use stable command keys.
+
+## Connect toolbar items
+
+```csharp
+toolbar.CreateToolbarItems<GalleryPage>(
+    new FlourishToolbarItem("Import", "\uE898", "gallery.import"));
+```
+
+The third constructor argument is the command key. It is optional, but toolbar actions that should do work should provide one.
+
+## Use services inside a parser
+
+Because parsers are resolved from DI, they can depend on your own services.
+
+```csharp
+internal sealed class GalleryCommandParser(ImageLibrary library) : ICommandParser
+{
+    public bool TryParse(string commandKey)
+    {
+        if (commandKey != "gallery.import")
+        {
+            return false;
+        }
+
+        library.Import();
+        return true;
+    }
+}
+```
+
+Register the dependency as usual:
+
+```csharp
+services.AddSingleton<ImageLibrary>();
+services.AddSingleton<ICommandParser, GalleryCommandParser>();
+```
+
+## Command key conventions
+
+- Use lowercase dotted names such as `gallery.import`.
+- Prefix keys by feature or page.
+- Keep keys stable even when display text is localized.
+- Return `false` for unknown keys instead of throwing.

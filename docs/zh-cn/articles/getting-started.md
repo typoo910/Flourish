@@ -1,50 +1,149 @@
 ---
 title: 快速开始
-description: 构建一个基础的 Flourish 应用。
+description: 用最短路径把 Flourish 接入 WPF 应用。
 ---
 
 # 快速开始
 
-创建默认的 Flourish builder，注册应用服务和页面，配置 Shell，然后构建并启动运行时。
+使用 Flourish 最快的方式，是让 Flourish Shell 托管你的 WPF `Application`：引用主题资源， 在 `Program.Main` 中构建 `IFlourish` 运行时，用 `AddNavigable` 注册页面，然后在应用启动时调用 `Program.Flourish.Show(this)`。
+
+## 引用主题资源
+
+`IFlourish.Show(Application)` 在打开 Shell 前会自动把 `/Flourish;component/Themes/Generic.xaml` 合并进应用资源。你仍然可以在 `App.xaml` 中显式引用它；这样 WPF 设计器和 Shell 显示前就需要使用的资源也能正常工作。
+
+```xml
+<Application
+  x:Class="MyApp.App"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Flourish;component/Themes/Generic.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>
+```
+
+## 创建 Program 入口
+
+把构建好的运行时保存在静态属性中，这样 `App` 和页面都可以用同一个入口访问服务。
 
 ```csharp
 using AcksheedSys.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
-var flourish = FlourishBuilder
-    .CreateDefaultBuilder(args)
-    .ConfigureServices((_, services) =>
-    {
-        services.AddSingleton<App>();
-        services.AddNavigable<HomePage>("Home", "\uE80F", isInitial: true);
-        services.AddNavigable<SettingsPage>("Settings", "\uE713");
-    })
-    .ConfigureShell((_, shell) =>
-    {
-        shell
-            .UseTitlebar((_, titlebar) =>
-            {
-                titlebar
-                    .ShowTitle()
-                    .ShowSearch()
-                    .ShowBreadcrumb()
-                    .SetTitle("Gallery")
-                    .SetSubtitle("Flourish sample");
-            })
-            .UseNavigationPanel((_, nav) =>
-            {
-                nav.SetInitiallyOpen().SetTitle("Navigation");
-            })
-            .UseDynamicToolbar()
-            .UseMotion()
-            .UseMaterialEffect()
-            .SetGlobalFont("Microsoft YaHei");
-    })
-    .Build();
+namespace MyApp;
 
-flourish.Start();
-var app = flourish.GetRequiredService<App>();
-app.Run();
+internal static class Program
+{
+    private static IFlourish? flourish;
+
+    public static IFlourish Flourish =>
+        flourish ?? throw new InvalidOperationException("Flourish has not been built.");
+
+    [STAThread]
+    public static int Main(string[] args)
+    {
+        flourish = FlourishBuilder
+            .CreateDefaultBuilder(args)
+            .ConfigureServices((_, services) =>
+            {
+                services.AddSingleton<App>();
+                services.AddSingleton<ICommandParser, AppCommandParser>();
+
+                services.AddNavigable<HomePage>("首页", "\uE80F", isInitial: true);
+                services.AddNavigable<SettingsPage>("设置", "\uE713");
+            })
+            .ConfigureShell((_, shell) =>
+            {
+                shell
+                    .UseTitlebar((_, titlebar) =>
+                    {
+                        titlebar
+                            .ShowLogo()
+                            .ShowTitle()
+                            .ShowSearch()
+                            .ShowBreadcrumb()
+                            .ShowNavToggle()
+                            .SetTitle("My App")
+                            .SetSubtitle("Flourish Shell");
+                    })
+                    .UseNavigationPanel((_, nav) =>
+                    {
+                        nav.SetInitiallyOpen().SetTitle("导航");
+                    })
+                    .UseDynamicToolbar()
+                    .UseMotion()
+                    .UseMaterialEffect()
+                    .SetGlobalFont("Microsoft YaHei")
+                    .SetWindowProperty((_, window) =>
+                    {
+                        window.SetWindowSize(1280, 720).SetWindowMinSize(960, 540);
+                    });
+            })
+            .Build();
+
+        try
+        {
+            flourish.Start();
+            var app = flourish.GetRequiredService<App>();
+            return app.Run();
+        }
+        finally
+        {
+            flourish.StopAsync().GetAwaiter().GetResult();
+            flourish.Dispose();
+            flourish = null;
+        }
+    }
+}
 ```
 
-仓库中的 `Gallery` 项目是当前公开 API 的可运行示例。新增场景文档时，优先从这个示例项目提炼代码片段。
+`CreateDefaultBuilder(args)` 会创建标准的 .NET Generic Host。因此 `ConfigureServices` 拿到的是普通 `IServiceCollection`，你的应用服务、页面、命令解析器都可以按熟悉的依赖注入方式注册。
+
+## 显示 Flourish Shell
+
+在 `App.xaml.cs` 的启动流程中调用 `Program.Flourish.Show(this)`。它会创建 `FlourishShellWindow`，把它设为 `Application.MainWindow`，按需合并主题资源，并显示 Shell。
+
+```csharp
+using System.Windows;
+
+namespace MyApp;
+
+public partial class App : Application
+{
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        Program.Flourish.Show(this);
+    }
+}
+```
+
+## 创建页面
+
+通过 `AddNavigable` 注册的页面就是普通 WPF `Page`。导航发生时，Flourish 会从依赖注入容器解析页面实例。
+
+```csharp
+using System.Windows.Controls;
+
+namespace MyApp;
+
+public partial class HomePage : Page
+{
+    public HomePage()
+    {
+        InitializeComponent();
+    }
+}
+```
+
+## 首次运行检查清单
+
+- `App` 已通过 `services.AddSingleton<App>()` 注册。
+- 至少一个页面已通过 `AddNavigable` 注册，最好指定 `isInitial: true`。
+- `App.OnStartup` 调用了 `Program.Flourish.Show(this)`。
+- `app.Run()` 之前调用了 `flourish.Start()`。
+- `finally` 中调用了 `StopAsync()` 和 `Dispose()`。

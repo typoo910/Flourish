@@ -1,9 +1,15 @@
 items:
 - name: Getting started
   href: getting-started.md
+- name: IFlourishBuilder
+  href: flourish-builder.md
 - name: Shell configuration
   href: shell-configuration.md
 - name: Navigation
   href: navigation.md
 - name: Dynamic toolbar
   href: dynamic-toolbar.md
+- name: Status bar
+  href: status-bar.md
+- name: Command parser
+  href: command-parser.md
