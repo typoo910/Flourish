@@ -46,6 +46,7 @@
     "template": [
       "default",
       "modern",
+      "material/material",
       "templates/flourish"
     ],
     "globalMetadata": {
