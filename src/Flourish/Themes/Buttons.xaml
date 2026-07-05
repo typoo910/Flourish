@@ -166,7 +166,7 @@
               RenderTransformOrigin="0.5,0.5"
             >
               <Border.RenderTransform>
-                <ScaleTransform x:Name="HoverRevealScale" ScaleX="0" ScaleY="0" />
+                <ScaleTransform x:Name="HoverRevealScale" ScaleX="1" ScaleY="1" />
               </Border.RenderTransform>
             </Border>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -221,16 +221,16 @@
                 <Condition Property="controls:HoverReveal.IsEnabled" Value="False" />
               </MultiTrigger.Conditions>
               <Setter
-                TargetName="Chrome"
-                Property="Background"
-                Value="{TemplateBinding BorderBrush}"
+                TargetName="HoverChrome"
+                Property="Opacity"
+                Value="1"
               />
             </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
               <Setter
-                TargetName="Chrome"
-                Property="Background"
-                Value="{TemplateBinding BorderBrush}"
+                TargetName="HoverChrome"
+                Property="Opacity"
+                Value="1"
               />
             </Trigger>
           </ControlTemplate.Triggers>
