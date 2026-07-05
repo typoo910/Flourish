@@ -100,13 +100,17 @@ internal sealed class FlourishCompositionRoot(
             shellOptions.PageCacheModesByPageType[page.PageType] = page.CacheMode;
         }
 
-        var navigationGroups = hasConfiguredNavigation
-            ? shellOptions
-                .NavigationGroups.OrderBy(group => group.GroupId)
-                .Select(CloneNavigationGroup)
-                .ToList()
-            : CreateLegacyNavigationGroups(registeredPages);
-        var fixedNavigationItems = CloneNavigationItems(shellOptions.FixedNavigationItemDefinitions);
+        var navigationGroups = shellOptions.IsNavigationPanelEnabled
+            ? hasConfiguredNavigation
+                ? shellOptions
+                    .NavigationGroups.OrderBy(group => group.GroupId)
+                    .Select(CloneNavigationGroup)
+                    .ToList()
+                : CreateLegacyNavigationGroups(registeredPages)
+            : [];
+        var fixedNavigationItems = shellOptions.IsNavigationPanelEnabled
+            ? CloneNavigationItems(shellOptions.FixedNavigationItemDefinitions)
+            : [];
 
         ValidateUniqueNavigationPageItems(navigationGroups, fixedNavigationItems);
 

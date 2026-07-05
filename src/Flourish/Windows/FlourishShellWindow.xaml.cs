@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.ComponentModel;
 using AcksheedSys.Flourish.Abstract;
 using AcksheedSys.Flourish.Configuration;
@@ -122,6 +123,9 @@ internal partial class FlourishShellWindow : Window
             options.IsTitlebarSubtitleEnabled,
             options.IsTitlebarProfileEnabled
         );
+        StatusBarBorder.Visibility = options.IsStatusBarEnabled
+            ? Visibility.Visible
+            : Visibility.Collapsed;
         StatusTextBlock.Text = statusService.StatusText;
         NavigationPaneBorder.Visibility = options.IsNavigationPanelEnabled
             ? Visibility.Visible
@@ -175,7 +179,35 @@ internal partial class FlourishShellWindow : Window
         }
 
         WindowState = options.WindowState;
+        ApplyWindowChrome();
         Titlebar.SetMaximizeEnabled(ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip);
+    }
+
+    private void ApplyWindowChrome()
+    {
+        if (!options.IsTitlebarEnabled)
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            WindowChrome.SetWindowChrome(this, null);
+            ShellBorder.BorderThickness = new Thickness();
+            Titlebar.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        WindowStyle = WindowStyle.None;
+        WindowChrome.SetWindowChrome(
+            this,
+            new WindowChrome
+            {
+                CaptionHeight = 0,
+                CornerRadius = new CornerRadius(),
+                GlassFrameThickness = new Thickness(),
+                ResizeBorderThickness = new Thickness(6),
+                UseAeroCaptionButtons = false,
+            }
+        );
+        ShellBorder.BorderThickness = new Thickness(1);
+        Titlebar.Visibility = Visibility.Visible;
     }
 
     private void AttachTitlebarEvents()
@@ -840,6 +872,11 @@ internal partial class FlourishShellWindow : Window
 
     private void UpdateTitlebarBreadcrumbNavigation()
     {
+        if (!options.IsTitlebarEnabled)
+        {
+            return;
+        }
+
         var isVisible = IsBreadcrumbFeatureEnabled()
             && (
                 options.BreadcrumbShowOption == BreadcrumbShowOption.Always
@@ -900,6 +937,11 @@ internal partial class FlourishShellWindow : Window
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
+        if (!options.IsTitlebarEnabled)
+        {
+            return;
+        }
+
         Titlebar.SetMaximized(WindowState == WindowState.Maximized);
     }
 

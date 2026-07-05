@@ -6,15 +6,15 @@ namespace AcksheedSys.Flourish.Configuration;
 
 internal sealed class FlourishShellOptions
 {
-    public string Title { get; set; } = "Flourish";
+    public string Title { get; set; } = string.Empty;
 
     public string Subtitle { get; set; } = "WPF Application";
 
-    public string PaneTitle { get; set; } = "NAVIGATION";
+    public string PaneTitle { get; set; } = string.Empty;
 
     public string SearchPlaceholder { get; set; } = "Search";
 
-    public string StatusText { get; set; } = "Ready";
+    public string StatusText { get; set; } = string.Empty;
 
     public ImageSource? LogoSource { get; set; }
 
@@ -59,27 +59,31 @@ internal sealed class FlourishShellOptions
 
     public bool IsTrayExitEnabled { get; set; }
 
-    public bool IsNavigationPanelEnabled { get; set; } = true;
+    public bool IsNavigationPanelEnabled { get; set; }
 
-    public bool IsNavigationPanelInitiallyOpen { get; set; } = true;
+    public bool IsNavigationPanelInitiallyOpen { get; set; }
 
     public NavigationPanelDirection NavigationPanelDirection { get; set; } = NavigationPanelDirection.Left;
 
-    public bool IsTitlebarSearchEnabled { get; set; } = true;
+    public bool IsTitlebarEnabled { get; set; }
 
-    public bool IsTitlebarNavigationToggleEnabled { get; set; } = true;
+    public bool IsTitlebarSearchEnabled { get; set; }
 
-    public bool IsTitlebarLogoEnabled { get; set; } = true;
+    public bool IsTitlebarNavigationToggleEnabled { get; set; }
 
-    public bool IsTitlebarTitleEnabled { get; set; } = true;
+    public bool IsTitlebarLogoEnabled { get; set; }
 
-    public bool IsTitlebarSubtitleEnabled { get; set; } = true;
+    public bool IsTitlebarTitleEnabled { get; set; }
 
-    public bool IsTitlebarProfileEnabled { get; set; } = true;
+    public bool IsTitlebarSubtitleEnabled { get; set; }
+
+    public bool IsTitlebarProfileEnabled { get; set; }
 
     public bool IsDynamicToolbarEnabled { get; set; }
 
-    public bool IsBreadcrumbEnabled { get; set; } = true;
+    public bool IsBreadcrumbEnabled { get; set; }
+
+    public bool IsStatusBarEnabled { get; set; }
 
     public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.Auto;
 

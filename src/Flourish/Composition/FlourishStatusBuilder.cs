@@ -7,12 +7,14 @@ internal sealed class FlourishStatusBuilder(FlourishShellOptions options) : IFlo
 {
     public IFlourishStatusBuilder SetStatusText(string text)
     {
+        options.IsStatusBarEnabled = true;
         options.StatusText = text;
         return this;
     }
 
     public IFlourishStatusBuilder AddStatusItem(string displayText, string iconGlyph)
     {
+        options.IsStatusBarEnabled = true;
         options.StatusItems.Add(new FlourishStatusItem(displayText, iconGlyph));
         return this;
     }

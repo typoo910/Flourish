@@ -5,7 +5,6 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:control="clr-namespace:AcksheedSys.Flourish.Controls"
-  xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
   Width="1100"
   Height="720"
   MinWidth="820"
@@ -13,7 +12,6 @@
   x:ClassModifier="internal"
   Background="{StaticResource AppBackgroundBrush}"
   WindowStartupLocation="CenterScreen"
-  WindowStyle="None"
   mc:Ignorable="d"
 >
   <Window.Resources>
@@ -91,17 +89,11 @@
     </DataTemplate>
   </Window.Resources>
 
-  <shell:WindowChrome.WindowChrome>
-    <shell:WindowChrome
-      CaptionHeight="0"
-      CornerRadius="0"
-      GlassFrameThickness="0"
-      ResizeBorderThickness="6"
-      UseAeroCaptionButtons="False"
-    />
-  </shell:WindowChrome.WindowChrome>
-
-  <Border BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
+  <Border
+    x:Name="ShellBorder"
+    BorderBrush="{StaticResource CardBorderBrush}"
+    BorderThickness="1"
+  >
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
@@ -234,6 +226,7 @@
       </Border>
 
       <Border
+        x:Name="StatusBarBorder"
         Grid.Row="2"
         Padding="10,4"
         Background="{StaticResource CardSecondaryBackgroundBrush}"

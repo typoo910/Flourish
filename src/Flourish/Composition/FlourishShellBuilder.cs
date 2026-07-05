@@ -11,6 +11,7 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options, HostBui
         Action<HostBuilderContext, IFlourishTitlebarBuilder> configureTitlebar
     )
     {
+        options.IsTitlebarEnabled = true;
         configureTitlebar(context, new FlourishTitlebarBuilder(options));
         return this;
     }
