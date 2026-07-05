@@ -39,6 +39,7 @@ internal partial class FlourishShellWindow : Window
     private Brush mutedTextBrush = null!;
     private FontFamily iconFontFamily = null!;
     private Type? activeToolbarPageType;
+    private FlourishNavigationItem? selectedNavigationItem;
     private bool isDefaultToolbarActive;
     private bool isPaneOpen = true;
     private bool suppressNavigationSelection;
@@ -515,13 +516,12 @@ internal partial class FlourishShellWindow : Window
         MouseButtonEventArgs e
     )
     {
-        if (suppressNavigationSelection || sender is not ListBox listBox)
+        if (suppressNavigationSelection || sender is not ListBox)
         {
             return;
         }
 
-        var itemContainer = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
-        if (itemContainer?.DataContext is not FlourishNavigationItem item)
+        if (GetNavigationItemFromInputSource(e.OriginalSource) is not { } item)
         {
             return;
         }
@@ -534,13 +534,75 @@ internal partial class FlourishShellWindow : Window
 
         if (item.IsCommandItem)
         {
-            ActivateNavigationItem(item, true);
-            Keyboard.ClearFocus();
+            ActivateCommandNavigationItem(item);
             return;
         }
 
-        listBox.SelectedItem = item;
+        SelectNavigationItem(item);
         ActivateNavigationItem(item, true);
+    }
+
+    private void NavigationItemsHost_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (suppressNavigationSelection || sender is not ListBox listBox)
+        {
+            return;
+        }
+
+        if (e.Key is not (Key.Enter or Key.Space))
+        {
+            return;
+        }
+
+        var item =
+            GetNavigationItemFromInputSource(e.OriginalSource)
+            ?? listBox.SelectedItem as FlourishNavigationItem;
+        if (item is null || !item.IsNavigationItem)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        if (item.IsCommandItem)
+        {
+            ActivateCommandNavigationItem(item);
+            return;
+        }
+
+        SelectNavigationItem(item);
+        ActivateNavigationItem(item, true);
+    }
+
+    private void NavigationItemsHost_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e
+    )
+    {
+        if (suppressNavigationSelection || sender is not ListBox listBox)
+        {
+            return;
+        }
+
+        if (listBox.SelectedItem is not FlourishNavigationItem item)
+        {
+            return;
+        }
+
+        if (!item.IsPageItem)
+        {
+            RestoreSelectedNavigationItem();
+            return;
+        }
+
+        SelectNavigationItem(item);
+        ActivateNavigationItem(item, true, toggleChildren: false);
+    }
+
+    private void ActivateCommandNavigationItem(FlourishNavigationItem item)
+    {
+        ActivateNavigationItem(item, true);
+        RestoreSelectedNavigationItem();
+        Keyboard.ClearFocus();
     }
 
     private void RootFrame_Navigated(object? sender, FlourishNavigatedEventArgs e)
@@ -768,6 +830,13 @@ internal partial class FlourishShellWindow : Window
 
     private void SelectNavigationItem(FlourishNavigationItem item)
     {
+        if (!item.IsPageItem)
+        {
+            RestoreSelectedNavigationItem();
+            return;
+        }
+
+        selectedNavigationItem = item;
         suppressNavigationSelection = true;
         try
         {
@@ -783,6 +852,26 @@ internal partial class FlourishShellWindow : Window
 
             FixedNavigationItemsHost.SelectedItem = null;
             NavigationItemsHost.SelectedItem = item;
+        }
+        finally
+        {
+            suppressNavigationSelection = false;
+        }
+    }
+
+    private void RestoreSelectedNavigationItem()
+    {
+        if (selectedNavigationItem is not null)
+        {
+            SelectNavigationItem(selectedNavigationItem);
+            return;
+        }
+
+        suppressNavigationSelection = true;
+        try
+        {
+            NavigationItemsHost.SelectedItem = null;
+            FixedNavigationItemsHost.SelectedItem = null;
         }
         finally
         {
@@ -825,5 +914,13 @@ internal partial class FlourishShellWindow : Window
         }
 
         return null;
+    }
+
+    private static FlourishNavigationItem? GetNavigationItemFromInputSource(object source)
+    {
+        return source is DependencyObject dependencyObject
+            && FindAncestor<ListBoxItem>(dependencyObject)?.DataContext is FlourishNavigationItem item
+            ? item
+            : null;
     }
 }
