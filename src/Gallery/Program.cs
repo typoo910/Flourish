@@ -65,10 +65,10 @@ internal static class Program
                                 nav.SetDirection()
                                     .SetInitiallyOpen()
                                     .SetPanelWidth(
-                                        openWidth: 260,
+                                        openWidth: 220,
                                         closedWidth: 48,
                                         maxWidth: 480,
-                                        minWidth: 180
+                                        minWidth: 150
                                     )
                                     .SetGroup(
                                         "导航",
