@@ -29,45 +29,47 @@ internal sealed class FlourishNavigationPanelBuilder(FlourishShellOptions option
         return this;
     }
 
-    public IFlourishNavigationPanelBuilder SetPaneWidth(
+    public IFlourishNavigationPanelBuilder SetPanelWidth(
         double openWidth = 220,
-        double closedWidth = 48
+        double closedWidth = 48,
+        double maxWidth = 420,
+        double minWidth = 160
     )
     {
         ValidatePositiveFinite(openWidth, nameof(openWidth));
         ValidateNonNegativeFinite(closedWidth, nameof(closedWidth));
+        ValidatePositiveFinite(minWidth, nameof(minWidth));
+        ValidatePositiveFinite(maxWidth, nameof(maxWidth));
 
         if (closedWidth > openWidth)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(closedWidth),
                 closedWidth,
-                "Closed navigation pane width cannot exceed open width."
+                "Closed navigation panel width cannot exceed open width."
             );
         }
-
-        options.OpenPaneWidth = openWidth;
-        options.ClosedPaneWidth = closedWidth;
-        return this;
-    }
-
-    public IFlourishNavigationPanelBuilder SetPaneWidthLimits(
-        double minWidth = 160,
-        double maxWidth = 420
-    )
-    {
-        ValidatePositiveFinite(minWidth, nameof(minWidth));
-        ValidatePositiveFinite(maxWidth, nameof(maxWidth));
 
         if (minWidth > maxWidth)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(minWidth),
                 minWidth,
-                "Minimum navigation pane width cannot exceed maximum width."
+                "Minimum navigation panel width cannot exceed maximum width."
             );
         }
 
+        if (openWidth < minWidth || openWidth > maxWidth)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(openWidth),
+                openWidth,
+                "Open navigation panel width must be within the minimum and maximum width range."
+            );
+        }
+
+        options.OpenPaneWidth = openWidth;
+        options.ClosedPaneWidth = closedWidth;
         options.NavigationPaneMinWidth = minWidth;
         options.NavigationPaneMaxWidth = maxWidth;
         return this;

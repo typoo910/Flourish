@@ -265,7 +265,7 @@ internal partial class FlourishShellWindow : Window
         GetContentColumn().Width = new GridLength(1, GridUnitType.Star);
     }
 
-    private void SetPaneWidth(double width)
+    private void SetNavigationPaneWidth(double width)
     {
         GetNavigationPaneColumn().Width = new GridLength(width);
         GetContentColumn().Width = new GridLength(1, GridUnitType.Star);
@@ -321,7 +321,7 @@ internal partial class FlourishShellWindow : Window
         if (!animate)
         {
             ApplyNavigationPaneColumnConstraints(isOpen);
-            SetPaneWidth(paneWidth);
+            SetNavigationPaneWidth(paneWidth);
             ApplyNavigationPaneChrome(isOpen);
             UpdateNavigationPaneSplitterState();
             return;
@@ -341,7 +341,7 @@ internal partial class FlourishShellWindow : Window
             () =>
             {
                 ApplyNavigationPaneColumnConstraints(isOpen);
-                SetPaneWidth(paneWidth);
+                SetNavigationPaneWidth(paneWidth);
                 ApplyNavigationPaneChrome(isOpen);
                 UpdateNavigationPaneSplitterState();
             }
@@ -365,7 +365,7 @@ internal partial class FlourishShellWindow : Window
 
         options.OpenPaneWidth = paneWidth;
         ApplyNavigationPaneColumnConstraints(isOpen: true);
-        SetPaneWidth(paneWidth);
+        SetNavigationPaneWidth(paneWidth);
         RefreshWorkAreaLayout();
     }
 

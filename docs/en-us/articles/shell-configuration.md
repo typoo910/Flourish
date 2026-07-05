@@ -60,8 +60,7 @@ shell.UseNavigationPanel((_, nav) =>
         .SetEnabled()
         .SetDirection(NavigationPanelDirection.Left)
         .SetInitiallyOpen()
-        .SetPaneWidth(openWidth: 260, closedWidth: 48)
-        .SetPaneWidthLimits(minWidth: 180, maxWidth: 480)
+        .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
         .SetGroup("Navigation", groupId: 0, group =>
         {
             group.AddNavigableViewItem<HomePage>(isInitial: true);
@@ -75,7 +74,7 @@ shell.UseNavigationPanel((_, nav) =>
 
 Use `SetEnabled(false)` for applications that rely on custom navigation or a single-page shell. Use `SetDirection(NavigationPanelDirection.Right)` when your layout benefits from a right-side navigation rail. Grouped items live in the scrollable upper area; fixed items stay visible in the bottom area.
 
-Use `SetPaneWidth` to set the open and collapsed panel widths. Use `SetPaneWidthLimits` to constrain the preview splitter resize range. By default, the panel opens at `220`, collapses to `48`, and can be resized between `160` and `420`.
+Use `SetPanelWidth` to set the open and collapsed panel widths and constrain the preview splitter resize range. By default, the panel opens at `220`, collapses to `48`, and can be resized between `160` and `420`.
 
 ## Dynamic toolbar surface
 

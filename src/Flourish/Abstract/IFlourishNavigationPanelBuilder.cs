@@ -60,38 +60,26 @@ public interface IFlourishNavigationPanelBuilder
     IFlourishNavigationPanelBuilder SetInitiallyOpen(bool enabled = true);
 
     /// <summary>
-    /// Sets the navigation panel width used when the panel is open or collapsed.
+    /// Sets the navigation panel width and the resize range used by the splitter.
     /// </summary>
     /// <param name="openWidth">The width used by the open navigation panel.</param>
     /// <param name="closedWidth">The width used by the collapsed navigation panel.</param>
+    /// <param name="maxWidth">The maximum open navigation panel width.</param>
+    /// <param name="minWidth">The minimum open navigation panel width.</param>
     /// <returns>The current builder for chained configuration.</returns>
     /// <remarks>
     /// The open width is also updated when users resize the panel with the splitter.
     /// </remarks>
     /// <example>
     /// <code><![CDATA[
-    /// nav.SetPaneWidth(openWidth: 260, closedWidth: 48);
+    /// nav.SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180);
     /// ]]></code>
     /// </example>
-    IFlourishNavigationPanelBuilder SetPaneWidth(
+    IFlourishNavigationPanelBuilder SetPanelWidth(
         double openWidth = 220,
-        double closedWidth = 48
-    );
-
-    /// <summary>
-    /// Sets the minimum and maximum width allowed while resizing the open navigation panel.
-    /// </summary>
-    /// <param name="minWidth">The minimum open navigation panel width.</param>
-    /// <param name="maxWidth">The maximum open navigation panel width.</param>
-    /// <returns>The current builder for chained configuration.</returns>
-    /// <example>
-    /// <code><![CDATA[
-    /// nav.SetPaneWidthLimits(minWidth: 180, maxWidth: 480);
-    /// ]]></code>
-    /// </example>
-    IFlourishNavigationPanelBuilder SetPaneWidthLimits(
-        double minWidth = 160,
-        double maxWidth = 420
+        double closedWidth = 48,
+        double maxWidth = 420,
+        double minWidth = 160
     );
 
     /// <summary>
