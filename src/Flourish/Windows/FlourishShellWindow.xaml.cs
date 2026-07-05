@@ -543,8 +543,19 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        isPaneOpen = !isPaneOpen;
+        var shouldOpen = !isPaneOpen;
+        if (!shouldOpen)
+        {
+            CollapseAllNavigationChildren();
+        }
+
+        isPaneOpen = shouldOpen;
         ApplyNavigationPaneState(animate: true);
+
+        if (shouldOpen)
+        {
+            RestoreSelectedNavigationItem();
+        }
     }
 
     private void NavigationItemsHost_PreviewMouseLeftButtonDown(
@@ -564,6 +575,11 @@ internal partial class FlourishShellWindow : Window
 
         e.Handled = true;
         if (!item.IsNavigationItem)
+        {
+            return;
+        }
+
+        if (TryOpenNavigationPaneForCollapsedParent(item))
         {
             return;
         }
@@ -599,6 +615,11 @@ internal partial class FlourishShellWindow : Window
         }
 
         e.Handled = true;
+        if (TryOpenNavigationPaneForCollapsedParent(item))
+        {
+            return;
+        }
+
         if (item.IsCommandItem)
         {
             ActivateCommandNavigationItem(item);
@@ -620,6 +641,11 @@ internal partial class FlourishShellWindow : Window
         }
 
         if (listBox.SelectedItem is not FlourishNavigationItem item)
+        {
+            return;
+        }
+
+        if (TryOpenNavigationPaneForCollapsedParent(item))
         {
             return;
         }
@@ -684,6 +710,11 @@ internal partial class FlourishShellWindow : Window
         bool toggleChildren = true
     )
     {
+        if (toggleChildren && TryOpenNavigationPaneForCollapsedParent(item))
+        {
+            return;
+        }
+
         if (toggleChildren && item.HasChildren)
         {
             ToggleChildItems(item);
@@ -717,6 +748,28 @@ internal partial class FlourishShellWindow : Window
     {
         parent.IsExpanded = !parent.IsExpanded;
         SetChildItemsVisibility(parent, parent.IsExpanded);
+    }
+
+    private bool TryOpenNavigationPaneForCollapsedParent(FlourishNavigationItem item)
+    {
+        if (isPaneOpen || !item.HasChildren)
+        {
+            return false;
+        }
+
+        isPaneOpen = true;
+        ApplyNavigationPaneState(animate: true);
+        RestoreSelectedNavigationItem();
+        return true;
+    }
+
+    private void CollapseAllNavigationChildren()
+    {
+        foreach (var parent in navigationParentsByKey.Values)
+        {
+            parent.IsExpanded = false;
+            SetChildItemsVisibility(parent, false);
+        }
     }
 
     private void ExpandAncestorsForSelection(FlourishNavigationItem item)

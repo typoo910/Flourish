@@ -14,7 +14,7 @@
         FontSize="28"
         FontWeight="SemiBold"
         Foreground="{StaticResource PrimaryTextBrush}"
-        Text="ViewItem 父节点"
+        Text="页面父节点"
       />
 
       <TextBlock
