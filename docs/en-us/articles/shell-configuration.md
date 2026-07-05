@@ -51,7 +51,7 @@ shell.UseTitlebar((_, titlebar) =>
 
 ## Navigation panel
 
-`UseNavigationPanel` configures the left or right navigation area. The actual items come from `AddNavigable`.
+`UseNavigationPanel` configures the left or right navigation area. Register page metadata with `AddNavigable`, then place visible page items, command items, groups, and fixed bottom items here.
 
 ```csharp
 shell.UseNavigationPanel((_, nav) =>
@@ -60,11 +60,18 @@ shell.UseNavigationPanel((_, nav) =>
         .SetEnabled()
         .SetDirection(NavigationPanelDirection.Left)
         .SetInitiallyOpen()
-        .SetTitle("Navigation");
+        .SetGroup("Navigation", groupId: 0, group =>
+        {
+            group.AddNavigableViewItem<HomePage>(isInitial: true);
+            group.AddNavigableViewItem<GalleryPage>();
+            group.AddNavigableItem("Refresh", "navigation.refresh", iconGlyph: "\uE72C");
+        })
+        .AddFixedNavigableViewItem<SettingsPage>()
+        .AddFixedNavigableItem("About", "app.about", iconGlyph: "\uE946");
 });
 ```
 
-Use `SetEnabled(false)` for applications that rely on custom navigation or a single-page shell. Use `SetDirection(NavigationPanelDirection.Right)` when your layout benefits from a right-side navigation rail.
+Use `SetEnabled(false)` for applications that rely on custom navigation or a single-page shell. Use `SetDirection(NavigationPanelDirection.Right)` when your layout benefits from a right-side navigation rail. Grouped items live in the scrollable upper area; fixed items stay visible in the bottom area.
 
 ## Dynamic toolbar surface
 
@@ -156,7 +163,12 @@ builder.ConfigureShell((_, shell) =>
         })
         .UseNavigationPanel((_, nav) =>
         {
-            nav.SetDirection().SetInitiallyOpen().SetTitle("Navigation");
+            nav.SetDirection()
+               .SetInitiallyOpen()
+               .SetGroup("Navigation", groupId: 0, group =>
+               {
+                   group.AddNavigableViewItem<HomePage>(isInitial: true);
+               });
         })
         .UseDynamicToolbar()
         .UseMotion((_, motion) =>

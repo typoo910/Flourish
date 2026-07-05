@@ -101,12 +101,21 @@ var flourish = FlourishBuilder
     {
         services.AddSingleton<App>();
         services.AddSingleton<ICommandParser, AppCommandParser>();
-        services.AddNavigable<HomePage>("首页", "\uE80F", isInitial: true);
+        services.AddNavigable<HomePage>("首页", "\uE80F");
         services.AddNavigable<GalleryPage>("图库", "\uE91B");
     })
     .ConfigureShell((_, shell) =>
     {
-        shell.UseDynamicToolbar();
+        shell
+            .UseNavigationPanel((_, nav) =>
+            {
+                nav.SetGroup("导航", groupId: 0, group =>
+                {
+                    group.AddNavigableViewItem<HomePage>(isInitial: true);
+                    group.AddNavigableViewItem<GalleryPage>();
+                });
+            })
+            .UseDynamicToolbar();
     })
     .ConfigureDynamicToolbar((_, toolbar) =>
     {

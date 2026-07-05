@@ -5,7 +5,7 @@ description: Apply Flourish to a WPF application with the shortest useful path.
 
 # Getting started
 
-The fastest way to use Flourish is to let the shell host your WPF `Application`: add the theme resources, build an `IFlourish` runtime in `Program.Main`, register pages with `AddNavigable`, then call `Program.Flourish.Show(this)` when the application starts.
+The fastest way to use Flourish is to let the shell host your WPF `Application`: add the theme resources, build an `IFlourish` runtime in `Program.Main`, register pages with `AddNavigable`, place them in the navigation panel with `UseNavigationPanel`, then call `Program.Flourish.Show(this)` when the application starts.
 
 ## Reference the theme
 
@@ -53,7 +53,7 @@ internal static class Program
                 services.AddSingleton<App>();
                 services.AddSingleton<ICommandParser, AppCommandParser>();
 
-                services.AddNavigable<HomePage>("Home", "\uE80F", isInitial: true);
+                services.AddNavigable<HomePage>("Home", "\uE80F");
                 services.AddNavigable<SettingsPage>("Settings", "\uE713");
             })
             .ConfigureShell((_, shell) =>
@@ -72,7 +72,12 @@ internal static class Program
                     })
                     .UseNavigationPanel((_, nav) =>
                     {
-                        nav.SetInitiallyOpen().SetTitle("Navigation");
+                        nav.SetInitiallyOpen()
+                           .SetGroup("Navigation", groupId: 0, group =>
+                           {
+                               group.AddNavigableViewItem<HomePage>(isInitial: true);
+                           })
+                           .AddFixedNavigableViewItem<SettingsPage>();
                     })
                     .UseDynamicToolbar()
                     .UseMotion()
@@ -124,7 +129,7 @@ public partial class App : Application
 
 ## Create pages
 
-Pages registered with `AddNavigable` are regular WPF `Page` classes. Flourish resolves them from dependency injection when navigation occurs.
+Pages registered with `AddNavigable` are regular WPF `Page` classes. Flourish resolves them from dependency injection when navigation occurs. The page display name, icon, and cache mode come from `AddNavigable`; the visible navigation position and initial page are configured in `UseNavigationPanel`.
 
 ```csharp
 using System.Windows.Controls;
@@ -143,7 +148,8 @@ public partial class HomePage : Page
 ## First run checklist
 
 - `App` is registered with `services.AddSingleton<App>()`.
-- At least one page is registered with `AddNavigable`, preferably with `isInitial: true`.
+- At least one page is registered with `AddNavigable`.
+- At least one visible page item is added with `AddNavigableViewItem`, preferably with `isInitial: true`.
 - `App.OnStartup` calls `Program.Flourish.Show(this)`.
 - `flourish.Start()` is called before `app.Run()`.
 - `StopAsync()` and `Dispose()` are called in `finally`.

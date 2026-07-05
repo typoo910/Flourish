@@ -5,7 +5,7 @@ description: Handle command keys raised by Flourish UI surfaces.
 
 # Command parser
 
-`ICommandParser` is the public extension point for command keys raised by Flourish UI surfaces, especially dynamic toolbar items. A toolbar item stores a `CommandKey`; when the user invokes that item, Flourish asks registered parsers whether they can handle the key.
+`ICommandParser` is the public extension point for command keys raised by Flourish UI surfaces, especially dynamic toolbar items and command navigation items. A UI item stores a command key; when the user invokes that item, Flourish asks registered parsers whether they can handle the key.
 
 ## Register a parser
 
@@ -64,6 +64,24 @@ toolbar.CreateToolbarItems<GalleryPage>(
 ```
 
 The third constructor argument is the command key. It is optional, but toolbar actions that should do work should provide one.
+
+## Connect navigation command items
+
+Navigation command items use the same parser path. Add them with `AddNavigableItem` inside a group, or with `AddFixedNavigableItem` in the fixed bottom section.
+
+```csharp
+shell.UseNavigationPanel((_, nav) =>
+{
+    nav.SetGroup("Commands", groupId: 1, group =>
+    {
+        group.AddNavigableItem("Refresh", "gallery.refresh", iconGlyph: "\uE72C");
+    });
+
+    nav.AddFixedNavigableItem("About", "app.about", iconGlyph: "\uE946");
+});
+```
+
+If a command item is a parent node, clicking it expands or collapses children and does not execute the command key.
 
 ## Use services inside a parser
 

@@ -37,11 +37,21 @@ public interface IFlourishShellBuilder
     /// </summary>
     /// <param name="configureNavigationPanel">A callback that receives the host context and navigation panel builder.</param>
     /// <returns>The current builder for chained configuration.</returns>
+    /// <remarks>
+    /// Register pages with <c>AddNavigable</c> during service configuration, then use the navigation
+    /// panel builder to decide where registered page items and command items are displayed.
+    /// </remarks>
     /// <example>
     /// <code><![CDATA[
     /// shell.UseNavigationPanel((_, nav) =>
     /// {
-    ///     nav.SetInitiallyOpen().SetTitle("Navigation");
+    ///     nav.SetInitiallyOpen()
+    ///        .SetGroup("Navigation", groupId: 0, group =>
+    ///        {
+    ///            group.AddNavigableViewItem<HomePage>(isInitial: true);
+    ///            group.AddNavigableViewItem<GalleryPage>();
+    ///        })
+    ///        .AddFixedNavigableViewItem<SettingsPage>();
     /// });
     /// ]]></code>
     /// </example>

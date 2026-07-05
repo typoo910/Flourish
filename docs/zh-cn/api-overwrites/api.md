@@ -128,8 +128,8 @@ summary: 提供 Flourish 应用使用的服务集合扩展方法。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,System.Boolean,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
-summary: 将 WPF 页面注册为 Flourish 可导航页面。
+uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
+summary: 将 WPF 页面注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
 syntax:
   typeParameters:
   - id: TPage
@@ -138,11 +138,9 @@ syntax:
   - id: services
     description: 接收页面注册的服务集合。
   - id: displayName
-    description: 在导航 UI 中显示的名称。
+    description: 页面显示为导航项时使用的名称。
   - id: iconGlyph
-    description: 在导航 UI 中显示的图标字形。
-  - id: isInitial
-    description: 指示该页面是否作为初始页面。
+    description: 页面显示为导航项时使用的图标字形。
   - id: cacheMode
     description: 该页面使用的页面缓存模式。
   return:
@@ -150,8 +148,8 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String,System.String,System.Boolean,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
-summary: 将指定的 WPF 页面类型注册为 Flourish 可导航页面。
+uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String,System.String,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
+summary: 将指定的 WPF 页面类型注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
 syntax:
   parameters:
   - id: services
@@ -159,11 +157,9 @@ syntax:
   - id: pageType
     description: 要注册的页面类型。
   - id: displayName
-    description: 在导航 UI 中显示的名称。
+    description: 页面显示为导航项时使用的名称。
   - id: iconGlyph
-    description: 在导航 UI 中显示的图标字形。
-  - id: isInitial
-    description: 指示该页面是否作为初始页面。
+    description: 页面显示为导航项时使用的图标字形。
   - id: cacheMode
     description: 该页面使用的页面缓存模式。
   return:
@@ -183,11 +179,11 @@ uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem.#ctor(System.String,Syste
 summary: 创建一个工具栏项描述。
 syntax:
   parameters:
-  - id: DisplayName
+  - id: displayName
     description: 工具栏项显示文本。
-  - id: IconGlyph
+  - id: iconGlyph
     description: 工具栏项显示的图标字形。
-  - id: CommandKey
+  - id: commandKey
     description: 传递给 ICommandParser 的可选命令键。
 ---
 
@@ -208,7 +204,7 @@ summary: 获取传递给 ICommandParser 的可选命令键。
 
 ---
 uid: AcksheedSys.Flourish.Abstract.ICommandParser
-summary: 解析由 Flourish UI 表面触发的命令键，例如工具栏项命令。
+summary: 解析由 Flourish UI 表面触发的命令键，例如工具栏项命令和按钮类型导航项命令。
 ---
 
 ---
@@ -507,13 +503,107 @@ syntax:
 
 ---
 uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetTitle(System.String)
-summary: 设置导航面板标题。
+summary: 设置旧版未分组导航界面使用的导航面板标题。
 syntax:
   parameters:
   - id: title
-    description: 显示在导航项上方的标题。
+    description: 显示在旧版导航项上方的标题。
   return:
     description: 用于链式配置的当前 builder。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetGroup(System.String,System.Int32,System.Action{AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder})
+summary: 添加并配置一个可滚动导航分组。
+syntax:
+  parameters:
+  - id: displayName
+    description: 分组标题。groupId 不为 0 时必须提供。
+  - id: groupId
+    description: 唯一分组 ID。数值越小显示越靠前，默认值为 0。
+  - id: configureGroup
+    description: 用于添加分组内导航项的配置回调。
+  return:
+    description: 用于链式配置的当前 builder。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
+summary: 在导航栏底部固定区域添加一个已注册页面导航项。
+syntax:
+  typeParameters:
+  - id: TPage
+    description: 要显示的已注册页面类型。
+  parameters:
+  - id: isInitial
+    description: 指示该页面是否作为 Shell 打开后的初始页面。
+  - id: parentId
+    description: 可选父节点 ID。childId 不为 0 时必须为 0。
+  - id: childId
+    description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
+  return:
+    description: 用于链式配置的当前 builder。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+summary: 在导航栏底部固定区域添加一个按钮类型命令项。
+syntax:
+  parameters:
+  - id: displayName
+    description: 命令项显示文本。
+  - id: commandKey
+    description: 触发时传递给 ICommandParser 的可选命令键。
+  - id: parentId
+    description: 可选父节点 ID。childId 不为 0 时必须为 0。
+  - id: childId
+    description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
+  - id: iconGlyph
+    description: 命令项显示的可选图标字形。
+  return:
+    description: 用于链式配置的当前 builder。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder
+summary: 配置 Flourish 导航分组中显示的导航项。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
+summary: 将一个已注册 WPF 页面添加到当前导航分组。
+syntax:
+  typeParameters:
+  - id: TPage
+    description: 要显示的已注册页面类型。
+  parameters:
+  - id: isInitial
+    description: 指示该页面是否作为 Shell 打开后的初始页面。
+  - id: parentId
+    description: 可选父节点 ID。childId 不为 0 时必须为 0。
+  - id: childId
+    description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
+  return:
+    description: 用于链式配置的当前分组 builder。
+---
+
+---
+uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+summary: 将一个按钮类型命令项添加到当前导航分组。
+syntax:
+  parameters:
+  - id: displayName
+    description: 命令项显示文本。
+  - id: commandKey
+    description: 触发时传递给 ICommandParser 的可选命令键。
+  - id: parentId
+    description: 可选父节点 ID。childId 不为 0 时必须为 0。
+  - id: childId
+    description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
+  - id: iconGlyph
+    description: 命令项显示的可选图标字形。
+  return:
+    description: 用于链式配置的当前分组 builder。
 ---
 
 ---
@@ -534,7 +624,7 @@ syntax:
 
 ---
 uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseNavigationPanel(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder})
-summary: 启用并配置 Shell 导航面板。
+summary: 启用并配置 Shell 导航面板，用于放置已注册页面项和按钮类型命令项。
 syntax:
   parameters:
   - id: configureNavigationPanel

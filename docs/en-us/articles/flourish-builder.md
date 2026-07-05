@@ -62,13 +62,12 @@ Flourish also registers its own internal services during build, including naviga
 
 ## Register pages with AddNavigable
 
-`AddNavigable` is the recommended way to make a WPF `Page` appear in the shell navigation model. It both registers the page in DI and records the display metadata used by Flourish.
+`AddNavigable` is the recommended way to register a WPF `Page` for Flourish navigation. It registers the page in DI and records the display metadata used by page navigation items. It does not decide where the page appears in the navigation panel.
 
 ```csharp
 services.AddNavigable<HomePage>(
     displayName: "Home",
     iconGlyph: "\uE80F",
-    isInitial: true,
     cacheMode: FlourishPageCacheMode.Enabled);
 ```
 
@@ -88,7 +87,24 @@ services.AddNavigable(
     cacheMode: FlourishPageCacheMode.Disabled);
 ```
 
-`displayName` is shown in navigation UI. `iconGlyph` is typically a Segoe Fluent Icons glyph such as `"\uE80F"`. `isInitial` marks the first page Flourish should navigate to when the shell opens. `cacheMode` controls whether the same page instance is reused.
+`displayName` is shown by `AddNavigableViewItem`. `iconGlyph` is typically a Segoe Fluent Icons glyph such as `"\uE80F"`. `cacheMode` controls whether the same page instance is reused.
+
+Place registered pages in the visible navigation panel with `UseNavigationPanel`.
+
+```csharp
+shell.UseNavigationPanel((_, nav) =>
+{
+    nav.SetGroup("Navigation", groupId: 0, group =>
+    {
+        group.AddNavigableViewItem<HomePage>(isInitial: true);
+        group.AddNavigableViewItem<SettingsPage>();
+    });
+
+    nav.AddFixedNavigableViewItem<ReportPage>();
+});
+```
+
+`isInitial` belongs to the visible view item. This lets a page be registered once and later placed in the scrollable group area or fixed bottom area without mixing registration metadata with layout decisions.
 
 ## Page cache mode
 
@@ -105,6 +121,8 @@ services.AddNavigable<ImportWizardPage>(
     "\uE8B5",
     cacheMode: FlourishPageCacheMode.Disabled);
 ```
+
+The cache mode is attached to the registered page type, not to a specific navigation item. A page can only be displayed in one navigation position, but its cache behavior is still defined at registration time.
 
 ## Build the runtime
 

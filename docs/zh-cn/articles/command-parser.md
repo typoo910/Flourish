@@ -5,7 +5,7 @@ description: 处理 Flourish UI 区域触发的命令键。
 
 # 命令解析器
 
-`ICommandParser` 是 Flourish UI 区域触发命令键时的公开扩展点，最常见来源是动态工具栏。工具栏项保存一个 `CommandKey`；用户触发工具栏项时，Flourish 会询问已注册的解析器是否能处理该命令。
+`ICommandParser` 是 Flourish UI 区域触发命令键时的公开扩展点，最常见来源是动态工具栏项和按钮类型导航项。UI 项会保存一个命令键；用户触发该项时，Flourish 会询问已注册的解析器是否能处理该命令。
 
 ## 注册解析器
 
@@ -64,6 +64,24 @@ toolbar.CreateToolbarItems<GalleryPage>(
 ```
 
 构造函数第三个参数就是命令键。它是可选的，但需要执行动作的工具栏项应提供命令键。
+
+## 连接导航命令项
+
+按钮类型导航项使用同一条解析路径。可以在分组内通过 `AddNavigableItem` 添加，也可以在底部固定区域通过 `AddFixedNavigableItem` 添加。
+
+```csharp
+shell.UseNavigationPanel((_, nav) =>
+{
+    nav.SetGroup("命令", groupId: 1, group =>
+    {
+        group.AddNavigableItem("刷新", "gallery.refresh", iconGlyph: "\uE72C");
+    });
+
+    nav.AddFixedNavigableItem("关于", "app.about", iconGlyph: "\uE946");
+});
+```
+
+如果命令项同时是父节点，点击它只会展开或折叠子项，不会执行命令键。
 
 ## 在解析器中使用服务
 

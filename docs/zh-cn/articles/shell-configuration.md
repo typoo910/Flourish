@@ -51,7 +51,7 @@ shell.UseTitlebar((_, titlebar) =>
 
 ## 导航栏
 
-`UseNavigationPanel` 配置左侧或右侧导航区域。实际导航项来自 `AddNavigable` 注册。
+`UseNavigationPanel` 配置左侧或右侧导航区域。页面元数据通过 `AddNavigable` 注册，可见页面项、命令项、分组和底部固定项则在这里放置。
 
 ```csharp
 shell.UseNavigationPanel((_, nav) =>
@@ -60,11 +60,18 @@ shell.UseNavigationPanel((_, nav) =>
         .SetEnabled()
         .SetDirection(NavigationPanelDirection.Left)
         .SetInitiallyOpen()
-        .SetTitle("导航");
+        .SetGroup("导航", groupId: 0, group =>
+        {
+            group.AddNavigableViewItem<HomePage>(isInitial: true);
+            group.AddNavigableViewItem<GalleryPage>();
+            group.AddNavigableItem("刷新", "navigation.refresh", iconGlyph: "\uE72C");
+        })
+        .AddFixedNavigableViewItem<SettingsPage>()
+        .AddFixedNavigableItem("关于", "app.about", iconGlyph: "\uE946");
 });
 ```
 
-如果应用使用自定义导航或只有单页 Shell，可以使用 `SetEnabled(false)`。如果布局更适合右侧导航，可以使用 `NavigationPanelDirection.Right`。
+如果应用使用自定义导航或只有单页 Shell，可以使用 `SetEnabled(false)`。如果布局更适合右侧导航，可以使用 `NavigationPanelDirection.Right`。分组项位于上方可滚动区域；固定项始终显示在底部区域。
 
 ## 动态工具栏区域
 
@@ -156,7 +163,12 @@ builder.ConfigureShell((_, shell) =>
         })
         .UseNavigationPanel((_, nav) =>
         {
-            nav.SetDirection().SetInitiallyOpen().SetTitle("导航");
+            nav.SetDirection()
+               .SetInitiallyOpen()
+               .SetGroup("导航", groupId: 0, group =>
+               {
+                   group.AddNavigableViewItem<HomePage>(isInitial: true);
+               });
         })
         .UseDynamicToolbar()
         .UseMotion((_, motion) =>

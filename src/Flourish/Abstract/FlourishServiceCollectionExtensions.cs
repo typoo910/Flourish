@@ -9,7 +9,10 @@ namespace AcksheedSys.Flourish.Abstract;
 /// </summary>
 /// <example>
 /// <code><![CDATA[
-/// services.AddNavigable<HomePage>("Home", "\uE80F");
+/// services.AddNavigable<HomePage>(
+///     displayName: "Home",
+///     iconGlyph: "\uE80F",
+///     cacheMode: FlourishPageCacheMode.Enabled);
 /// ]]></code>
 /// </example>
 public static class FlourishServiceCollectionExtensions
@@ -17,10 +20,17 @@ public static class FlourishServiceCollectionExtensions
     /// <summary>
     /// Registers a WPF page as a navigable Flourish page.
     /// </summary>
+    /// <remarks>
+    /// This method records the page display name, icon glyph, and cache mode. It does not add
+    /// the page to a visible navigation position by itself. Use
+    /// <see cref="IFlourishNavigationGroupBuilder.AddNavigableViewItem{TPage}" /> or
+    /// <see cref="IFlourishNavigationPanelBuilder.AddFixedNavigableViewItem{TPage}" /> inside
+    /// <c>UseNavigationPanel</c> to decide where the registered page is displayed.
+    /// </remarks>
     /// <typeparam name="TPage">The page type to register.</typeparam>
     /// <param name="services">The service collection that receives the page registration.</param>
-    /// <param name="displayName">The display name shown in navigation UI.</param>
-    /// <param name="iconGlyph">The icon glyph shown in navigation UI.</param>
+    /// <param name="displayName">The display name used when the page is displayed in navigation UI.</param>
+    /// <param name="iconGlyph">The icon glyph used when the page is displayed in navigation UI.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <example>
@@ -45,10 +55,15 @@ public static class FlourishServiceCollectionExtensions
     /// <summary>
     /// Registers a WPF page type as a navigable Flourish page.
     /// </summary>
+    /// <remarks>
+    /// Use this overload when the page type is discovered at runtime, such as from configuration or
+    /// a plug-in. As with the generic overload, this registers page metadata only; the visible
+    /// navigation item is created later by the navigation panel builder.
+    /// </remarks>
     /// <param name="services">The service collection that receives the page registration.</param>
     /// <param name="pageType">The page type to register.</param>
-    /// <param name="displayName">The default display name used by navigation UI.</param>
-    /// <param name="iconGlyph">The default icon glyph used by navigation UI.</param>
+    /// <param name="displayName">The display name used when the page is displayed in navigation UI.</param>
+    /// <param name="iconGlyph">The icon glyph used when the page is displayed in navigation UI.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="pageType" /> does not derive from <see cref="Page" />.</exception>
