@@ -688,10 +688,7 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        if (TryOpenNavigationPaneForCollapsedParent(item))
-        {
-            return;
-        }
+        OpenNavigationPaneForCollapsedParent(item);
 
         if (item.IsCommandItem)
         {
@@ -724,10 +721,7 @@ internal partial class FlourishShellWindow : Window
         }
 
         e.Handled = true;
-        if (TryOpenNavigationPaneForCollapsedParent(item))
-        {
-            return;
-        }
+        OpenNavigationPaneForCollapsedParent(item);
 
         if (item.IsCommandItem)
         {
@@ -754,10 +748,7 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        if (TryOpenNavigationPaneForCollapsedParent(item))
-        {
-            return;
-        }
+        OpenNavigationPaneForCollapsedParent(item);
 
         if (!item.IsPageItem)
         {
@@ -819,9 +810,9 @@ internal partial class FlourishShellWindow : Window
         bool toggleChildren = true
     )
     {
-        if (toggleChildren && TryOpenNavigationPaneForCollapsedParent(item))
+        if (toggleChildren)
         {
-            return;
+            OpenNavigationPaneForCollapsedParent(item);
         }
 
         if (toggleChildren && item.HasChildren)
@@ -859,17 +850,15 @@ internal partial class FlourishShellWindow : Window
         SetChildItemsVisibility(parent, parent.IsExpanded);
     }
 
-    private bool TryOpenNavigationPaneForCollapsedParent(FlourishNavigationItem item)
+    private void OpenNavigationPaneForCollapsedParent(FlourishNavigationItem item)
     {
         if (isPaneOpen || !item.HasChildren)
         {
-            return false;
+            return;
         }
 
         isPaneOpen = true;
         ApplyNavigationPaneState(animate: true);
-        RestoreSelectedNavigationItem();
-        return true;
     }
 
     private void CollapseAllNavigationChildren()
