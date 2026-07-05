@@ -14,6 +14,7 @@ builder.ConfigureShell((_, shell) =>
         .UseTitlebar((_, titlebar) => { })
         .UseNavigationPanel((_, nav) => { })
         .UseDynamicToolbar()
+        .UseTips((_, tips) => { })
         .UseMotion((_, motion) => { })
         .UseMaterialEffect()
         .SetGlobalFont("Microsoft YaHei")
@@ -85,6 +86,19 @@ shell.UseDynamicToolbar(enabled: true);
 ```
 
 Disable it when the application does not have contextual page commands.
+
+## Tips
+
+`UseTips` configures Flourish tooltips. Tooltips use Flourish styling and predefined shell-region placement: navigation opens toward the content area, title bar and top toolbar controls open downward, and footer controls open upward.
+
+```csharp
+shell.UseTips((_, tips) =>
+{
+    tips.SetDelay(600).SetSpawnableMargin(5);
+});
+```
+
+By default, tips appear after `800` milliseconds and keep at least `5` pixels away from the shell window bounds. Use `SetDelay` to tune the hover delay and `SetSpawnableMargin` to adjust that window-edge margin.
 
 ## Motion
 
@@ -177,6 +191,10 @@ builder.ConfigureShell((_, shell) =>
                });
         })
         .UseDynamicToolbar()
+        .UseTips((_, tips) =>
+        {
+            tips.SetDelay(600).SetSpawnableMargin(5);
+        })
         .UseMotion((_, motion) =>
         {
             motion.SetDuration().SetHoverReveal().SetNavigationPanelTransition().SetPageTransition();

@@ -135,6 +135,12 @@ internal static class Program
                             }
                         )
                         .UseDynamicToolbar()
+                        .UseTips(
+                            (_, tips) =>
+                            {
+                                tips.SetDelay(200).SetSpawnableMargin(5);
+                            }
+                        )
                         .UseMotion(
                             (_, motion) =>
                             {

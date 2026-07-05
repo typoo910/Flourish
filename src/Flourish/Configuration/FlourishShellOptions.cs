@@ -53,6 +53,8 @@ internal sealed class FlourishShellOptions
 
     public FlourishMotionOptions Motion { get; } = new();
 
+    public FlourishTipOptions Tips { get; } = new();
+
     public bool WindowTopmost { get; set; }
 
     public bool WindowShowInTaskbar { get; set; } = true;

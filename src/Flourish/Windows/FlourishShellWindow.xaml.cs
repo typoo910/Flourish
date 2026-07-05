@@ -137,6 +137,7 @@ internal partial class FlourishShellWindow : Window
             : Visibility.Collapsed;
         UpdateTitlebarBreadcrumbNavigation();
         ApplyMotionResources();
+        ApplyToolTipResources();
 
         NormalizeNavigationPaneWidths();
         ApplyNavigationPanelPlacement();
@@ -156,6 +157,13 @@ internal partial class FlourishShellWindow : Window
                 !options.Motion.RespectSystemReducedMotion
                 || SystemParameters.ClientAreaAnimation
             );
+    }
+
+    private void ApplyToolTipResources()
+    {
+        Resources["FlourishToolTipInitialShowDelay"] =
+            options.Tips.InitialShowDelayMilliseconds;
+        Resources["FlourishToolTipSpawnableMargin"] = options.Tips.SpawnableMargin;
     }
 
     private void ApplyWindowOptions()

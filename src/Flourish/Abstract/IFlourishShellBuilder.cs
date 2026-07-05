@@ -141,4 +141,21 @@ public interface IFlourishShellBuilder
     IFlourishShellBuilder UseMotion(
         Action<HostBuilderContext, IFlourishMotionBuilder> configureMotion
     );
+
+    /// <summary>
+    /// Configures Flourish tooltips.
+    /// </summary>
+    /// <param name="configureTips">A callback that receives the host context and tooltip builder.</param>
+    /// <returns>The current builder for chained configuration.</returns>
+    /// <example>
+    /// <code><![CDATA[
+    /// shell.UseTips((_, tips) =>
+    /// {
+    ///     tips.SetDelay(600).SetSpawnableMargin(5);
+    /// });
+    /// ]]></code>
+    /// </example>
+    IFlourishShellBuilder UseTips(
+        Action<HostBuilderContext, IFlourishTipsBuilder> configureTips
+    );
 }

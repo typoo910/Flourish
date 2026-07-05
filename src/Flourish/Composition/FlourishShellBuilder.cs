@@ -68,6 +68,14 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options, HostBui
         return this;
     }
 
+    public IFlourishShellBuilder UseTips(
+        Action<HostBuilderContext, IFlourishTipsBuilder> configureTips
+    )
+    {
+        configureTips(context, new FlourishTipsBuilder(options.Tips));
+        return this;
+    }
+
     private static void ValidatePositiveFinite(double value, string parameterName)
     {
         ValidateFinite(value, parameterName);

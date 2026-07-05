@@ -22,6 +22,13 @@
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="ToolTip" Value="{Binding Label}" />
+    <Setter
+      Property="ToolTipService.InitialShowDelay"
+      Value="{DynamicResource FlourishToolTipInitialShowDelay}"
+    />
+    <Setter Property="ToolTipService.BetweenShowDelay" Value="0" />
+    <Setter Property="ToolTipService.ShowDuration" Value="10000" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter
       Property="controls:HoverReveal.IsEnabled"
@@ -164,6 +171,7 @@
         <Setter Property="Height" Value="Auto" />
         <Setter Property="Margin" Value="16,20,12,7" />
         <Setter Property="Padding" Value="0" />
+        <Setter Property="ToolTip" Value="{x:Null}" />
         <Setter Property="Cursor" Value="Arrow" />
         <Setter Property="IsHitTestVisible" Value="False" />
       </DataTrigger>

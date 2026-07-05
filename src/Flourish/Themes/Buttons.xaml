@@ -12,6 +12,13 @@
     <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter
+      Property="ToolTipService.InitialShowDelay"
+      Value="{DynamicResource FlourishToolTipInitialShowDelay}"
+    />
+    <Setter Property="ToolTipService.BetweenShowDelay" Value="0" />
+    <Setter Property="ToolTipService.ShowDuration" Value="10000" />
+    <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+    <Setter
       Property="controls:HoverReveal.IsEnabled"
       Value="{DynamicResource FlourishHoverRevealEnabled}"
     />
