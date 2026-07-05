@@ -618,16 +618,57 @@ internal partial class FlourishShellWindow : Window
     private void ToggleChildItems(FlourishNavigationItem parent)
     {
         parent.IsExpanded = !parent.IsExpanded;
-        var items = parent.IsFixed ? options.FixedNavigationItems : options.NavigationItems;
+        SetChildItemsVisibility(parent, parent.IsExpanded);
+    }
 
-        foreach (
-            var child in items.Where(item =>
-                item.GroupId == parent.GroupId && item.ChildId == parent.ParentId
-            )
-        )
+    private void ExpandAncestorsForSelection(FlourishNavigationItem item)
+    {
+        if (item.ChildId == 0)
         {
-            child.IsVisible = parent.IsExpanded;
+            return;
         }
+
+        var parent = FindParentNavigationItem(item);
+        if (parent is null)
+        {
+            return;
+        }
+
+        parent.IsExpanded = true;
+        SetChildItemsVisibility(parent, true);
+    }
+
+    private void SetChildItemsVisibility(FlourishNavigationItem parent, bool isVisible)
+    {
+        foreach (var child in GetChildNavigationItems(parent))
+        {
+            child.IsVisible = isVisible;
+        }
+    }
+
+    private IEnumerable<FlourishNavigationItem> GetChildNavigationItems(
+        FlourishNavigationItem parent
+    )
+    {
+        return GetNavigationScopeItems(parent)
+            .Where(item => item.GroupId == parent.GroupId && item.ChildId == parent.ParentId);
+    }
+
+    private FlourishNavigationItem? FindParentNavigationItem(FlourishNavigationItem child)
+    {
+        return child.ChildId == 0
+            ? null
+            : GetNavigationScopeItems(child)
+                .FirstOrDefault(item =>
+                    item.GroupId == child.GroupId && item.ParentId == child.ChildId
+                );
+    }
+
+    private IReadOnlyList<FlourishNavigationItem> GetNavigationScopeItems(
+        FlourishNavigationItem item
+    )
+    {
+        return item.IsFixed ? options.FixedNavigationItems : options.NavigationItems;
     }
 
     private bool IsBreadcrumbFeatureEnabled()
@@ -730,6 +771,7 @@ internal partial class FlourishShellWindow : Window
         suppressNavigationSelection = true;
         try
         {
+            ExpandAncestorsForSelection(item);
             UpdateActiveChildParent(item);
 
             if (item.IsFixed)
@@ -760,10 +802,7 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        var items = activeItem.IsFixed ? options.FixedNavigationItems : options.NavigationItems;
-        var parent = items.FirstOrDefault(item =>
-            item.GroupId == activeItem.GroupId && item.ParentId == activeItem.ChildId
-        );
+        var parent = FindParentNavigationItem(activeItem);
 
         if (parent is not null)
         {

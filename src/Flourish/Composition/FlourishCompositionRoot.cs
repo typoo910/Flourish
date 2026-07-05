@@ -89,42 +89,28 @@ internal sealed class FlourishCompositionRoot(
                 .ToDictionary(group => group.Key, group => group.Last())
             ?? [];
         var hasConfiguredNavigation =
-            shellOptions.NavigationGroups.Count > 0 || shellOptions.FixedNavigationItems.Count > 0;
+            shellOptions.NavigationGroups.Count > 0
+            || shellOptions.FixedNavigationItemDefinitions.Count > 0;
 
         shellOptions.NavigationItems.Clear();
+        shellOptions.FixedNavigationItems.Clear();
         shellOptions.PageCacheModesByPageType.Clear();
         foreach (var page in registeredPages.Values)
         {
             shellOptions.PageCacheModesByPageType[page.PageType] = page.CacheMode;
         }
 
-        if (!hasConfiguredNavigation)
-        {
-            var legacyGroup = new FlourishNavigationGroup(
-                0,
-                string.IsNullOrWhiteSpace(shellOptions.PaneTitle) ? null : shellOptions.PaneTitle
-            );
+        var navigationGroups = hasConfiguredNavigation
+            ? shellOptions
+                .NavigationGroups.OrderBy(group => group.GroupId)
+                .Select(CloneNavigationGroup)
+                .ToList()
+            : CreateLegacyNavigationGroups(registeredPages);
+        var fixedNavigationItems = CloneNavigationItems(shellOptions.FixedNavigationItemDefinitions);
 
-            foreach (var page in registeredPages.Values)
-            {
-                legacyGroup.Items.Add(
-                    new FlourishNavigationItem(
-                        page.PageType.FullName ?? page.PageType.Name,
-                        page.DisplayName ?? page.PageType.Name,
-                        page.IconGlyph,
-                        0,
-                        FlourishNavigationItemKind.Page,
-                        page.PageType
-                    )
-                );
-            }
+        ValidateUniqueNavigationPageItems(navigationGroups, fixedNavigationItems);
 
-            shellOptions.NavigationGroups.Add(legacyGroup);
-        }
-
-        ValidateUniqueNavigationPageItems();
-
-        foreach (var group in shellOptions.NavigationGroups.OrderBy(group => group.GroupId))
+        foreach (var group in navigationGroups)
         {
             if (!string.IsNullOrWhiteSpace(group.Title))
             {
@@ -143,18 +129,81 @@ internal sealed class FlourishCompositionRoot(
             shellOptions.NavigationItems.AddRange(group.Items);
         }
 
-        FinalizeNavigationItems(
-            shellOptions.FixedNavigationItems,
-            registeredPages,
-            "fixed navigation items"
+        FinalizeNavigationItems(fixedNavigationItems, registeredPages, "fixed navigation items");
+        shellOptions.FixedNavigationItems.AddRange(fixedNavigationItems);
+    }
+
+    private IReadOnlyList<FlourishNavigationGroup> CreateLegacyNavigationGroups(
+        IReadOnlyDictionary<Type, NavigablePageRegistration> registeredPages
+    )
+    {
+        var legacyGroup = new FlourishNavigationGroup(
+            0,
+            string.IsNullOrWhiteSpace(shellOptions.PaneTitle) ? null : shellOptions.PaneTitle
+        );
+
+        foreach (var page in registeredPages.Values)
+        {
+            legacyGroup.Items.Add(
+                new FlourishNavigationItem(
+                    page.PageType.FullName ?? page.PageType.Name,
+                    page.DisplayName ?? page.PageType.Name,
+                    page.IconGlyph,
+                    0,
+                    FlourishNavigationItemKind.Page,
+                    page.PageType
+                )
+            );
+        }
+
+        return [legacyGroup];
+    }
+
+    private static FlourishNavigationGroup CloneNavigationGroup(FlourishNavigationGroup source)
+    {
+        var group = new FlourishNavigationGroup(source.GroupId, source.Title);
+        group.Items.AddRange(CloneNavigationItems(source.Items));
+        return group;
+    }
+
+    private static List<FlourishNavigationItem> CloneNavigationItems(
+        IEnumerable<FlourishNavigationItem> sourceItems
+    )
+    {
+        var clonedItems = new List<FlourishNavigationItem>();
+        foreach (var item in sourceItems)
+        {
+            clonedItems.Add(CloneNavigationItem(item));
+        }
+
+        return clonedItems;
+    }
+
+    private static FlourishNavigationItem CloneNavigationItem(FlourishNavigationItem item)
+    {
+        return new FlourishNavigationItem(
+            item.Key,
+            item.Label,
+            item.IconGlyph,
+            item.GroupId,
+            item.Kind,
+            item.PageType,
+            commandKey: item.CommandKey,
+            isInitial: item.IsInitial,
+            isFixed: item.IsFixed,
+            parentId: item.ParentId,
+            childId: item.ChildId
         );
     }
 
-    private void ValidateUniqueNavigationPageItems()
+    private static void ValidateUniqueNavigationPageItems(
+        IReadOnlyList<FlourishNavigationGroup> navigationGroups,
+        IReadOnlyList<FlourishNavigationItem> fixedNavigationItems
+    )
     {
         var pageLocationsByType = new Dictionary<Type, List<string>>();
 
-        foreach (var group in shellOptions.NavigationGroups)
+        foreach (var group in navigationGroups)
         {
             AddNavigationPageLocations(
                 pageLocationsByType,
@@ -165,7 +214,7 @@ internal sealed class FlourishCompositionRoot(
 
         AddNavigationPageLocations(
             pageLocationsByType,
-            shellOptions.FixedNavigationItems,
+            fixedNavigationItems,
             "fixed navigation items"
         );
 

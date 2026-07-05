@@ -71,7 +71,7 @@ internal sealed class FlourishNavigationPanelBuilder(FlourishShellOptions option
         where TPage : Page
     {
         AddPageItem(
-            options.FixedNavigationItems,
+            options.FixedNavigationItemDefinitions,
             FixedItemsGroupId,
             isFixed: true,
             typeof(TPage),
@@ -91,7 +91,7 @@ internal sealed class FlourishNavigationPanelBuilder(FlourishShellOptions option
     )
     {
         AddCommandItem(
-            options.FixedNavigationItems,
+            options.FixedNavigationItemDefinitions,
             FixedItemsGroupId,
             isFixed: true,
             displayName,

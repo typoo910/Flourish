@@ -95,6 +95,8 @@ internal sealed class FlourishShellOptions
 
     public List<FlourishNavigationGroup> NavigationGroups { get; } = [];
 
+    public List<FlourishNavigationItem> FixedNavigationItemDefinitions { get; } = [];
+
     public List<FlourishNavigationItem> NavigationItems { get; } = [];
 
     public List<FlourishNavigationItem> FixedNavigationItems { get; } = [];
