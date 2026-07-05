@@ -11,5 +11,6 @@
   <SolidColorBrush x:Key="AccentBrush" Color="#2563EB" />
   <SolidColorBrush x:Key="AccentSoftBrush" Color="#DBEAFE" />
   <SolidColorBrush x:Key="FlourishControlHoverBrush" Color="#D6E8FF" />
+  <SolidColorBrush x:Key="FlourishWindowCaptionCloseHoverBrush" Color="#E81123" />
   <SolidColorBrush x:Key="FlourishNavigationSelectedBrush" Color="#CFE0FF" />
 </ResourceDictionary>
