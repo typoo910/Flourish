@@ -6,6 +6,5 @@ internal sealed record NavigablePageRegistration(
     Type PageType,
     string DisplayName,
     string IconGlyph,
-    bool IsInitial,
     FlourishPageCacheMode CacheMode
 );

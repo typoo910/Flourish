@@ -64,6 +64,7 @@ internal sealed class FlourishCompositionRoot(
 
     private void ApplyServiceCollectionRegistrations(IServiceCollection services)
     {
+        FlourishServiceCollectionState? state = null;
         if (
             services
                 .FirstOrDefault(descriptor =>
@@ -71,34 +72,135 @@ internal sealed class FlourishCompositionRoot(
                     && descriptor.ImplementationInstance is FlourishServiceCollectionState
                 )
                 ?.ImplementationInstance
-            is not FlourishServiceCollectionState state
+            is FlourishServiceCollectionState existingState
         )
         {
-            return;
+            state = existingState;
         }
 
-        foreach (var page in state.NavigablePages)
-        {
-            var key = page.PageType.FullName ?? page.DisplayName;
-            if (shellOptions.NavigationItems.Any(item => item.Key == key))
-            {
-                continue;
-            }
+        ApplyNavigationRegistrations(state);
+    }
 
-            shellOptions.NavigationItems.Add(
-                new FlourishNavigationItem(
-                    key,
-                    page.DisplayName,
-                    page.IconGlyph,
-                    page.PageType,
-                    page.CacheMode
-                )
+    private void ApplyNavigationRegistrations(FlourishServiceCollectionState? state)
+    {
+        var registeredPages =
+            state
+                ?.NavigablePages.GroupBy(page => page.PageType)
+                .ToDictionary(group => group.Key, group => group.Last())
+            ?? [];
+        var hasConfiguredNavigation =
+            shellOptions.NavigationGroups.Count > 0 || shellOptions.FixedNavigationItems.Count > 0;
+
+        shellOptions.NavigationItems.Clear();
+
+        if (!hasConfiguredNavigation)
+        {
+            var legacyGroup = new FlourishNavigationGroup(
+                0,
+                string.IsNullOrWhiteSpace(shellOptions.PaneTitle) ? null : shellOptions.PaneTitle
             );
 
-            if (page.IsInitial)
+            foreach (var page in registeredPages.Values)
             {
-                shellOptions.InitialNavigationPageType = page.PageType;
+                legacyGroup.Items.Add(
+                    new FlourishNavigationItem(
+                        page.PageType.FullName ?? page.PageType.Name,
+                        page.DisplayName ?? page.PageType.Name,
+                        page.IconGlyph,
+                        0,
+                        FlourishNavigationItemKind.Page,
+                        page.PageType,
+                        page.CacheMode
+                    )
+                );
             }
+
+            shellOptions.NavigationGroups.Add(legacyGroup);
+        }
+
+        foreach (var group in shellOptions.NavigationGroups.OrderBy(group => group.GroupId))
+        {
+            if (!string.IsNullOrWhiteSpace(group.Title))
+            {
+                shellOptions.NavigationItems.Add(
+                    new FlourishNavigationItem(
+                        $"group:{group.GroupId}",
+                        group.Title,
+                        null,
+                        group.GroupId,
+                        FlourishNavigationItemKind.GroupHeader
+                    )
+                );
+            }
+
+            FinalizeNavigationItems(group.Items, registeredPages, $"group {group.GroupId}");
+            shellOptions.NavigationItems.AddRange(group.Items);
+        }
+
+        FinalizeNavigationItems(
+            shellOptions.FixedNavigationItems,
+            registeredPages,
+            "fixed navigation items"
+        );
+    }
+
+    private void FinalizeNavigationItems(
+        IReadOnlyList<FlourishNavigationItem> items,
+        IReadOnlyDictionary<Type, NavigablePageRegistration> registeredPages,
+        string scopeName
+    )
+    {
+        var parentsById = new Dictionary<int, FlourishNavigationItem>();
+        foreach (var item in items)
+        {
+            item.Validate();
+
+            if (item.ParentId != 0 && !parentsById.TryAdd(item.ParentId, item))
+            {
+                throw new InvalidOperationException(
+                    $"Navigation parentID {item.ParentId} is duplicated in {scopeName}."
+                );
+            }
+
+            if (item.IsPageItem && item.PageType is not null)
+            {
+                if (!registeredPages.TryGetValue(item.PageType, out var page))
+                {
+                    throw new InvalidOperationException(
+                        $"{item.PageType.FullName} must be registered with AddNavigable before it is added to the navigation panel."
+                    );
+                }
+
+                if (item.Label == item.PageType.Name && !string.IsNullOrWhiteSpace(page.DisplayName))
+                {
+                    item.Label = page.DisplayName;
+                }
+
+                if (string.IsNullOrWhiteSpace(item.IconGlyph) && page.IconGlyph is not null)
+                {
+                    item.IconGlyph = page.IconGlyph;
+                }
+
+                item.CacheMode = page.CacheMode;
+            }
+
+            if (item.IsInitial && item.PageType is not null)
+            {
+                shellOptions.InitialNavigationPageType = item.PageType;
+            }
+        }
+
+        foreach (var child in items.Where(item => item.ChildId != 0))
+        {
+            if (!parentsById.TryGetValue(child.ChildId, out var parent))
+            {
+                throw new InvalidOperationException(
+                    $"Navigation childID {child.ChildId} in {scopeName} does not match a parentID."
+                );
+            }
+
+            parent.HasChildren = true;
+            child.IsVisible = false;
         }
     }
 

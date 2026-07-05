@@ -16,6 +16,74 @@
   WindowStyle="None"
   mc:Ignorable="d"
 >
+  <Window.Resources>
+    <DataTemplate x:Key="FlourishNavigationItemTemplate">
+      <Grid x:Name="NavigationTemplateRoot">
+        <TextBlock
+          x:Name="NavigationGroupHeader"
+          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontWeight="Normal"
+          Foreground="{StaticResource MutedTextBrush}"
+          Opacity="0.72"
+          Text="{Binding Label}"
+          Visibility="Collapsed"
+        />
+
+        <Grid
+          x:Name="NavigationItemLayout"
+          Margin="{Binding IndentMargin}"
+        >
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+          </Grid.ColumnDefinitions>
+          <TextBlock
+            x:Name="NavigationItemIcon"
+            Width="20"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontFamily="{DynamicResource FlourishIconFontFamily}"
+            FontSize="{DynamicResource FlourishFontSizeNavigationIcon}"
+            Text="{Binding IconGlyph}"
+            TextAlignment="Center"
+          />
+          <TextBlock
+            x:Name="NavigationItemLabel"
+            Grid.Column="1"
+            Margin="8,0,0,0"
+            VerticalAlignment="Center"
+            Text="{Binding Label}"
+          />
+          <TextBlock
+            x:Name="NavigationItemExpander"
+            Grid.Column="2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            FontFamily="{DynamicResource FlourishIconFontFamily}"
+            FontSize="{DynamicResource FlourishFontSizeCaption}"
+            Text="{Binding ExpandGlyph}"
+          />
+        </Grid>
+      </Grid>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
+          <Setter TargetName="NavigationGroupHeader" Property="Visibility" Value="Visible" />
+          <Setter TargetName="NavigationItemLayout" Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+        <DataTrigger
+          Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
+          Value="False"
+        >
+          <Setter TargetName="NavigationGroupHeader" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="NavigationItemLabel" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="NavigationItemExpander" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="NavigationItemLayout" Property="Width" Value="20" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+  </Window.Resources>
+
   <shell:WindowChrome.WindowChrome>
     <shell:WindowChrome
       CaptionHeight="0"
@@ -60,24 +128,19 @@
             BorderBrush="{StaticResource CardBorderBrush}"
             BorderThickness="0,0,1,0"
           >
-            <DockPanel LastChildFill="True">
-              <TextBlock
-                x:Name="PaneTitle"
-                Margin="16,10,12,6"
-                DockPanel.Dock="Top"
-                FontSize="{DynamicResource FlourishFontSizeSmall}"
-                FontWeight="Normal"
-                Foreground="{StaticResource MutedTextBrush}"
-                Opacity="0.72"
-              />
-
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
               <ListBox
                 x:Name="NavigationItemsHost"
-                DockPanel.Dock="Top"
+                Grid.Row="0"
+                ItemTemplate="{StaticResource FlourishNavigationItemTemplate}"
                 ItemContainerStyle="{StaticResource FlourishNavigationListBoxItemStyle}"
                 ItemsSource="{Binding}"
                 ScrollViewer.CanContentScroll="True"
-                SelectionChanged="NavigationItemsHost_SelectionChanged"
+                PreviewMouseLeftButtonDown="NavigationItemsHost_PreviewMouseLeftButtonDown"
                 Style="{StaticResource FlourishNavigationListBoxStyle}"
                 Tag="True"
                 VirtualizingStackPanel.IsVirtualizing="True"
@@ -88,52 +151,29 @@
                     <VirtualizingStackPanel />
                   </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
-                  <DataTemplate>
-                    <Grid x:Name="NavigationItemLayout">
-                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="*" />
-                      </Grid.ColumnDefinitions>
-                      <TextBlock
-                        x:Name="NavigationItemIcon"
-                        Width="20"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="{DynamicResource FlourishIconFontFamily}"
-                        FontSize="{DynamicResource FlourishFontSizeNavigationIcon}"
-                        TextAlignment="Center"
-                        Text="{Binding IconGlyph}"
-                      />
-                      <TextBlock
-                        x:Name="NavigationItemLabel"
-                        Grid.Column="1"
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center"
-                        Text="{Binding Label}"
-                      />
-                    </Grid>
-                    <DataTemplate.Triggers>
-                      <DataTrigger
-                        Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                        Value="False"
-                      >
-                        <Setter
-                          TargetName="NavigationItemLabel"
-                          Property="Visibility"
-                          Value="Collapsed"
-                        />
-                        <Setter
-                          TargetName="NavigationItemLayout"
-                          Property="Width"
-                          Value="20"
-                        />
-                      </DataTrigger>
-                    </DataTemplate.Triggers>
-                  </DataTemplate>
-                </ListBox.ItemTemplate>
               </ListBox>
-            </DockPanel>
+
+              <Border
+                x:Name="FixedNavigationItemsBorder"
+                Grid.Row="1"
+                Padding="0,6,0,6"
+                BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Visibility="Collapsed"
+              >
+                <ListBox
+                  x:Name="FixedNavigationItemsHost"
+                  ItemTemplate="{StaticResource FlourishNavigationItemTemplate}"
+                  ItemContainerStyle="{StaticResource FlourishNavigationListBoxItemStyle}"
+                  ItemsSource="{Binding}"
+                  PreviewMouseLeftButtonDown="NavigationItemsHost_PreviewMouseLeftButtonDown"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  Style="{StaticResource FlourishNavigationListBoxStyle}"
+                  Tag="True"
+                />
+              </Border>
+            </Grid>
           </Border>
 
           <Grid x:Name="ContentAreaGrid" Grid.Column="1">

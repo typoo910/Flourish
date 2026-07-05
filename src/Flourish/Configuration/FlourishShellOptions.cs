@@ -91,7 +91,11 @@ internal sealed class FlourishShellOptions
 
     public Type? InitialNavigationPageType { get; set; }
 
+    public List<FlourishNavigationGroup> NavigationGroups { get; } = [];
+
     public List<FlourishNavigationItem> NavigationItems { get; } = [];
+
+    public List<FlourishNavigationItem> FixedNavigationItems { get; } = [];
 
     public List<FlourishToolbarItem> ToolbarItems { get; } = [];
 

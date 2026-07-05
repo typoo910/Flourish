@@ -613,6 +613,19 @@
       </Setter.Value>
     </Setter>
     <Style.Triggers>
+      <DataTrigger Binding="{Binding IsVisible}" Value="False">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Height" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding IsGroupHeader}" Value="True">
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="Margin" Value="16,12,12,4" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Arrow" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+      </DataTrigger>
       <DataTrigger
         Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
         Value="False"
@@ -622,6 +635,19 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
       </DataTrigger>
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding IsGroupHeader}" Value="True" />
+          <Condition
+            Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+            Value="False"
+          />
+        </MultiDataTrigger.Conditions>
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Height" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+      </MultiDataTrigger>
     </Style.Triggers>
   </Style>
 </ResourceDictionary>

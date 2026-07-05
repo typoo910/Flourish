@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
 using AcksheedSys.Flourish.Abstract;
@@ -8,6 +9,7 @@ using AcksheedSys.Flourish.Services;
 using Brush = System.Windows.Media.Brush;
 using Button = System.Windows.Controls.Button;
 using FontFamily = System.Windows.Media.FontFamily;
+using ListBox = System.Windows.Controls.ListBox;
 using Orientation = System.Windows.Controls.Orientation;
 
 namespace AcksheedSys.Flourish.Windows;
@@ -110,7 +112,6 @@ internal partial class FlourishShellWindow : Window
             options.IsTitlebarSubtitleEnabled,
             options.IsTitlebarProfileEnabled
         );
-        PaneTitle.Text = options.PaneTitle;
         StatusTextBlock.Text = statusService.StatusText;
         NavigationPaneBorder.Visibility = options.IsNavigationPanelEnabled
             ? Visibility.Visible
@@ -265,8 +266,8 @@ internal partial class FlourishShellWindow : Window
 
     private void ApplyNavigationPaneChrome(bool isOpen)
     {
-        PaneTitle.Visibility = isOpen ? Visibility.Visible : Visibility.Collapsed;
         NavigationItemsHost.Tag = isOpen;
+        FixedNavigationItemsHost.Tag = isOpen;
     }
 
     private void BuildToolbarItems(Type? pageType = null)
@@ -358,16 +359,32 @@ internal partial class FlourishShellWindow : Window
         navigationItemsByPage.Clear();
         firstNavigationItem = null;
 
-        foreach (var item in options.NavigationItems)
+        foreach (var item in options.NavigationItems.Concat(options.FixedNavigationItems))
         {
             item.Validate();
-            firstNavigationItem ??= item;
-            navigationItemsByKey[item.Key] = item;
-            navigationItemsByPage[item.PageType] = item;
+            if (!item.IsNavigationItem)
+            {
+                continue;
+            }
+
+            if (!navigationItemsByKey.ContainsKey(item.Key))
+            {
+                navigationItemsByKey[item.Key] = item;
+            }
+
+            if (item.PageType is not null)
+            {
+                firstNavigationItem ??= item;
+                navigationItemsByPage[item.PageType] = item;
+            }
         }
 
         NavigationItemsHost.ItemContainerStyle = navigationListBoxItemStyle;
         NavigationItemsHost.ItemsSource = options.NavigationItems;
+        FixedNavigationItemsHost.ItemContainerStyle = navigationListBoxItemStyle;
+        FixedNavigationItemsHost.ItemsSource = options.FixedNavigationItems;
+        FixedNavigationItemsBorder.Visibility =
+            options.FixedNavigationItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void BuildStatusItems()
@@ -458,7 +475,7 @@ internal partial class FlourishShellWindow : Window
         }
 
         SelectNavigationItem(initialItem);
-        NavigateToKey(initialItem.Key, false);
+        ActivateNavigationItem(initialItem, false, toggleChildren: false);
     }
 
     private FlourishNavigationItem? GetNavigationItem(string? key)
@@ -493,17 +510,30 @@ internal partial class FlourishShellWindow : Window
         ApplyNavigationPaneState(animate: true);
     }
 
-    private void NavigationItemsHost_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NavigationItemsHost_PreviewMouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e
+    )
     {
-        if (
-            suppressNavigationSelection
-            || NavigationItemsHost.SelectedItem is not FlourishNavigationItem item
-        )
+        if (suppressNavigationSelection || sender is not ListBox listBox)
         {
             return;
         }
 
-        NavigateToKey(item.Key, true);
+        var itemContainer = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
+        if (itemContainer?.DataContext is not FlourishNavigationItem item)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        if (!item.IsNavigationItem)
+        {
+            return;
+        }
+
+        listBox.SelectedItem = item;
+        ActivateNavigationItem(item, true);
     }
 
     private void RootFrame_Navigated(object? sender, FlourishNavigatedEventArgs e)
@@ -543,24 +573,53 @@ internal partial class FlourishShellWindow : Window
         BreadcrumbHost.Visibility = Visibility.Visible;
     }
 
-    private void NavigateToKey(string key, bool addToBackStack)
+    private void ActivateNavigationItem(
+        FlourishNavigationItem item,
+        bool addToBackStack,
+        bool toggleChildren = true
+    )
     {
-        if (!navigationItemsByKey.TryGetValue(key, out var targetItem))
+        if (toggleChildren && item.HasChildren)
         {
-            targetItem = firstNavigationItem;
+            ToggleChildItems(item);
         }
 
-        if (targetItem is null || navigationService.CurrentSourcePageType == targetItem.PageType)
+        if (item.IsCommandItem)
+        {
+            if (!item.HasChildren)
+            {
+                commandParser.Parse(item.CommandKey);
+            }
+
+            return;
+        }
+
+        if (item.PageType is null || navigationService.CurrentSourcePageType == item.PageType)
         {
             return;
         }
 
-        navigationService.Navigate(targetItem.PageType, addToBackStack: addToBackStack);
+        navigationService.Navigate(item.PageType, addToBackStack: addToBackStack);
 
         if (!addToBackStack && navigationService.CanGoBack)
         {
             navigationService.ClearBackStack();
             UpdateTitlebarBreadcrumbNavigation();
+        }
+    }
+
+    private void ToggleChildItems(FlourishNavigationItem parent)
+    {
+        parent.IsExpanded = !parent.IsExpanded;
+        var items = parent.IsFixed ? options.FixedNavigationItems : options.NavigationItems;
+
+        foreach (
+            var child in items.Where(item =>
+                item.GroupId == parent.GroupId && item.ChildId == parent.ParentId
+            )
+        )
+        {
+            child.IsVisible = parent.IsExpanded;
         }
     }
 
@@ -664,11 +723,36 @@ internal partial class FlourishShellWindow : Window
         suppressNavigationSelection = true;
         try
         {
+            if (item.IsFixed)
+            {
+                NavigationItemsHost.SelectedItem = null;
+                FixedNavigationItemsHost.SelectedItem = item;
+                return;
+            }
+
+            FixedNavigationItemsHost.SelectedItem = null;
             NavigationItemsHost.SelectedItem = item;
         }
         finally
         {
             suppressNavigationSelection = false;
         }
+    }
+
+    private static T? FindAncestor<T>(DependencyObject source)
+        where T : DependencyObject
+    {
+        var current = source;
+        while (current is not null)
+        {
+            if (current is T match)
+            {
+                return match;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return null;
     }
 }

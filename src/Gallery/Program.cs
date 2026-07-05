@@ -32,6 +32,9 @@ internal static class Program
                     services.AddNavigable<GalleryPage>("图库", "\uE91B");
                     services.AddNavigable<EditorPage>("编辑", "\uE70F");
                     services.AddNavigable<SettingsPage>("设置", "\uE713");
+                    services.AddNavigable<TreeParentPage>("ViewItem 父节点", "\uE8A5");
+                    services.AddNavigable<Page1>("Page1", "\uE8A5");
+                    services.AddNavigable<Page2>("Page2", "\uE8A5");
                 }
             )
             .ConfigureShell(
@@ -59,7 +62,50 @@ internal static class Program
                         .UseNavigationPanel(
                             (_, nav) =>
                             {
-                                nav.SetDirection().SetInitiallyOpen().SetTitle("导航");
+                                nav.SetDirection()
+                                    .SetInitiallyOpen()
+                                    .SetGroup(
+                                        "导航",
+                                        GroupID: 0,
+                                        group =>
+                                        {
+                                            group.AddNavigableViewItem<HomePage>(isInitial: true);
+                                            group.AddNavigableViewItem<GalleryPage>();
+                                            group.AddNavigableViewItem<EditorPage>();
+                                        }
+                                    )
+                                    .SetGroup(
+                                        "按钮",
+                                        GroupID: 1,
+                                        group =>
+                                        {
+                                            group.AddNavigableItem("Hello", "demo.hello");
+                                            group.AddNavigableItem("World", "demo.world");
+                                        }
+                                    )
+                                    .SetGroup(
+                                        "树",
+                                        GroupID: 2,
+                                        group =>
+                                        {
+                                            group.AddNavigableViewItem<TreeParentPage>(parentID: 1);
+                                            group.AddNavigableItem(
+                                                "Button1",
+                                                "tree.button1",
+                                                childID: 1
+                                            );
+                                            group.AddNavigableItem(
+                                                "Button2",
+                                                "tree.button2",
+                                                childID: 1
+                                            );
+
+                                            group.AddNavigableItem("页面父节点", null, parentID: 2);
+                                            group.AddNavigableViewItem<Page1>(childID: 2);
+                                            group.AddNavigableViewItem<Page2>(childID: 2);
+                                        }
+                                    )
+                                    .AddFixedNavigableViewItem<SettingsPage>();
                             }
                         )
                         .UseDynamicToolbar()

@@ -1,3 +1,5 @@
+using System.Windows.Controls;
+
 namespace AcksheedSys.Flourish.Abstract;
 
 /// <summary>
@@ -62,4 +64,37 @@ public interface IFlourishNavigationPanelBuilder
     /// ]]></code>
     /// </example>
     IFlourishNavigationPanelBuilder SetTitle(string title);
+
+    /// <summary>
+    /// Adds and configures a navigation group. Group IDs are unique and control display order.
+    /// </summary>
+    /// <param name="displayName">The group heading. Required when <paramref name="GroupID" /> is not 0.</param>
+    /// <param name="GroupID">The unique group ID. Lower IDs are displayed first.</param>
+    /// <param name="configureGroup">The group item configuration callback.</param>
+    /// <returns>The current builder for chained configuration.</returns>
+    IFlourishNavigationPanelBuilder SetGroup(
+        string? displayName = null,
+        int GroupID = 0,
+        Action<IFlourishNavigationGroupBuilder>? configureGroup = null
+    );
+
+    /// <summary>
+    /// Adds a fixed WPF page navigation item to the bottom of the navigation panel.
+    /// </summary>
+    IFlourishNavigationPanelBuilder AddFixedNavigableViewItem<TPage>(
+        bool isInitial = false,
+        int parentID = 0,
+        int childID = 0
+    )
+        where TPage : Page;
+
+    /// <summary>
+    /// Adds a fixed command item to the bottom of the navigation panel.
+    /// </summary>
+    IFlourishNavigationPanelBuilder AddFixedNavigableItem(
+        string displayName,
+        string? CommandKey,
+        int parentID = 0,
+        int childID = 0
+    );
 }

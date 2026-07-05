@@ -26,7 +26,7 @@ public interface IFlourishBuilder
     /// builder.ConfigureServices((_, services) =>
     /// {
     ///     services.AddSingleton<App>();
-    ///     services.AddNavigable<HomePage>("Home", "\uE80F", isInitial: true);
+    ///     services.AddNavigable<HomePage>("Home", "\uE80F");
     /// });
     /// ]]></code>
     /// </example>

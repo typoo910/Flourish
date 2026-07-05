@@ -9,7 +9,7 @@ namespace AcksheedSys.Flourish.Abstract;
 /// </summary>
 /// <example>
 /// <code><![CDATA[
-/// services.AddNavigable<HomePage>("Home", "\uE80F", isInitial: true);
+/// services.AddNavigable<HomePage>("Home", "\uE80F");
 /// ]]></code>
 /// </example>
 public static class FlourishServiceCollectionExtensions
@@ -21,7 +21,6 @@ public static class FlourishServiceCollectionExtensions
     /// <param name="services">The service collection that receives the page registration.</param>
     /// <param name="displayName">The display name shown in navigation UI.</param>
     /// <param name="iconGlyph">The icon glyph shown in navigation UI.</param>
-    /// <param name="isInitial">A value indicating whether this page should be used as the initial page.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <example>
@@ -29,7 +28,6 @@ public static class FlourishServiceCollectionExtensions
     /// services.AddNavigable<HomePage>(
     ///     displayName: "Home",
     ///     iconGlyph: "\uE80F",
-    ///     isInitial: true,
     ///     cacheMode: FlourishPageCacheMode.Enabled);
     /// ]]></code>
     /// </example>
@@ -37,24 +35,11 @@ public static class FlourishServiceCollectionExtensions
         this IServiceCollection services,
         string displayName,
         string iconGlyph,
-        bool isInitial = false,
         FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
     )
         where TPage : Page
     {
-        services.AddTransient<TPage>();
-        GetOrCreateState(services)
-            .NavigablePages.Add(
-                new NavigablePageRegistration(
-                    typeof(TPage),
-                    displayName,
-                    iconGlyph,
-                    isInitial,
-                    cacheMode
-                )
-            );
-
-        return services;
+        return services.AddNavigable(typeof(TPage), displayName, iconGlyph, cacheMode);
     }
 
     /// <summary>
@@ -62,9 +47,8 @@ public static class FlourishServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection that receives the page registration.</param>
     /// <param name="pageType">The page type to register.</param>
-    /// <param name="displayName">The display name shown in navigation UI.</param>
-    /// <param name="iconGlyph">The icon glyph shown in navigation UI.</param>
-    /// <param name="isInitial">A value indicating whether this page should be used as the initial page.</param>
+    /// <param name="displayName">The default display name used by navigation UI.</param>
+    /// <param name="iconGlyph">The default icon glyph used by navigation UI.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="pageType" /> does not derive from <see cref="Page" />.</exception>
@@ -81,7 +65,6 @@ public static class FlourishServiceCollectionExtensions
         Type pageType,
         string displayName,
         string iconGlyph,
-        bool isInitial = false,
         FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
     )
     {
@@ -93,10 +76,15 @@ public static class FlourishServiceCollectionExtensions
             );
         }
 
+        if (string.IsNullOrWhiteSpace(displayName))
+        {
+            throw new ArgumentException("A navigable page requires a display name.", nameof(displayName));
+        }
+
         services.AddTransient(pageType);
         GetOrCreateState(services)
             .NavigablePages.Add(
-                new NavigablePageRegistration(pageType, displayName, iconGlyph, isInitial, cacheMode)
+                new NavigablePageRegistration(pageType, displayName, iconGlyph, cacheMode)
             );
 
         return services;
