@@ -8,11 +8,4 @@ public partial class App : Application
     {
         InitializeComponent();
     }
-
-    protected override void OnStartup(StartupEventArgs e)
-    {
-        base.OnStartup(e);
-
-        Program.Flourish.Show(this);
-    }
 }

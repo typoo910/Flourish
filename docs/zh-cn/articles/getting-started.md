@@ -5,11 +5,11 @@ description: 用最短路径把 Flourish 接入 WPF 应用。
 
 # 快速开始
 
-使用 Flourish 最快的方式，是让 Flourish Shell 托管你的 WPF `Application`：引用主题资源， 在 `Program.Main` 中构建 `IFlourish` 运行时，用 `AddNavigable` 注册页面，在 `UseNavigationPanel` 中放置导航项，然后在应用启动时调用 `Program.Flourish.Show(this)`。
+使用 Flourish 最快的方式，是让 Flourish Shell 托管你的 WPF `Application`：引用主题资源，在 `Program.Main` 中构建 `IFlourish` 运行时，用 `AddNavigable` 注册页面，在 `UseNavigationPanel` 中放置导航项，然后通过 `flourish.Run<App>()` 运行应用。
 
 ## 引用主题资源
 
-`IFlourish.Show(Application)` 在打开 Shell 前会自动把 `/Flourish;component/Themes/Generic.xaml` 合并进应用资源。你仍然可以在 `App.xaml` 中显式引用它；这样 WPF 设计器和 Shell 显示前就需要使用的资源也能正常工作。
+`Run(Application)` 快捷方法和 `IFlourish.Show(Application)` 会在打开 Shell 前自动把 `/Flourish;component/Themes/Generic.xaml` 合并进应用资源。你仍然可以在 `App.xaml` 中显式引用它；这样 WPF 设计器和 Shell 显示前就需要使用的资源也能正常工作。
 
 ```xml
 <Application
@@ -92,13 +92,10 @@ internal static class Program
 
         try
         {
-            flourish.Start();
-            var app = flourish.GetRequiredService<App>();
-            return app.Run();
+            return flourish.Run<App>();
         }
         finally
         {
-            flourish.StopAsync().GetAwaiter().GetResult();
             flourish.Dispose();
             flourish = null;
         }
@@ -108,9 +105,9 @@ internal static class Program
 
 `CreateDefaultBuilder(args)` 会创建标准的 .NET Generic Host。因此 `ConfigureServices` 拿到的是普通 `IServiceCollection`，你的应用服务、页面、命令解析器都可以按熟悉的依赖注入方式注册。
 
-## 显示 Flourish Shell
+## 保持 App 简洁
 
-在 `App.xaml.cs` 的启动流程中调用 `Program.Flourish.Show(this)`。它会创建 `FlourishShellWindow`，把它设为 `Application.MainWindow`，按需合并主题资源，并显示 Shell。
+现在 Flourish 的启动流程由 `Program.Main` 承接，`App.xaml.cs` 只需要初始化 XAML 资源。
 
 ```csharp
 using System.Windows;
@@ -119,10 +116,9 @@ namespace MyApp;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    public App()
     {
-        base.OnStartup(e);
-        Program.Flourish.Show(this);
+        InitializeComponent();
     }
 }
 ```
@@ -150,6 +146,5 @@ public partial class HomePage : Page
 - `App` 已通过 `services.AddSingleton<App>()` 注册。
 - 至少一个页面已通过 `AddNavigable` 注册。
 - 至少一个可见页面项已通过 `AddNavigableViewItem` 添加，最好指定 `isInitial: true`。
-- `App.OnStartup` 调用了 `Program.Flourish.Show(this)`。
-- `app.Run()` 之前调用了 `flourish.Start()`。
-- `finally` 中调用了 `StopAsync()` 和 `Dispose()`。
+- `Program.Main` 调用了 `flourish.Run<App>()`。
+- `finally` 中调用了 `Dispose()`，或者直接使用 builder 快捷入口 `.Run<App>()`。

@@ -9,6 +9,8 @@ namespace AcksheedSys.Flourish.Composition;
 
 internal sealed class FlourishRuntime(IHost host) : IFlourish
 {
+    private bool isStarted;
+
     public IServiceProvider Services => host.Services;
 
     public T GetRequiredService<T>()
@@ -19,26 +21,68 @@ internal sealed class FlourishRuntime(IHost host) : IFlourish
 
     public void Start()
     {
+        if (isStarted)
+        {
+            return;
+        }
+
         host.Start();
+        isStarted = true;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
-        return host.StopAsync(cancellationToken);
+        if (!isStarted)
+        {
+            return;
+        }
+
+        try
+        {
+            await host.StopAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            isStarted = false;
+        }
+    }
+
+    internal int Run(Application application)
+    {
+        ArgumentNullException.ThrowIfNull(application);
+
+        Start();
+        try
+        {
+            var mainWindow = PrepareShell(application);
+            return application.Run(mainWindow);
+        }
+        finally
+        {
+            StopAsync().GetAwaiter().GetResult();
+        }
     }
 
     public void Show(Application application)
     {
-        EnsureApplicationResources(application);
+        ArgumentNullException.ThrowIfNull(application);
 
-        var mainWindow = host.Services.GetRequiredService<FlourishShellWindow>();
-        application.MainWindow = mainWindow;
+        var mainWindow = PrepareShell(application);
         mainWindow.Show();
     }
 
     public void Dispose()
     {
         host.Dispose();
+    }
+
+    private FlourishShellWindow PrepareShell(Application application)
+    {
+        EnsureApplicationResources(application);
+
+        var mainWindow = host.Services.GetRequiredService<FlourishShellWindow>();
+        application.MainWindow = mainWindow;
+        return mainWindow;
     }
 
     private static void EnsureApplicationResources(Application application)

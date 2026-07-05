@@ -174,13 +174,10 @@ internal static class Program
 
         try
         {
-            flourish.Start();
-            var app = flourish.GetRequiredService<App>();
-            return app.Run();
+            return flourish.Run<App>();
         }
         finally
         {
-            flourish.StopAsync().GetAwaiter().GetResult();
             flourish.Dispose();
             flourish = null;
         }

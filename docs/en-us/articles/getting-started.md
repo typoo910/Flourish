@@ -5,11 +5,11 @@ description: Apply Flourish to a WPF application with the shortest useful path.
 
 # Getting started
 
-The fastest way to use Flourish is to let the shell host your WPF `Application`: add the theme resources, build an `IFlourish` runtime in `Program.Main`, register pages with `AddNavigable`, place them in the navigation panel with `UseNavigationPanel`, then call `Program.Flourish.Show(this)` when the application starts.
+The fastest way to use Flourish is to let the shell host your WPF `Application`: add the theme resources, build an `IFlourish` runtime in `Program.Main`, register pages with `AddNavigable`, place them in the navigation panel with `UseNavigationPanel`, then run the application with `flourish.Run<App>()`.
 
 ## Reference the theme
 
-`IFlourish.Show(Application)` automatically merges `/Flourish;component/Themes/Generic.xaml` into the application resources before it opens the shell. You can still add it explicitly in `App.xaml`; this is useful for the WPF designer and for resources used before the shell is shown.
+The `Run(Application)` helper and `IFlourish.Show(Application)` automatically merge `/Flourish;component/Themes/Generic.xaml` into the application resources before the shell is opened. You can still add it explicitly in `App.xaml`; this is useful for the WPF designer and for resources used before the shell is shown.
 
 ```xml
 <Application
@@ -92,13 +92,10 @@ internal static class Program
 
         try
         {
-            flourish.Start();
-            var app = flourish.GetRequiredService<App>();
-            return app.Run();
+            return flourish.Run<App>();
         }
         finally
         {
-            flourish.StopAsync().GetAwaiter().GetResult();
             flourish.Dispose();
             flourish = null;
         }
@@ -108,9 +105,9 @@ internal static class Program
 
 `CreateDefaultBuilder(args)` creates a standard .NET Generic Host. That means `ConfigureServices` receives a normal `IServiceCollection`, so your application services, pages, and command parsers all use familiar dependency injection patterns.
 
-## Show the Flourish shell
+## Keep App simple
 
-In `App.xaml.cs`, call `Program.Flourish.Show(this)` from startup. This creates the `FlourishShellWindow`, assigns it as `Application.MainWindow`, merges the theme if needed, and opens the shell.
+`Program.Main` now owns the Flourish startup flow, so `App.xaml.cs` only needs to initialize the XAML resources.
 
 ```csharp
 using System.Windows;
@@ -119,10 +116,9 @@ namespace MyApp;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    public App()
     {
-        base.OnStartup(e);
-        Program.Flourish.Show(this);
+        InitializeComponent();
     }
 }
 ```
@@ -150,6 +146,5 @@ public partial class HomePage : Page
 - `App` is registered with `services.AddSingleton<App>()`.
 - At least one page is registered with `AddNavigable`.
 - At least one visible page item is added with `AddNavigableViewItem`, preferably with `isInitial: true`.
-- `App.OnStartup` calls `Program.Flourish.Show(this)`.
-- `flourish.Start()` is called before `app.Run()`.
-- `StopAsync()` and `Dispose()` are called in `finally`.
+- `Program.Main` calls `flourish.Run<App>()`.
+- `Dispose()` is called in `finally`, or you use the builder shortcut `.Run<App>()`.

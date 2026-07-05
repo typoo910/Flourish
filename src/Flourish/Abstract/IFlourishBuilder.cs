@@ -8,10 +8,10 @@ namespace AcksheedSys.Flourish.Abstract;
 /// </summary>
 /// <example>
 /// <code><![CDATA[
-/// var flourish = FlourishBuilder
+/// return FlourishBuilder
 ///     .CreateDefaultBuilder(args)
 ///     .ConfigureServices((_, services) => services.AddSingleton<App>())
-///     .Build();
+///     .Run<App>();
 /// ]]></code>
 /// </example>
 public interface IFlourishBuilder
@@ -84,7 +84,7 @@ public interface IFlourishBuilder
     /// <example>
     /// <code><![CDATA[
     /// using var flourish = builder.Build();
-    /// flourish.Start();
+    /// return flourish.Run<App>();
     /// ]]></code>
     /// </example>
     IFlourish Build();

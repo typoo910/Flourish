@@ -15,10 +15,11 @@ description: Understand the builder, hosting integration, services, and page reg
 - services are registered in `IServiceCollection`
 - the final service provider is available from `IFlourish.Services`
 - application objects can be resolved with `flourish.GetRequiredService<T>()`
+- `flourish.Run<App>()` starts the host, shows the shell, runs the WPF dispatcher, and stops the host when the application exits
 - `flourish.Start()` and `flourish.StopAsync()` map to host lifecycle methods
 
 ```csharp
-var flourish = FlourishBuilder
+using var flourish = FlourishBuilder
     .CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
@@ -27,8 +28,7 @@ var flourish = FlourishBuilder
     })
     .Build();
 
-flourish.Start();
-var app = flourish.GetRequiredService<App>();
+return flourish.Run<App>();
 ```
 
 ## Builder stages
@@ -126,21 +126,11 @@ The cache mode is attached to the registered page type, not to a specific naviga
 
 ## Build the runtime
 
-`Build()` creates the host and returns `IFlourish`. After that, configuration is complete.
+`Build()` creates the host and returns `IFlourish`. After that, configuration is complete. For the common WPF application path, call `Run<App>()`; it starts the host, creates and shows the Flourish shell, enters the WPF dispatcher, and stops the host when the application exits.
 
 ```csharp
 using var flourish = builder.Build();
-flourish.Start();
-
-try
-{
-    var app = flourish.GetRequiredService<App>();
-    app.Run();
-}
-finally
-{
-    await flourish.StopAsync();
-}
+return flourish.Run<App>();
 ```
 
 Keep the runtime alive for as long as the WPF application is running.

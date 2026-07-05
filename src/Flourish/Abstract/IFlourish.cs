@@ -8,7 +8,7 @@ namespace AcksheedSys.Flourish.Abstract;
 /// <example>
 /// <code><![CDATA[
 /// using var flourish = FlourishBuilder.CreateDefaultBuilder(args).Build();
-/// flourish.Start();
+/// return flourish.Run<App>();
 /// ]]></code>
 /// </example>
 public interface IFlourish : IDisposable

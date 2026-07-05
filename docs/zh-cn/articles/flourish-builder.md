@@ -15,10 +15,11 @@ description: 理解 builder、Hosting 集成、服务注册和页面注册。
 - 使用 `IServiceCollection` 注册服务
 - 最终服务提供器可通过 `IFlourish.Services` 获取
 - 应用对象可以用 `flourish.GetRequiredService<T>()` 解析
+- `flourish.Run<App>()` 会启动 Host、显示 Shell、运行 WPF dispatcher，并在应用退出时停止 Host
 - `flourish.Start()` 和 `flourish.StopAsync()` 对应 Host 生命周期方法
 
 ```csharp
-var flourish = FlourishBuilder
+using var flourish = FlourishBuilder
     .CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
@@ -27,8 +28,7 @@ var flourish = FlourishBuilder
     })
     .Build();
 
-flourish.Start();
-var app = flourish.GetRequiredService<App>();
+return flourish.Run<App>();
 ```
 
 ## Builder 阶段
@@ -126,21 +126,11 @@ services.AddNavigable<ImportWizardPage>(
 
 ## 构建运行时
 
-`Build()` 会创建 Host 并返回 `IFlourish`。调用之后，配置阶段就结束了。
+`Build()` 会创建 Host 并返回 `IFlourish`。调用之后，配置阶段就结束了。对于常见 WPF 应用，调用 `Run<App>()` 即可；它会启动 Host、创建并显示 Flourish Shell、进入 WPF dispatcher，并在应用退出后停止 Host。
 
 ```csharp
 using var flourish = builder.Build();
-flourish.Start();
-
-try
-{
-    var app = flourish.GetRequiredService<App>();
-    app.Run();
-}
-finally
-{
-    await flourish.StopAsync();
-}
+return flourish.Run<App>();
 ```
 
 只要 WPF 应用还在运行，就应保持这个运行时实例存活。
