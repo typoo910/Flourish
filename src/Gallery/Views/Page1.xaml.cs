@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AcksheedSys.Gallery.Views;
+namespace AckSS.Gallery.Views;
 
 public partial class Page1 : Page
 {

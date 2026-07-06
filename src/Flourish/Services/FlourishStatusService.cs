@@ -1,7 +1,7 @@
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Configuration;
+using AckSS.Flourish.Abstract;
+using AckSS.Flourish.Configuration;
 
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed class FlourishStatusService(FlourishShellOptions options)
 {

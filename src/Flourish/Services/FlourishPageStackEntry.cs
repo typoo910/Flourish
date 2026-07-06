@@ -1,3 +1,3 @@
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed record FlourishPageStackEntry(Type SourcePageType, object? Parameter);

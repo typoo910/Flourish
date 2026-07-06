@@ -1,6 +1,6 @@
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Configuration;
+namespace AckSS.Flourish.Configuration;
 
 internal sealed class FlourishMotionOptions
 {

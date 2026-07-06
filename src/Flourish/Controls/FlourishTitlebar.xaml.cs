@@ -4,11 +4,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 using TextChangedEventArgs = System.Windows.Controls.TextChangedEventArgs;
 using UserControl = System.Windows.Controls.UserControl;
 
-namespace AcksheedSys.Flourish.Controls;
+namespace AckSS.Flourish.Controls;
 
 internal partial class FlourishTitlebar : UserControl
 {

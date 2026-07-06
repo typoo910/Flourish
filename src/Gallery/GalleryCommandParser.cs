@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Windows;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 
-namespace AcksheedSys.Gallery;
+namespace AckSS.Gallery;
 
 internal sealed class GalleryCommandParser(IMessageService messages) : ICommandParser
 {

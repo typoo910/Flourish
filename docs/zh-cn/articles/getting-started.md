@@ -34,7 +34,7 @@ description: 用最短路径把 Flourish 接入 WPF 应用。
 把构建好的运行时保存在静态属性中，这样 `App` 和页面都可以用同一个入口访问服务。
 
 ```csharp
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MyApp;

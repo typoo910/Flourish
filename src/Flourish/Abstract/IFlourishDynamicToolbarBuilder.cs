@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Configures toolbar items that change according to the active page.

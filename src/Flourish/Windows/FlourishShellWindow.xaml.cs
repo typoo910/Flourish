@@ -5,16 +5,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
 using System.ComponentModel;
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Configuration;
-using AcksheedSys.Flourish.Services;
-using Brush = System.Windows.Media.Brush;
+using AckSS.Flourish.Abstract;
+using AckSS.Flourish.Configuration;
+using AckSS.Flourish.Services;
 using Button = System.Windows.Controls.Button;
 using FontFamily = System.Windows.Media.FontFamily;
 using ListBox = System.Windows.Controls.ListBox;
 using Orientation = System.Windows.Controls.Orientation;
 
-namespace AcksheedSys.Flourish.Windows;
+namespace AckSS.Flourish.Windows;
 
 internal partial class FlourishShellWindow : Window
 {
@@ -46,7 +45,6 @@ internal partial class FlourishShellWindow : Window
     private FlourishNavigationItem? firstNavigationItem;
     private Style toolbarButtonStyle = null!;
     private Style navigationListBoxItemStyle = null!;
-    private Brush mutedTextBrush = null!;
     private FontFamily iconFontFamily = null!;
     private Type? activeToolbarPageType;
     private FlourishNavigationItem? selectedNavigationItem;
@@ -113,7 +111,6 @@ internal partial class FlourishShellWindow : Window
     {
         toolbarButtonStyle = (Style)FindResource("FlourishToolbarButtonStyle");
         navigationListBoxItemStyle = (Style)FindResource("FlourishNavigationListBoxItemStyle");
-        mutedTextBrush = (Brush)FindResource("MutedTextBrush");
         iconFontFamily = (FontFamily)FindResource("FlourishIconFontFamily");
     }
 
@@ -569,25 +566,25 @@ internal partial class FlourishShellWindow : Window
                         : new Thickness(),
                 Orientation = Orientation.Horizontal,
             };
-            status.Children.Add(
-                new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontFamily = iconFontFamily,
-                    FontSize = statusFontSize,
-                    Foreground = mutedTextBrush,
-                    Text = item.IconGlyph,
-                }
-            );
-            status.Children.Add(
-                new TextBlock
-                {
-                    Margin = new Thickness(5, 0, 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = statusFontSize,
-                    Text = item.Text,
-                }
-            );
+            var iconText = new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                FontFamily = iconFontFamily,
+                FontSize = statusFontSize,
+                Text = item.IconGlyph,
+            };
+            iconText.SetResourceReference(TextBlock.ForegroundProperty, "MutedTextBrush");
+            status.Children.Add(iconText);
+
+            var labelText = new TextBlock
+            {
+                Margin = new Thickness(5, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = statusFontSize,
+                Text = item.Text,
+            };
+            labelText.SetResourceReference(TextBlock.ForegroundProperty, "MutedTextBrush");
+            status.Children.Add(labelText);
 
             StatusItemsHost.Children.Add(status);
         }

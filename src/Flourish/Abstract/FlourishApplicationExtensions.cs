@@ -1,8 +1,8 @@
-using AcksheedSys.Flourish.Composition;
+using AckSS.Flourish.Composition;
 using Application = System.Windows.Application;
 using StartupEventArgs = System.Windows.StartupEventArgs;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Provides convenience methods for building and running Flourish applications.

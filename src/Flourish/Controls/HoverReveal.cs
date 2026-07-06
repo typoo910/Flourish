@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace AcksheedSys.Flourish.Controls;
+namespace AckSS.Flourish.Controls;
 
 internal static class HoverReveal
 {

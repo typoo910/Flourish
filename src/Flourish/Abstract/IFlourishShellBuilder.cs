@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Configures the high-level Flourish shell.

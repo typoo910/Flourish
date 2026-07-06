@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Specifies the animation behavior used when a page enters the content frame.

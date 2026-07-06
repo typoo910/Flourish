@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Configuration;
+namespace AckSS.Flourish.Configuration;
 
 internal sealed class FlourishTipOptions
 {

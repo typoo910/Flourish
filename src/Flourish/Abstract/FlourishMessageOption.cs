@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Describes a custom option displayed by <see cref="IMessageService"/>.

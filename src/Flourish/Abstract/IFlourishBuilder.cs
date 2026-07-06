@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Configures services, shell options, toolbar items, and status items before building a Flourish runtime.
@@ -25,7 +25,7 @@ public interface IFlourishBuilder
     /// <code><![CDATA[
     /// builder.ConfigureData((_, data) =>
     /// {
-    ///     data.SetAppCompany("Acksheed").SetAppName("Gallery");
+    ///     data.SetAppCompany("Acksheed System Team").SetAppName("Gallery");
     /// });
     /// ]]></code>
     /// </example>

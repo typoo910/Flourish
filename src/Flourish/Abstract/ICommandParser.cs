@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Parses command keys raised by Flourish UI surfaces such as toolbar items.

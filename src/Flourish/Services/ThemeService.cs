@@ -1,11 +1,11 @@
 using System.Windows;
 using System.Windows.Interop;
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Configuration;
+using AckSS.Flourish.Abstract;
+using AckSS.Flourish.Configuration;
 using Microsoft.Win32;
 using Application = System.Windows.Application;
 
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed class ThemeService(
     FlourishShellOptions shellOptions,

@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace AcksheedSys.Flourish.Configuration;
+namespace AckSS.Flourish.Configuration;
 
 internal sealed class FlourishDataOptions
 {

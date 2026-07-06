@@ -1,7 +1,7 @@
 using System.Windows.Controls;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed class NavigationService(
     PageCacheService pageCacheService,

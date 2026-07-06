@@ -1,35 +1,35 @@
 ---
-uid: AcksheedSys.Flourish.Abstract
+uid: AckSS.Flourish.Abstract
 summary: Flourish 对外公开的应用组合、Shell 配置、导航和工具栏契约。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.BreadcrumbShowOption
+uid: AckSS.Flourish.Abstract.BreadcrumbShowOption
 summary: 指定标题栏中的面包屑导航何时显示。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.BreadcrumbShowOption.Always
+uid: AckSS.Flourish.Abstract.BreadcrumbShowOption.Always
 summary: 只要标题栏可见，就始终显示面包屑导航。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.BreadcrumbShowOption.Auto
+uid: AckSS.Flourish.Abstract.BreadcrumbShowOption.Auto
 summary: 由 Flourish 根据当前导航状态自动决定是否显示面包屑导航。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.BreadcrumbShowOption.Hidden
+uid: AckSS.Flourish.Abstract.BreadcrumbShowOption.Hidden
 summary: 隐藏面包屑导航。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishBuilder
+uid: AckSS.Flourish.Abstract.FlourishBuilder
 summary: 提供用于创建 Flourish 应用 builder 的工厂方法。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishBuilder.CreateDefaultBuilder(System.String[])
+uid: AckSS.Flourish.Abstract.FlourishBuilder.CreateDefaultBuilder(System.String[])
 summary: 创建使用标准 .NET Host 默认值配置的 Flourish builder。
 syntax:
   parameters:
@@ -40,12 +40,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigatedEventArgs
+uid: AckSS.Flourish.Abstract.FlourishNavigatedEventArgs
 summary: 为 Flourish 导航事件提供数据。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigatedEventArgs.#ctor(System.Type,System.Windows.Controls.Page,System.Object)
+uid: AckSS.Flourish.Abstract.FlourishNavigatedEventArgs.#ctor(System.Type,System.Windows.Controls.Page,System.Object)
 summary: 初始化导航事件数据。
 syntax:
   parameters:
@@ -58,77 +58,77 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigatedEventArgs.SourcePageType
+uid: AckSS.Flourish.Abstract.FlourishNavigatedEventArgs.SourcePageType
 summary: 获取已经导航到的已注册页面类型。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigatedEventArgs.Page
+uid: AckSS.Flourish.Abstract.FlourishNavigatedEventArgs.Page
 summary: 获取显示在内容框架中的页面实例。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigatedEventArgs.Parameter
+uid: AckSS.Flourish.Abstract.FlourishNavigatedEventArgs.Parameter
 summary: 获取调用方提供的可选导航参数。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigationPanelTransition
+uid: AckSS.Flourish.Abstract.FlourishNavigationPanelTransition
 summary: 指定导航面板打开或关闭时使用的动画行为。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigationPanelTransition.None
+uid: AckSS.Flourish.Abstract.FlourishNavigationPanelTransition.None
 summary: 禁用导航面板过渡动画。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishNavigationPanelTransition.Resize
+uid: AckSS.Flourish.Abstract.FlourishNavigationPanelTransition.Resize
 summary: 通过调整布局列宽来为导航面板生成动画。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageCacheMode
+uid: AckSS.Flourish.Abstract.FlourishPageCacheMode
 summary: 指定 Flourish 是否缓存导航创建的页面实例。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageCacheMode.Enabled
+uid: AckSS.Flourish.Abstract.FlourishPageCacheMode.Enabled
 summary: 页面创建后复用同一个页面实例。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageCacheMode.Disabled
+uid: AckSS.Flourish.Abstract.FlourishPageCacheMode.Disabled
 summary: 每次导航请求都创建新的页面实例。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageTransition
+uid: AckSS.Flourish.Abstract.FlourishPageTransition
 summary: 指定页面进入内容框架时使用的动画行为。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageTransition.None
+uid: AckSS.Flourish.Abstract.FlourishPageTransition.None
 summary: 禁用页面过渡动画。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageTransition.Fade
+uid: AckSS.Flourish.Abstract.FlourishPageTransition.Fade
 summary: 将页面淡入显示。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishPageTransition.EntranceFromBottom
+uid: AckSS.Flourish.Abstract.FlourishPageTransition.EntranceFromBottom
 summary: 让页面从底部进入视图。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions
+uid: AckSS.Flourish.Abstract.FlourishServiceCollectionExtensions
 summary: 提供 Flourish 应用使用的服务集合扩展方法。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
+uid: AckSS.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,AckSS.Flourish.Abstract.FlourishPageCacheMode)
 summary: 将 WPF 页面注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
 syntax:
   typeParameters:
@@ -148,7 +148,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String,System.String,AcksheedSys.Flourish.Abstract.FlourishPageCacheMode)
+uid: AckSS.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String,System.String,AckSS.Flourish.Abstract.FlourishPageCacheMode)
 summary: 将指定的 WPF 页面类型注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
 syntax:
   parameters:
@@ -170,12 +170,12 @@ exceptions:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem
+uid: AckSS.Flourish.Abstract.FlourishToolbarItem
 summary: 描述显示在 Flourish Shell 中的工具栏项。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem.#ctor(System.String,System.String,System.String)
+uid: AckSS.Flourish.Abstract.FlourishToolbarItem.#ctor(System.String,System.String,System.String)
 summary: 创建一个工具栏项描述。
 syntax:
   parameters:
@@ -188,27 +188,27 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem.DisplayName
+uid: AckSS.Flourish.Abstract.FlourishToolbarItem.DisplayName
 summary: 获取工具栏项显示文本。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem.IconGlyph
+uid: AckSS.Flourish.Abstract.FlourishToolbarItem.IconGlyph
 summary: 获取工具栏项显示的图标字形。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.FlourishToolbarItem.CommandKey
+uid: AckSS.Flourish.Abstract.FlourishToolbarItem.CommandKey
 summary: 获取传递给 ICommandParser 的可选命令键。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.ICommandParser
+uid: AckSS.Flourish.Abstract.ICommandParser
 summary: 解析由 Flourish UI 表面触发的命令键，例如工具栏项命令和按钮类型导航项命令。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.ICommandParser.TryParse(System.String)
+uid: AckSS.Flourish.Abstract.ICommandParser.TryParse(System.String)
 summary: 尝试解析并处理命令键。
 syntax:
   parameters:
@@ -219,17 +219,17 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish
+uid: AckSS.Flourish.Abstract.IFlourish
 summary: 表示已经构建完成的 Flourish 应用运行时。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish.Services
+uid: AckSS.Flourish.Abstract.IFlourish.Services
 summary: 获取由底层 .NET Host 创建的应用服务提供程序。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish.GetRequiredService``1
+uid: AckSS.Flourish.Abstract.IFlourish.GetRequiredService``1
 summary: 从 Flourish 服务提供程序中获取必需服务。
 syntax:
   typeParameters:
@@ -240,12 +240,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish.Start
+uid: AckSS.Flourish.Abstract.IFlourish.Start
 summary: 启动底层应用 Host。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish.StopAsync(System.Threading.CancellationToken)
+uid: AckSS.Flourish.Abstract.IFlourish.StopAsync(System.Threading.CancellationToken)
 summary: 异步停止底层应用 Host。
 syntax:
   parameters:
@@ -256,7 +256,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourish.Show(System.Windows.Application)
+uid: AckSS.Flourish.Abstract.IFlourish.Show(System.Windows.Application)
 summary: 为指定的 WPF 应用显示 Flourish Shell。
 syntax:
   parameters:
@@ -265,12 +265,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder
+uid: AckSS.Flourish.Abstract.IFlourishBuilder
 summary: 在构建 Flourish 运行时之前配置服务、Shell 选项、工具栏项和状态栏项。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder.ConfigureServices(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,Microsoft.Extensions.DependencyInjection.IServiceCollection})
+uid: AckSS.Flourish.Abstract.IFlourishBuilder.ConfigureServices(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,Microsoft.Extensions.DependencyInjection.IServiceCollection})
 summary: 向底层 .NET Host builder 添加服务注册。
 syntax:
   parameters:
@@ -281,7 +281,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder.ConfigureShell(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishShellBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishBuilder.ConfigureShell(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishShellBuilder})
 summary: 配置 Flourish Shell。
 syntax:
   parameters:
@@ -292,7 +292,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder.ConfigureDynamicToolbar(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishBuilder.ConfigureDynamicToolbar(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder})
 summary: 配置按页面变化的动态工具栏项。
 syntax:
   parameters:
@@ -303,7 +303,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder.ConfigureStatus(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishBuilder.ConfigureStatus(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishStatusBuilder})
 summary: 配置 Shell 状态区域。
 syntax:
   parameters:
@@ -314,7 +314,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishBuilder.Build
+uid: AckSS.Flourish.Abstract.IFlourishBuilder.Build
 summary: 构建 Flourish 运行时。
 syntax:
   return:
@@ -322,12 +322,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder
+uid: AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder
 summary: 配置会随当前页面变化的工具栏项。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems(System.Type,AcksheedSys.Flourish.Abstract.FlourishToolbarItem[])
+uid: AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems(System.Type,AckSS.Flourish.Abstract.FlourishToolbarItem[])
 summary: 为指定页面类型创建工具栏项。
 syntax:
   parameters:
@@ -340,7 +340,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems(System.Type,System.Boolean,AcksheedSys.Flourish.Abstract.FlourishToolbarItem[])
+uid: AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems(System.Type,System.Boolean,AckSS.Flourish.Abstract.FlourishToolbarItem[])
 summary: 为指定页面类型创建工具栏项，并控制是否显示工具栏图标。
 syntax:
   parameters:
@@ -355,7 +355,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems``1(AcksheedSys.Flourish.Abstract.FlourishToolbarItem[])
+uid: AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems``1(AckSS.Flourish.Abstract.FlourishToolbarItem[])
 summary: 为指定泛型页面类型创建工具栏项。
 syntax:
   typeParameters:
@@ -369,7 +369,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems``1(System.Boolean,AcksheedSys.Flourish.Abstract.FlourishToolbarItem[])
+uid: AckSS.Flourish.Abstract.IFlourishDynamicToolbarBuilder.CreateToolbarItems``1(System.Boolean,AckSS.Flourish.Abstract.FlourishToolbarItem[])
 summary: 为指定泛型页面类型创建工具栏项，并控制是否显示工具栏图标。
 syntax:
   typeParameters:
@@ -385,12 +385,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder
 summary: 配置 Flourish Shell 的动效和动画行为。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetEnabled(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetEnabled(System.Boolean)
 summary: 启用或禁用 Flourish 动效。
 syntax:
   parameters:
@@ -401,7 +401,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetDuration
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetDuration
 summary: 设置默认动效持续时间。
 syntax:
   return:
@@ -409,7 +409,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetDuration(System.TimeSpan)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetDuration(System.TimeSpan)
 summary: 设置动效持续时间。
 syntax:
   parameters:
@@ -420,7 +420,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetPageTransition(AcksheedSys.Flourish.Abstract.FlourishPageTransition)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetPageTransition(AckSS.Flourish.Abstract.FlourishPageTransition)
 summary: 设置页面进入内容框架时使用的过渡效果。
 syntax:
   parameters:
@@ -431,7 +431,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetNavigationPanelTransition(AcksheedSys.Flourish.Abstract.FlourishNavigationPanelTransition)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetNavigationPanelTransition(AckSS.Flourish.Abstract.FlourishNavigationPanelTransition)
 summary: 设置导航面板打开或关闭时使用的过渡效果。
 syntax:
   parameters:
@@ -442,7 +442,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.SetHoverReveal(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.SetHoverReveal(System.Boolean)
 summary: 启用或禁用悬停揭示动画。
 syntax:
   parameters:
@@ -453,7 +453,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder.RespectSystemReducedMotion(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishMotionBuilder.RespectSystemReducedMotion(System.Boolean)
 summary: 控制 Flourish 是否遵循操作系统的减少动态效果偏好。
 syntax:
   parameters:
@@ -464,12 +464,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder
 summary: 配置 Flourish 导航面板。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetEnabled(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetEnabled(System.Boolean)
 summary: 启用或禁用导航面板。
 syntax:
   parameters:
@@ -480,7 +480,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetDirection(AcksheedSys.Flourish.Abstract.NavigationPanelDirection)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetDirection(AckSS.Flourish.Abstract.NavigationPanelDirection)
 summary: 设置导航面板显示在 Shell 的哪一侧。
 syntax:
   parameters:
@@ -491,7 +491,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetInitiallyOpen(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetInitiallyOpen(System.Boolean)
 summary: 设置 Shell 首次显示时导航面板是否打开。
 syntax:
   parameters:
@@ -502,7 +502,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetTitle(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetTitle(System.String)
 summary: 设置旧版未分组导航界面使用的导航面板标题。
 syntax:
   parameters:
@@ -513,7 +513,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetGroup(System.String,System.Int32,System.Action{AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.SetGroup(System.String,System.Int32,System.Action{AckSS.Flourish.Abstract.IFlourishNavigationGroupBuilder})
 summary: 添加并配置一个可滚动导航分组。
 syntax:
   parameters:
@@ -528,7 +528,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
 summary: 在导航栏底部固定区域添加一个已注册页面导航项。
 syntax:
   typeParameters:
@@ -546,7 +546,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder.AddFixedNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
 summary: 在导航栏底部固定区域添加一个按钮类型命令项。
 syntax:
   parameters:
@@ -565,12 +565,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder
+uid: AckSS.Flourish.Abstract.IFlourishNavigationGroupBuilder
 summary: 配置 Flourish 导航分组中显示的导航项。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableViewItem``1(System.Boolean,System.Int32,System.Int32)
 summary: 将一个已注册 WPF 页面添加到当前导航分组。
 syntax:
   typeParameters:
@@ -588,7 +588,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+uid: AckSS.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
 summary: 将一个按钮类型命令项添加到当前导航分组。
 syntax:
   parameters:
@@ -607,12 +607,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder
 summary: 配置高层 Flourish Shell。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseTitlebar(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseTitlebar(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishTitlebarBuilder})
 summary: 启用并配置 Shell 标题栏。
 syntax:
   parameters:
@@ -623,7 +623,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseNavigationPanel(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishNavigationPanelBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseNavigationPanel(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishNavigationPanelBuilder})
 summary: 启用并配置 Shell 导航面板，用于放置已注册页面项和按钮类型命令项。
 syntax:
   parameters:
@@ -634,7 +634,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.SetWindowProperty(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.SetWindowProperty(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder})
 summary: 配置 Shell 窗口属性。
 syntax:
   parameters:
@@ -645,7 +645,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.SetGlobalFont(System.String,System.Double)
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.SetGlobalFont(System.String,System.Double)
 summary: 设置 Flourish Shell UI 使用的全局字体。
 syntax:
   parameters:
@@ -658,7 +658,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseMaterialEffect(AcksheedSys.Flourish.Abstract.MaterialEffect)
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseMaterialEffect(AckSS.Flourish.Abstract.MaterialEffect)
 summary: 为 Shell 窗口应用系统材质效果。
 syntax:
   parameters:
@@ -669,7 +669,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseDynamicToolbar(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseDynamicToolbar(System.Boolean)
 summary: 启用或禁用动态工具栏区域。
 syntax:
   parameters:
@@ -680,7 +680,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseMotion(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseMotion(System.Boolean)
 summary: 使用默认动效设置启用或禁用 Flourish 动效。
 syntax:
   parameters:
@@ -691,7 +691,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishShellBuilder.UseMotion(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AcksheedSys.Flourish.Abstract.IFlourishMotionBuilder})
+uid: AckSS.Flourish.Abstract.IFlourishShellBuilder.UseMotion(System.Action{Microsoft.Extensions.Hosting.HostBuilderContext,AckSS.Flourish.Abstract.IFlourishMotionBuilder})
 summary: 启用并配置 Flourish 动效。
 syntax:
   parameters:
@@ -702,12 +702,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder
+uid: AckSS.Flourish.Abstract.IFlourishStatusBuilder
 summary: 配置 Flourish Shell 状态区域。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder.SetStatusText(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishStatusBuilder.SetStatusText(System.String)
 summary: 设置主要状态文本。
 syntax:
   parameters:
@@ -718,7 +718,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder.AddStatusItem(System.String,System.String)
+uid: AckSS.Flourish.Abstract.IFlourishStatusBuilder.AddStatusItem(System.String,System.String)
 summary: 添加包含显示文本和图标字形的状态项。
 syntax:
   parameters:
@@ -731,7 +731,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder.ShowLANConnectionStatus
+uid: AckSS.Flourish.Abstract.IFlourishStatusBuilder.ShowLANConnectionStatus
 summary: 显示内置 LAN 连接状态项。
 syntax:
   return:
@@ -739,7 +739,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishStatusBuilder.ShowPowerStatus
+uid: AckSS.Flourish.Abstract.IFlourishStatusBuilder.ShowPowerStatus
 summary: 显示内置电源状态项。
 syntax:
   return:
@@ -747,12 +747,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder
 summary: 配置 Flourish Shell 标题栏。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowSearch(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowSearch(System.Boolean)
 summary: 显示或隐藏搜索框。
 syntax:
   parameters:
@@ -763,7 +763,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowBreadcrumb(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowBreadcrumb(System.Boolean)
 summary: 显示或隐藏面包屑导航。
 syntax:
   parameters:
@@ -774,7 +774,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowNavToggle(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowNavToggle(System.Boolean)
 summary: 显示或隐藏导航面板切换按钮。
 syntax:
   parameters:
@@ -785,7 +785,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowLogo(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowLogo(System.Boolean)
 summary: 显示或隐藏 Logo 区域。
 syntax:
   parameters:
@@ -796,7 +796,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowTitle(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowTitle(System.Boolean)
 summary: 显示或隐藏标题文本。
 syntax:
   parameters:
@@ -807,7 +807,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowSubTitle(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowSubTitle(System.Boolean)
 summary: 显示或隐藏副标题文本。
 syntax:
   parameters:
@@ -818,7 +818,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.ShowProfile(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.ShowProfile(System.Boolean)
 summary: 显示或隐藏用户资料区域。
 syntax:
   parameters:
@@ -829,7 +829,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetTrayExit(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetTrayExit(System.Boolean)
 summary: 设置关闭标题栏时是否使用托盘退出流程。
 syntax:
   parameters:
@@ -840,7 +840,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetTitle(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetTitle(System.String)
 summary: 设置标题文本。
 syntax:
   parameters:
@@ -851,7 +851,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetSubtitle(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetSubtitle(System.String)
 summary: 设置副标题文本。
 syntax:
   parameters:
@@ -862,7 +862,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetLogo(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetLogo(System.String)
 summary: 使用 WPF pack URI 设置 Logo 图像。
 syntax:
   parameters:
@@ -873,7 +873,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetSearchPlaceholder(System.String)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetSearchPlaceholder(System.String)
 summary: 设置搜索框占位文本。
 syntax:
   parameters:
@@ -884,7 +884,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishTitlebarBuilder.SetBreadcrumbBehavior(AcksheedSys.Flourish.Abstract.BreadcrumbShowOption)
+uid: AckSS.Flourish.Abstract.IFlourishTitlebarBuilder.SetBreadcrumbBehavior(AckSS.Flourish.Abstract.BreadcrumbShowOption)
 summary: 设置面包屑导航何时显示。
 syntax:
   parameters:
@@ -895,12 +895,12 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder
 summary: 配置 Flourish Shell 窗口。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowSize(System.Double,System.Double)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowSize(System.Double,System.Double)
 summary: 设置 Shell 窗口初始尺寸。
 syntax:
   parameters:
@@ -913,7 +913,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowMinSize(System.Double,System.Double)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowMinSize(System.Double,System.Double)
 summary: 设置 Shell 窗口最小尺寸。
 syntax:
   parameters:
@@ -926,7 +926,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowMaxSize(System.Double,System.Double)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowMaxSize(System.Double,System.Double)
 summary: 设置 Shell 窗口最大尺寸。
 syntax:
   parameters:
@@ -939,7 +939,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowPosition(System.Windows.WindowStartupLocation)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowPosition(System.Windows.WindowStartupLocation)
 summary: 设置 Shell 窗口启动位置。
 syntax:
   parameters:
@@ -950,7 +950,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetManualWindowPosition(System.Double,System.Double)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetManualWindowPosition(System.Double,System.Double)
 summary: 设置 Shell 窗口的手动位置。
 syntax:
   parameters:
@@ -963,7 +963,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowState(System.Windows.WindowState)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowState(System.Windows.WindowState)
 summary: 设置 Shell 窗口初始状态。
 syntax:
   parameters:
@@ -974,7 +974,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowResizeMode(System.Windows.ResizeMode)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.SetWindowResizeMode(System.Windows.ResizeMode)
 summary: 设置 Shell 窗口调整大小模式。
 syntax:
   parameters:
@@ -985,7 +985,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.UseTopmost(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.UseTopmost(System.Boolean)
 summary: 设置 Shell 窗口是否保持在其他窗口上方。
 syntax:
   parameters:
@@ -996,7 +996,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.IFlourishWindowPropertyBuilder.ShowInTaskbar(System.Boolean)
+uid: AckSS.Flourish.Abstract.IFlourishWindowPropertyBuilder.ShowInTaskbar(System.Boolean)
 summary: 设置 Shell 窗口是否显示在 Windows 任务栏中。
 syntax:
   parameters:
@@ -1007,32 +1007,32 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService
+uid: AckSS.Flourish.Abstract.INavigationService
 summary: 为已注册的 Flourish 页面提供运行时导航服务。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.Navigated
+uid: AckSS.Flourish.Abstract.INavigationService.Navigated
 summary: Flourish 导航到已注册页面后触发。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.CanGoBack
+uid: AckSS.Flourish.Abstract.INavigationService.CanGoBack
 summary: 获取是否可以执行后退导航。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.CanGoForward
+uid: AckSS.Flourish.Abstract.INavigationService.CanGoForward
 summary: 获取是否可以执行前进导航。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.CurrentSourcePageType
+uid: AckSS.Flourish.Abstract.INavigationService.CurrentSourcePageType
 summary: 获取当前显示在内容框架中的已注册源页面类型。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.Navigate(System.Type,System.Object,System.Boolean)
+uid: AckSS.Flourish.Abstract.INavigationService.Navigate(System.Type,System.Object,System.Boolean)
 summary: 导航到已注册的页面类型。
 syntax:
   parameters:
@@ -1047,7 +1047,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.Navigate``1(System.Object,System.Boolean)
+uid: AckSS.Flourish.Abstract.INavigationService.Navigate``1(System.Object,System.Boolean)
 summary: 导航到已注册的泛型页面类型。
 syntax:
   typeParameters:
@@ -1063,7 +1063,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.GoBack
+uid: AckSS.Flourish.Abstract.INavigationService.GoBack
 summary: 导航到后退栈中的上一页。
 syntax:
   return:
@@ -1071,7 +1071,7 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.GoForward
+uid: AckSS.Flourish.Abstract.INavigationService.GoForward
 summary: 导航到前进栈中的下一页。
 syntax:
   return:
@@ -1079,36 +1079,36 @@ syntax:
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.INavigationService.ClearBackStack
+uid: AckSS.Flourish.Abstract.INavigationService.ClearBackStack
 summary: 清空导航后退栈。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.MaterialEffect
+uid: AckSS.Flourish.Abstract.MaterialEffect
 summary: 指定应用到 Flourish Shell 窗口的系统材质效果。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.MaterialEffect.None
+uid: AckSS.Flourish.Abstract.MaterialEffect.None
 summary: 不应用系统材质效果。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.MaterialEffect.Mica
+uid: AckSS.Flourish.Abstract.MaterialEffect.Mica
 summary: 在支持时应用 Windows Mica 材质效果。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.NavigationPanelDirection
+uid: AckSS.Flourish.Abstract.NavigationPanelDirection
 summary: 指定导航面板显示在 Shell 的哪一侧。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.NavigationPanelDirection.Left
+uid: AckSS.Flourish.Abstract.NavigationPanelDirection.Left
 summary: 在 Shell 左侧显示导航面板。
 ---
 
 ---
-uid: AcksheedSys.Flourish.Abstract.NavigationPanelDirection.Right
+uid: AckSS.Flourish.Abstract.NavigationPanelDirection.Right
 summary: 在 Shell 右侧显示导航面板。
 ---

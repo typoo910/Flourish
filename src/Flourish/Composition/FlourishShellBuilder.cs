@@ -1,8 +1,8 @@
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Configuration;
+using AckSS.Flourish.Abstract;
+using AckSS.Flourish.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace AcksheedSys.Flourish.Composition;
+namespace AckSS.Flourish.Composition;
 
 internal sealed class FlourishShellBuilder(FlourishShellOptions options, HostBuilderContext context)
     : IFlourishShellBuilder

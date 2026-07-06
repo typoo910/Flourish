@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Specifies when breadcrumb navigation is displayed in the Flourish title bar.

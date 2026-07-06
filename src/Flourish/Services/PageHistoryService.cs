@@ -1,4 +1,4 @@
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed class PageHistoryService
 {

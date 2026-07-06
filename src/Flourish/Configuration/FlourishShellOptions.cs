@@ -1,8 +1,8 @@
 using System.Windows.Media;
 using System.Windows;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Configuration;
+namespace AckSS.Flourish.Configuration;
 
 internal sealed class FlourishShellOptions
 {

@@ -1,7 +1,7 @@
 using System.Windows;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Shows Flourish-styled modal messages.

@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Provides runtime navigation services for registered Flourish pages.

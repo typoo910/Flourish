@@ -34,7 +34,7 @@ The `Run(Application)` helper and `IFlourish.Show(Application)` automatically me
 Store the built runtime in a static property so `App` and pages can reach services consistently.
 
 ```csharp
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MyApp;

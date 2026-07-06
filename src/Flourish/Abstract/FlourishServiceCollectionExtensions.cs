@@ -1,8 +1,8 @@
 using System.Windows.Controls;
-using AcksheedSys.Flourish.Configuration;
+using AckSS.Flourish.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Provides service collection extensions used by Flourish applications.

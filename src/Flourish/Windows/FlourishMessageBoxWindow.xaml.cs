@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 using Brush = System.Windows.Media.Brush;
 using Button = System.Windows.Controls.Button;
 using Color = System.Windows.Media.Color;
@@ -12,7 +12,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using WpfFlowDirection = System.Windows.FlowDirection;
 
-namespace AcksheedSys.Flourish.Windows;
+namespace AckSS.Flourish.Windows;
 
 internal partial class FlourishMessageBoxWindow : Window
 {

@@ -1,8 +1,8 @@
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Gallery.Views;
+using AckSS.Flourish.Abstract;
+using AckSS.Gallery.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AcksheedSys.Gallery;
+namespace AckSS.Gallery;
 
 internal static class Program
 {
@@ -25,7 +25,7 @@ internal static class Program
             .ConfigureData(
                 (_, data) =>
                 {
-                    data.SetAppCompany("AcksheedSys").SetAppName("Flourish Gallery");
+                    data.SetAppCompany("Acksheed System Team").SetAppName("Flourish Gallery");
                 }
             )
             .ConfigureServices(

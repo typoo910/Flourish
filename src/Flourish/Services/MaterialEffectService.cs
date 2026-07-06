@@ -3,11 +3,11 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shell;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 using Brushes = System.Windows.Media.Brushes;
 using Colors = System.Windows.Media.Colors;
 
-namespace AcksheedSys.Flourish.Services;
+namespace AckSS.Flourish.Services;
 
 internal sealed class MaterialEffectService
 {

@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Configures items displayed inside a Flourish navigation panel group.

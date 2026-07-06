@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace AcksheedSys.Gallery;
+namespace AckSS.Gallery;
 
 public partial class App : Application
 {

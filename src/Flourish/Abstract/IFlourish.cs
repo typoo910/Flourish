@@ -1,6 +1,6 @@
 using Application = System.Windows.Application;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Represents a built Flourish application runtime.

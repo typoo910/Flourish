@@ -12,7 +12,7 @@ Use this skill in the Flourish repository root.
 - `.config/dotnet-tools.json`: local .NET tool manifest. DocFX is pinned as `docfx` version `2.78.5`.
 - `docs/docfx.en-us.json`: English DocFX config. Outputs to `docs/_site/en-us`.
 - `docs/docfx.zh-cn.json`: Chinese DocFX config. Outputs to `docs/_site/zh-cn` and applies `docs/zh-cn/api-overwrites/**/*.md`.
-- `docs/filterConfig.yml`: API filter. Only `AcksheedSys.Flourish.Abstract` is public in generated API docs.
+- `docs/filterConfig.yml`: API filter. Only `AckSS.Flourish.Abstract` is public in generated API docs.
 - `docs/en-us/`: English conceptual docs and TOCs.
 - `docs/zh-cn/`: Chinese conceptual docs, TOCs, and API overwrite docs.
 - `docs/material/material/public/main.css`: active shared custom theme CSS.
@@ -100,8 +100,8 @@ If a port is busy, choose another local port and mention it in the final respons
 
 Open representative pages in the browser:
 
-- English API example: `http://127.0.0.1:8098/api/AcksheedSys.Flourish.Abstract.IMessageService.html`
-- Chinese API example: `http://127.0.0.1:8097/api/AcksheedSys.Flourish.Abstract.IMessageService.html`
+- English API example: `http://127.0.0.1:8098/api/AckSS.Flourish.Abstract.IMessageService.html`
+- Chinese API example: `http://127.0.0.1:8097/api/AckSS.Flourish.Abstract.IMessageService.html`
 - Conceptual pages: use `/articles/<page>.html`.
 
 For visual or CSS fixes, verify computed styles in the actual page, not only source CSS. For example, after changing the navbar logo rule, check `#logo.getBoundingClientRect()` and `getComputedStyle(#logo)` on both language sites. The previous logo fix required both:

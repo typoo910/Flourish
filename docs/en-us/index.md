@@ -28,7 +28,7 @@ Flourish focuses on a small, teachable API surface. Application setup stays in `
 - [Shell configuration](articles/shell-configuration.md)
 - [Navigation](articles/navigation.md)
 - [Dynamic toolbar](articles/dynamic-toolbar.md)
-- [API reference](xref:AcksheedSys.Flourish.Abstract)
+- [API reference](xref:AckSS.Flourish.Abstract)
 
 ## Project Links
 

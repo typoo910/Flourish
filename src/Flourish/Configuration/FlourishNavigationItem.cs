@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using AcksheedSys.Flourish.Abstract;
+using AckSS.Flourish.Abstract;
 
-namespace AcksheedSys.Flourish.Configuration;
+namespace AckSS.Flourish.Configuration;
 
 internal enum FlourishNavigationItemKind
 {

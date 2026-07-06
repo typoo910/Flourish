@@ -1,6 +1,6 @@
-using AcksheedSys.Flourish.Composition;
+using AckSS.Flourish.Composition;
 
-namespace AcksheedSys.Flourish.Abstract;
+namespace AckSS.Flourish.Abstract;
 
 /// <summary>
 /// Provides factory methods for creating Flourish application builders.

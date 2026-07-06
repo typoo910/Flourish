@@ -1,11 +1,11 @@
 using System.Windows;
-using AcksheedSys.Flourish.Abstract;
-using AcksheedSys.Flourish.Windows;
+using AckSS.Flourish.Abstract;
+using AckSS.Flourish.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Application = System.Windows.Application;
 
-namespace AcksheedSys.Flourish.Composition;
+namespace AckSS.Flourish.Composition;
 
 internal sealed class FlourishRuntime(IHost host) : IFlourish
 {
