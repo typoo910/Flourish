@@ -13,14 +13,14 @@
         HorizontalAlignment="Center"
         FontSize="28"
         FontWeight="SemiBold"
-        Foreground="{StaticResource PrimaryTextBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
         Text="页面父节点"
       />
 
       <TextBlock
         Margin="0,10,0,0"
         HorizontalAlignment="Center"
-        Foreground="{StaticResource MutedTextBrush}"
+        Foreground="{DynamicResource MutedTextBrush}"
         Text="点击该导航项会进入这个页面，同时展开 Button1 和 Button2。"
         TextAlignment="Center"
         TextWrapping="Wrap"

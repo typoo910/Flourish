@@ -171,11 +171,13 @@
           VerticalContentAlignment="Center"
           Background="Transparent"
           BorderThickness="0"
+          CaretBrush="{DynamicResource PrimaryTextBrush}"
           FontFamily="{DynamicResource FlourishFontFamily}"
           FontSize="{DynamicResource FlourishFontSizeCaption}"
           Foreground="{DynamicResource PrimaryTextBrush}"
           GotKeyboardFocus="SearchBox_GotKeyboardFocus"
           LostKeyboardFocus="SearchBox_LostKeyboardFocus"
+          SelectionBrush="{DynamicResource AccentSoftBrush}"
           TextChanged="SearchBox_TextChanged"
         />
         <TextBlock

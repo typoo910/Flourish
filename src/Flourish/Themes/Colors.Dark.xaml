@@ -18,6 +18,14 @@
   <SolidColorBrush x:Key="FlourishProfileForegroundBrush" Color="#A5F3FC" />
   <SolidColorBrush x:Key="FlourishMessageBoxSurfaceBrush" Color="#1F2937" />
   <SolidColorBrush x:Key="FlourishMessageBoxSecondarySurfaceBrush" Color="#111827" />
+  <SolidColorBrush x:Key="FlourishMessageBoxErrorIconBackgroundBrush" Color="#451A1A" />
+  <SolidColorBrush x:Key="FlourishMessageBoxErrorIconForegroundBrush" Color="#FCA5A5" />
+  <SolidColorBrush x:Key="FlourishMessageBoxQuestionIconBackgroundBrush" Color="#35205A" />
+  <SolidColorBrush x:Key="FlourishMessageBoxQuestionIconForegroundBrush" Color="#C4B5FD" />
+  <SolidColorBrush x:Key="FlourishMessageBoxWarningIconBackgroundBrush" Color="#4A3412" />
+  <SolidColorBrush x:Key="FlourishMessageBoxWarningIconForegroundBrush" Color="#FCD34D" />
+  <SolidColorBrush x:Key="FlourishMessageBoxInfoIconBackgroundBrush" Color="#1E3A5F" />
+  <SolidColorBrush x:Key="FlourishMessageBoxInfoIconForegroundBrush" Color="#93C5FD" />
   <SolidColorBrush x:Key="FlourishPrimaryButtonHoverBrush" Color="#3B82F6" />
   <SolidColorBrush x:Key="FlourishPrimaryButtonPressedBrush" Color="#2563EB" />
 </ResourceDictionary>

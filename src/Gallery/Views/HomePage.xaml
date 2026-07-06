@@ -13,7 +13,7 @@
         Width="88"
         Height="88"
         HorizontalAlignment="Center"
-        Background="{StaticResource AccentSoftBrush}"
+        Background="{DynamicResource AccentSoftBrush}"
         CornerRadius="24"
       >
         <TextBlock
@@ -21,7 +21,7 @@
           VerticalAlignment="Center"
           FontFamily="Segoe MDL2 Assets"
           FontSize="42"
-          Foreground="{StaticResource AccentBrush}"
+          Foreground="{DynamicResource AccentBrush}"
           Text="&#xE80F;"
         />
       </Border>
@@ -31,14 +31,14 @@
         HorizontalAlignment="Center"
         FontSize="28"
         FontWeight="SemiBold"
-        Foreground="{StaticResource PrimaryTextBrush}"
+        Foreground="{DynamicResource PrimaryTextBrush}"
         Text="欢迎使用 Flourish Gallery"
       />
 
       <TextBlock
         Margin="0,10,0,0"
         HorizontalAlignment="Center"
-        Foreground="{StaticResource MutedTextBrush}"
+        Foreground="{DynamicResource MutedTextBrush}"
         Text="这里是首页占位内容。后续可以在这里展示最近项目、快速操作和图库概览。"
         TextAlignment="Center"
         TextWrapping="Wrap"

@@ -4,6 +4,11 @@ on:
   push:
     branches:
     - master
+    paths:
+    - .config/dotnet-tools.json
+    - .github/workflows/docs.yml
+    - docs/**
+    - src/Flourish/**
   workflow_dispatch:
 
 permissions:

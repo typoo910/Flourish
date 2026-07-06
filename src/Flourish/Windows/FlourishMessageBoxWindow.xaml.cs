@@ -2,11 +2,8 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using AckSS.Flourish.Abstract;
-using Brush = System.Windows.Media.Brush;
 using Button = System.Windows.Controls.Button;
-using Color = System.Windows.Media.Color;
 using Key = System.Windows.Input.Key;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
@@ -107,9 +104,9 @@ internal partial class FlourishMessageBoxWindow : Window
         }
 
         IconText.Text = iconGlyph;
-        var (background, foreground) = GetIconColors(icon);
-        IconHost.Background = background;
-        IconText.Foreground = foreground;
+        var (backgroundKey, foregroundKey) = GetIconBrushKeys(icon);
+        IconHost.SetResourceReference(Border.BackgroundProperty, backgroundKey);
+        IconText.SetResourceReference(TextBlock.ForegroundProperty, foregroundKey);
     }
 
     private void ConfigureButtons(IReadOnlyList<MessageDialogButton> buttonDefinitions)
@@ -289,30 +286,37 @@ internal partial class FlourishMessageBoxWindow : Window
         return "\uE946";
     }
 
-    private static (Brush Background, Brush Foreground) GetIconColors(MessageBoxImage icon)
+    private static (string BackgroundKey, string ForegroundKey) GetIconBrushKeys(
+        MessageBoxImage icon
+    )
     {
         if (icon == MessageBoxImage.Hand)
         {
-            return (CreateBrush(0xFEE2E2), CreateBrush(0xDC2626));
+            return (
+                "FlourishMessageBoxErrorIconBackgroundBrush",
+                "FlourishMessageBoxErrorIconForegroundBrush"
+            );
         }
 
         if (icon == MessageBoxImage.Question)
         {
-            return (CreateBrush(0xEDE9FE), CreateBrush(0x7C3AED));
+            return (
+                "FlourishMessageBoxQuestionIconBackgroundBrush",
+                "FlourishMessageBoxQuestionIconForegroundBrush"
+            );
         }
 
         if (icon == MessageBoxImage.Exclamation)
         {
-            return (CreateBrush(0xFEF3C7), CreateBrush(0xD97706));
+            return (
+                "FlourishMessageBoxWarningIconBackgroundBrush",
+                "FlourishMessageBoxWarningIconForegroundBrush"
+            );
         }
 
-        return (CreateBrush(0xDBEAFE), CreateBrush(0x2563EB));
-    }
-
-    private static SolidColorBrush CreateBrush(uint rgb)
-    {
-        return new SolidColorBrush(
-            Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb)
+        return (
+            "FlourishMessageBoxInfoIconBackgroundBrush",
+            "FlourishMessageBoxInfoIconForegroundBrush"
         );
     }
 

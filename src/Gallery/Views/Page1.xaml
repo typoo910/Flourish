@@ -13,7 +13,7 @@
       VerticalAlignment="Center"
       FontSize="28"
       FontWeight="SemiBold"
-      Foreground="{StaticResource PrimaryTextBrush}"
+      Foreground="{DynamicResource PrimaryTextBrush}"
       Text="Page1"
     />
   </Grid>

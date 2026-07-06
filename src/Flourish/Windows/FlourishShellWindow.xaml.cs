@@ -1032,14 +1032,19 @@ internal partial class FlourishShellWindow : Window
 
     private bool ConfirmCloseRequest()
     {
+        FlourishMessageOption[] closeOptions =
+        [
+            new("no", "No") { IsDefault = true, IsCancel = true },
+            new("yes", "Yes") { IsPrimary = true },
+        ];
+
         return messageService.Show(
             this,
             "Are you sure you want to close this window?",
             "Close",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question,
-            MessageBoxResult.No
-        ) == MessageBoxResult.Yes;
+            closeOptions,
+            MessageBoxImage.Question
+        )?.Id == "yes";
     }
 
     private void ShellWindow_Closing(object? sender, CancelEventArgs e)
