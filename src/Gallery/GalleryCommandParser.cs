@@ -4,8 +4,10 @@ using AcksheedSys.Flourish.Abstract;
 
 namespace AcksheedSys.Gallery;
 
-internal sealed class GalleryCommandParser : ICommandParser
+internal sealed class GalleryCommandParser(IMessageService messages) : ICommandParser
 {
+    private readonly IMessageService messages = messages;
+
     public bool TryParse(string commandKey)
     {
         switch (commandKey)
@@ -26,7 +28,12 @@ internal sealed class GalleryCommandParser : ICommandParser
                 ShowCommandOutput("关于");
                 return true;
             case "home.open":
-                MessageBox.Show("Hello, World!");
+                messages.Show(
+                    "Hello, World!",
+                    "Gallery",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                );
                 return true;
             case "home.save":
                 return true;
@@ -42,9 +49,9 @@ internal sealed class GalleryCommandParser : ICommandParser
         }
     }
 
-    private static void ShowCommandOutput(string text)
+    private void ShowCommandOutput(string text)
     {
         Debug.WriteLine(text);
-        MessageBox.Show(text);
+        messages.Show(text, "Gallery", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

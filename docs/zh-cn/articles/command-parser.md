@@ -23,7 +23,7 @@ builder.ConfigureServices((_, services) =>
 ## 实现 TryParse
 
 ```csharp
-internal sealed class AppCommandParser : ICommandParser
+internal sealed class AppCommandParser(IMessageService messages) : ICommandParser
 {
     public bool TryParse(string commandKey)
     {
@@ -36,9 +36,13 @@ internal sealed class AppCommandParser : ICommandParser
         };
     }
 
-    private static bool OpenHome()
+    private bool OpenHome()
     {
-        MessageBox.Show("从首页打开");
+        messages.Show(
+            "从首页打开",
+            "首页",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
         return true;
     }
 
@@ -88,7 +92,7 @@ shell.UseNavigationPanel((_, nav) =>
 
 ## 在解析器中使用服务
 
-解析器由 DI 解析，因此可以依赖你自己的服务。
+解析器由 DI 解析，因此可以依赖你自己的服务。Flourish 也会注册 `IMessageService`，用于显示符合 Flourish 样式的模态消息，并复用 WPF `MessageBox` 的按钮、图标和返回值枚举。
 
 ```csharp
 internal sealed class GalleryCommandParser(ImageLibrary library) : ICommandParser

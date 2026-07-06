@@ -107,7 +107,7 @@ nav.SetGroup("Commands", groupId: 2, group =>
 Command items keep only the hover style. After a command is invoked, the current page selection is restored and focus is cleared from the command item.
 
 ```csharp
-internal sealed class AppCommandParser : ICommandParser
+internal sealed class AppCommandParser(IMessageService messages) : ICommandParser
 {
     public bool TryParse(string commandKey)
     {
@@ -119,9 +119,9 @@ internal sealed class AppCommandParser : ICommandParser
         };
     }
 
-    private static bool Show(string text)
+    private bool Show(string text)
     {
-        MessageBox.Show(text);
+        messages.Show(text, "Navigation", MessageBoxButton.OK, MessageBoxImage.Information);
         return true;
     }
 }

@@ -324,6 +324,7 @@ internal sealed class FlourishCompositionRoot(
         services.AddSingleton<FlourishShellWindow>();
         services.AddSingleton<FlourishToolbarService>();
         services.AddSingleton<FlourishStatusService>();
+        services.AddSingleton<IMessageService, MessageService>();
         services.AddSingleton<TrayIconService>();
         services.AddSingleton<FontService>();
         services.AddSingleton<CommandParser>();

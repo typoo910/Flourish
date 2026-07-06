@@ -58,7 +58,7 @@ builder.ConfigureServices((_, services) =>
 });
 ```
 
-Flourish 会在构建阶段注册自己的内部服务，包括导航、工具栏、状态栏、Tips、材质特效、动效、页面缓存和 Shell 窗口服务。你不需要直接构造这些内部服务。
+Flourish 会在构建阶段注册自己的内部服务，包括导航、工具栏、状态栏、Message、Tips、材质特效、动效、页面缓存和 Shell 窗口服务。你不需要直接构造这些内部服务。
 
 ## 使用 AddNavigable 注册页面
 

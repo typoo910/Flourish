@@ -107,7 +107,7 @@ nav.SetGroup("按钮", groupId: 2, group =>
 命令项只保留 Hover 样式。命令触发后，Flourish 会恢复当前页面选中状态，并清除命令项焦点。
 
 ```csharp
-internal sealed class AppCommandParser : ICommandParser
+internal sealed class AppCommandParser(IMessageService messages) : ICommandParser
 {
     public bool TryParse(string commandKey)
     {
@@ -119,9 +119,9 @@ internal sealed class AppCommandParser : ICommandParser
         };
     }
 
-    private static bool Show(string text)
+    private bool Show(string text)
     {
-        MessageBox.Show(text);
+        messages.Show(text, "导航", MessageBoxButton.OK, MessageBoxImage.Information);
         return true;
     }
 }

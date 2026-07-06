@@ -58,7 +58,7 @@ builder.ConfigureServices((_, services) =>
 });
 ```
 
-Flourish also registers its own internal services during build, including navigation, toolbar, status, tooltips, material effect, motion, page cache, and shell window services. You do not need to construct those directly.
+Flourish also registers its own internal services during build, including navigation, toolbar, status, message, tooltip, material effect, motion, page cache, and shell window services. You do not need to construct those directly.
 
 ## Register pages with AddNavigable
 

@@ -23,7 +23,7 @@ You can register more than one parser. Each parser returns `true` when it handle
 ## Implement TryParse
 
 ```csharp
-internal sealed class AppCommandParser : ICommandParser
+internal sealed class AppCommandParser(IMessageService messages) : ICommandParser
 {
     public bool TryParse(string commandKey)
     {
@@ -36,9 +36,13 @@ internal sealed class AppCommandParser : ICommandParser
         };
     }
 
-    private static bool OpenHome()
+    private bool OpenHome()
     {
-        MessageBox.Show("Open from Home");
+        messages.Show(
+            "Open from Home",
+            "Home",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
         return true;
     }
 
@@ -88,7 +92,7 @@ If a command item is a parent node, clicking it expands or collapses children an
 
 ## Use services inside a parser
 
-Because parsers are resolved from DI, they can depend on your own services.
+Because parsers are resolved from DI, they can depend on your own services. Flourish also registers `IMessageService`, which shows Flourish-styled modal messages with the same button, icon, and result enums used by WPF `MessageBox`.
 
 ```csharp
 internal sealed class GalleryCommandParser(ImageLibrary library) : ICommandParser
