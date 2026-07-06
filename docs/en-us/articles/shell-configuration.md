@@ -75,7 +75,7 @@ shell.UseNavigationPanel((_, nav) =>
 
 Use `SetEnabled(false)` for applications that rely on custom navigation or a single-page shell. Use `SetDirection(NavigationPanelDirection.Right)` when your layout benefits from a right-side navigation rail. Grouped items live in the scrollable upper area; fixed items stay visible in the bottom area.
 
-Use `SetPanelWidth` to set the open and collapsed panel widths and constrain the preview splitter resize range. By default, the panel opens at `220`, collapses to `48`, and can be resized between `160` and `420`.
+Use `SetPanelWidth` to set the open and collapsed panel widths and constrain the preview splitter resize range. By default, the panel opens at `220`, collapses to `48`, and can be resized between `160` and `420`. The splitter is invisible in the normal layout, appears only while hovering over the resize edge, and uses preview mode so the layout is committed after dragging finishes.
 
 ## Dynamic toolbar surface
 
@@ -89,7 +89,7 @@ Disable it when the application does not have contextual page commands.
 
 ## Tips
 
-`UseTips` configures Flourish tooltips. Tooltips use Flourish styling and predefined shell-region placement: navigation opens toward the content area, title bar and top toolbar controls open downward, and footer controls open upward.
+`UseTips` configures Flourish tooltips. Tooltips use Flourish styling and predefined shell-region placement: left navigation opens right, right navigation opens left, title bar and top toolbar controls open downward, and footer controls open upward.
 
 ```csharp
 shell.UseTips((_, tips) =>
@@ -185,6 +185,7 @@ builder.ConfigureShell((_, shell) =>
         {
             nav.SetDirection()
                .SetInitiallyOpen()
+               .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
                .SetGroup("Navigation", groupId: 0, group =>
                {
                    group.AddNavigableViewItem<HomePage>(isInitial: true);

@@ -46,6 +46,7 @@ builder.ConfigureShell((_, shell) =>
     {
         nav.SetDirection(NavigationPanelDirection.Left)
            .SetInitiallyOpen()
+           .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
            .SetGroup("导航", groupId: 0, group =>
            {
                group.AddNavigableViewItem<HomePage>(isInitial: true);
@@ -80,6 +81,16 @@ nav.SetGroup("管理", groupId: 10, group =>
 ```
 
 如果启用了导航栏，但没有配置任何分组或固定项，Flourish 会回退到旧的扁平模式：把所有已注册页面组成一个列表。
+
+## 调整导航栏宽度
+
+使用 `SetPanelWidth` 可以配置导航栏展开宽度、折叠宽度，以及拖拽调整时的宽度约束。
+
+```csharp
+nav.SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180);
+```
+
+默认展开宽度为 `220`，折叠宽度为 `48`，可调整范围为 `160` 到 `420`。用户可以通过悬浮时显示的 splitter 调整展开状态下的导航栏宽度；它使用预览模式，因此 Flourish 会在拖拽结束后再刷新布局。
 
 ## 添加命令项
 
@@ -166,7 +177,7 @@ nav.SetGroup("树", groupId: 3, group =>
 
 页面项可以作为父节点。点击页面父节点时，会跳转到该页面并展开或折叠子项。命令项也可以作为父节点，但命令父节点只负责展开或折叠子项，不会执行 `commandKey`；因此推荐为命令父节点传入 `null`。
 
-当选中页面子项时，Flourish 会自动展开父节点，并把父节点名称标记为激活样式。导航栏折叠时，会先隐藏所有子项，避免折叠后的图标位置偏移。折叠状态下点击可展开父节点，会先打开整个导航栏，再显示子项。
+当选中页面子项时，Flourish 会自动展开父节点，并把父节点名称标记为激活样式。导航栏折叠时，会先隐藏所有子项，避免折叠后的图标位置偏移。折叠状态下点击父节点会先打开整个导航栏；页面父节点会立刻被选中并导航到对应页面，命令父节点仍然只负责显示或折叠子项。
 
 ## 校验规则
 

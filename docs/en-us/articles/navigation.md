@@ -46,6 +46,7 @@ builder.ConfigureShell((_, shell) =>
     {
         nav.SetDirection(NavigationPanelDirection.Left)
            .SetInitiallyOpen()
+           .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
            .SetGroup("Navigation", groupId: 0, group =>
            {
                group.AddNavigableViewItem<HomePage>(isInitial: true);
@@ -80,6 +81,16 @@ nav.SetGroup("Admin", groupId: 10, group =>
 ```
 
 If you enable the navigation panel but do not configure any groups or fixed items, Flourish falls back to a flat legacy list built from all registered pages.
+
+## Resize the panel
+
+Use `SetPanelWidth` to configure the expanded width, collapsed width, and resize constraints for the navigation panel.
+
+```csharp
+nav.SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180);
+```
+
+The default widths are `220` expanded and `48` collapsed. The default resize range is `160` to `420`. Users can resize the expanded panel with a hover-revealed splitter; it uses preview mode, so Flourish updates the layout only after the drag completes.
 
 ## Add command items
 
@@ -166,7 +177,7 @@ Tree rules:
 
 A page item can be a parent. Clicking it navigates to the page and toggles its children. A command item can also be a parent, but parent command items toggle children only and do not execute their `commandKey`; passing `null` is recommended.
 
-When a page child is selected, Flourish automatically expands its parent and highlights the parent name. When the navigation panel is collapsed, closing first hides all child items so icons stay aligned. Clicking a collapsed parent that can expand opens the whole navigation panel before showing children.
+When a page child is selected, Flourish automatically expands its parent and highlights the parent name. When the navigation panel is collapsed, closing first hides all child items so icons stay aligned. Clicking a collapsed parent opens the whole navigation panel; page parents are selected and navigated immediately, while command parents still only reveal or toggle children.
 
 ## Validation rules
 

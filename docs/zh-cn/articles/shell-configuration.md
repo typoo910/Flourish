@@ -14,6 +14,7 @@ builder.ConfigureShell((_, shell) =>
         .UseTitlebar((_, titlebar) => { })
         .UseNavigationPanel((_, nav) => { })
         .UseDynamicToolbar()
+        .UseTips((_, tips) => { })
         .UseMotion((_, motion) => { })
         .UseMaterialEffect()
         .SetGlobalFont("Microsoft YaHei")
@@ -60,6 +61,7 @@ shell.UseNavigationPanel((_, nav) =>
         .SetEnabled()
         .SetDirection(NavigationPanelDirection.Left)
         .SetInitiallyOpen()
+        .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
         .SetGroup("导航", groupId: 0, group =>
         {
             group.AddNavigableViewItem<HomePage>(isInitial: true);
@@ -73,6 +75,8 @@ shell.UseNavigationPanel((_, nav) =>
 
 如果应用使用自定义导航或只有单页 Shell，可以使用 `SetEnabled(false)`。如果布局更适合右侧导航，可以使用 `NavigationPanelDirection.Right`。分组项位于上方可滚动区域；固定项始终显示在底部区域。
 
+使用 `SetPanelWidth` 可以设置导航栏展开宽度、折叠宽度，以及拖拽调整时允许的最小和最大宽度。默认展开宽度为 `220`，折叠宽度为 `48`，可调整范围为 `160` 到 `420`。调整宽度的 splitter 在正常布局中不可见，仅在鼠标悬浮到边缘时显示，并使用预览模式，拖拽结束后才提交布局宽度。
+
 ## 动态工具栏区域
 
 `UseDynamicToolbar()` 只负责启用 Shell 中的工具栏区域。具体按页面变化的工具栏项，需要通过 `ConfigureDynamicToolbar` 单独注册。
@@ -82,6 +86,19 @@ shell.UseDynamicToolbar(enabled: true);
 ```
 
 如果应用没有上下文页面命令，可以关闭它。
+
+## Tips
+
+`UseTips` 配置 Flourish 的提示浮层。Tips 使用 Flourish 样式，并按 Shell 区域预设生成方向：左侧导航向右显示，右侧导航向左显示，标题栏和顶部工具栏向下显示，Footer 向上显示。
+
+```csharp
+shell.UseTips((_, tips) =>
+{
+    tips.SetDelay(600).SetSpawnableMargin(5);
+});
+```
+
+默认情况下，Tips 在悬浮 `800` 毫秒后显示，并和 Shell 窗口边界至少保持 `5` 像素距离。使用 `SetDelay` 可以调整悬浮延迟，使用 `SetSpawnableMargin` 可以调整这个边界距离。
 
 ## 动效
 
@@ -168,12 +185,17 @@ builder.ConfigureShell((_, shell) =>
         {
             nav.SetDirection()
                .SetInitiallyOpen()
+               .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
                .SetGroup("导航", groupId: 0, group =>
                {
                    group.AddNavigableViewItem<HomePage>(isInitial: true);
                });
         })
         .UseDynamicToolbar()
+        .UseTips((_, tips) =>
+        {
+            tips.SetDelay(600).SetSpawnableMargin(5);
+        })
         .UseMotion((_, motion) =>
         {
             motion.SetDuration().SetHoverReveal().SetNavigationPanelTransition().SetPageTransition();

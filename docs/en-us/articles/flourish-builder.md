@@ -38,7 +38,7 @@ The public builder has four configuration stages.
 | Method | Purpose |
 | --- | --- |
 | `ConfigureServices` | Registers application services, pages, command parsers, view models, and any infrastructure you want in DI. |
-| `ConfigureShell` | Configures the shell window, title bar, navigation panel, motion, material effect, font, and dynamic toolbar surface. |
+| `ConfigureShell` | Configures the shell window, title bar, navigation panel, tooltips, motion, material effect, font, and dynamic toolbar surface. |
 | `ConfigureDynamicToolbar` | Registers page-specific toolbar items. |
 | `ConfigureStatus` | Configures the status area at the bottom of the shell. |
 
@@ -58,7 +58,7 @@ builder.ConfigureServices((_, services) =>
 });
 ```
 
-Flourish also registers its own internal services during build, including navigation, toolbar, status, material effect, motion, page cache, and shell window services. You do not need to construct those directly.
+Flourish also registers its own internal services during build, including navigation, toolbar, status, tooltips, material effect, motion, page cache, and shell window services. You do not need to construct those directly.
 
 ## Register pages with AddNavigable
 

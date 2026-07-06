@@ -38,7 +38,7 @@ return flourish.Run<App>();
 | 方法 | 作用 |
 | --- | --- |
 | `ConfigureServices` | 注册应用服务、页面、命令解析器、ViewModel 以及你希望放入 DI 的基础设施。 |
-| `ConfigureShell` | 配置 Shell 窗口、标题栏、导航栏、动效、材质特效、字体和动态工具栏区域。 |
+| `ConfigureShell` | 配置 Shell 窗口、标题栏、导航栏、Tips、动效、材质特效、字体和动态工具栏区域。 |
 | `ConfigureDynamicToolbar` | 注册按页面变化的工具栏项。 |
 | `ConfigureStatus` | 配置 Shell 底部状态栏。 |
 
@@ -58,7 +58,7 @@ builder.ConfigureServices((_, services) =>
 });
 ```
 
-Flourish 会在构建阶段注册自己的内部服务，包括导航、工具栏、状态栏、材质特效、动效、页面缓存和 Shell 窗口服务。你不需要直接构造这些内部服务。
+Flourish 会在构建阶段注册自己的内部服务，包括导航、工具栏、状态栏、Tips、材质特效、动效、页面缓存和 Shell 窗口服务。你不需要直接构造这些内部服务。
 
 ## 使用 AddNavigable 注册页面
 

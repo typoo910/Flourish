@@ -76,6 +76,7 @@ internal static class Program
                     .UseNavigationPanel((_, nav) =>
                     {
                         nav.SetInitiallyOpen()
+                           .SetPanelWidth(openWidth: 260, closedWidth: 48, maxWidth: 480, minWidth: 180)
                            .SetGroup("Navigation", groupId: 0, group =>
                            {
                                group.AddNavigableViewItem<HomePage>(isInitial: true);
@@ -83,6 +84,10 @@ internal static class Program
                            .AddFixedNavigableViewItem<SettingsPage>();
                     })
                     .UseDynamicToolbar()
+                    .UseTips((_, tips) =>
+                    {
+                        tips.SetDelay(600).SetSpawnableMargin(5);
+                    })
                     .UseMotion()
                     .UseMaterialEffect()
                     .SetGlobalFont("Microsoft YaHei")

@@ -41,7 +41,7 @@ public static class FlourishToolTipPlacement
     /// Sets whether shell-region-aware tooltip placement is enabled.
     /// </summary>
     /// <param name="element">The tooltip to configure.</param>
-    /// <param name="value">A value indicating whether center-aware placement is enabled.</param>
+    /// <param name="value">A value indicating whether shell-region-aware placement is enabled.</param>
     public static void SetIsEnabled(DependencyObject element, bool value)
     {
         element.SetValue(IsEnabledProperty, value);
