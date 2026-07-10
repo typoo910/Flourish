@@ -8,13 +8,13 @@ namespace ArkheideSystem.Flourish.Test.Services;
 public sealed class FlourishLocalizationServiceTests
 {
     [Fact]
-    public void Constructor_WithoutLocaleConfiguration_UsesBuiltInChinese()
+    public void Constructor_WithoutLocaleConfiguration_UsesBuiltInEnglish()
     {
         var sut = new FlourishLocalizationService(new FlourishDataOptions());
 
-        Assert.Equal("CN", sut.Locale);
-        Assert.Equal("返回", sut.Get(FlourishLocaleKeys.TitleBarBack));
-        Assert.Equal("用户", sut.Get(FlourishLocaleKeys.ProfileDefaultName));
+        Assert.Equal("EN", sut.Locale);
+        Assert.Equal("Back", sut.Get(FlourishLocaleKeys.TitleBarBack));
+        Assert.Equal("User", sut.Get(FlourishLocaleKeys.ProfileDefaultName));
     }
 
     [Fact]
@@ -54,14 +54,14 @@ public sealed class FlourishLocalizationServiceTests
     }
 
     [Fact]
-    public void Get_UnknownLocale_FallsBackToCustomChineseBeforeBuiltInChinese()
+    public void Get_UnknownLocale_FallsBackToCustomEnglishBeforeBuiltInEnglish()
     {
         using var directory = new TemporaryDirectory();
         var path = directory.WriteLocale(
-            "lang_CN.json",
+            "lang_EN.json",
             """
             {
-              "Tray.Show": "展示"
+              "Tray.Show": "Reveal"
             }
             """
         );
@@ -70,32 +70,32 @@ public sealed class FlourishLocalizationServiceTests
 
         var sut = new FlourishLocalizationService(options);
 
-        Assert.Equal("展示", sut.Get(FlourishLocaleKeys.TrayShow));
-        Assert.Equal("退出", sut.Get(FlourishLocaleKeys.TrayExit));
-    }
-
-    [Fact]
-    public void Get_BuiltInSelectedLocale_IsUsedBeforeCustomChineseFallback()
-    {
-        using var directory = new TemporaryDirectory();
-        var path = directory.WriteLocale(
-            "lang_CN.json",
-            """
-            {
-              "Tray.Exit": "关闭程序"
-            }
-            """
-        );
-        var options = new FlourishDataOptions { Locale = "EN" };
-        options.LocalePaths.Add(path);
-
-        var sut = new FlourishLocalizationService(options);
-
+        Assert.Equal("Reveal", sut.Get(FlourishLocaleKeys.TrayShow));
         Assert.Equal("Exit", sut.Get(FlourishLocaleKeys.TrayExit));
     }
 
     [Fact]
-    public void Get_CustomUnknownSelectedLocale_IsUsedBeforeChineseFallback()
+    public void Get_BuiltInSelectedLocale_IsUsedBeforeCustomEnglishFallback()
+    {
+        using var directory = new TemporaryDirectory();
+        var path = directory.WriteLocale(
+            "lang_EN.json",
+            """
+            {
+              "Tray.Exit": "Quit"
+            }
+            """
+        );
+        var options = new FlourishDataOptions { Locale = "CN" };
+        options.LocalePaths.Add(path);
+
+        var sut = new FlourishLocalizationService(options);
+
+        Assert.Equal("退出", sut.Get(FlourishLocaleKeys.TrayExit));
+    }
+
+    [Fact]
+    public void Get_CustomUnknownSelectedLocale_IsUsedBeforeEnglishFallback()
     {
         using var directory = new TemporaryDirectory();
         var path = directory.WriteLocale(
@@ -112,7 +112,7 @@ public sealed class FlourishLocalizationServiceTests
         var sut = new FlourishLocalizationService(options);
 
         Assert.Equal("Afficher", sut.Get(FlourishLocaleKeys.TrayShow));
-        Assert.Equal("退出", sut.Get(FlourishLocaleKeys.TrayExit));
+        Assert.Equal("Exit", sut.Get(FlourishLocaleKeys.TrayExit));
     }
 
     [Fact]

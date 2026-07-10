@@ -5,7 +5,7 @@ description: Configure localization, application identity, and preference storag
 
 # Application data
 
-`ConfigureData` controls Flourish built-in interface language, custom locale files, application identity, and preference storage. Localization is always available: when `ConfigureData` or `SetLocale` is omitted, Flourish uses the built-in Chinese (`CN`) locale.
+`ConfigureData` controls Flourish built-in interface language, custom locale files, application identity, and preference storage. Localization is always available: when `ConfigureData` or `SetLocale` is omitted, Flourish uses the built-in English (`EN`) locale.
 
 ## Select a built-in locale
 
@@ -15,7 +15,7 @@ Flourish includes `CN` and `EN`. Locale identifiers are case-insensitive and nor
 builder.ConfigureData(data => data.SetLocale("EN"));
 ```
 
-`SetLocale()` without an argument selects `CN`. Application-provided text such as titles, search placeholders, navigation labels, status text, dialog messages, and custom option text is not translated automatically.
+`SetLocale()` without an argument selects `EN`. Application-provided text such as titles, search placeholders, navigation labels, status text, dialog messages, and custom option text is not translated automatically.
 
 ## Add a custom locale
 
@@ -45,11 +45,11 @@ Calling `AddLocale` more than once for the same locale merges the files in regis
 
 1. Custom value for the selected locale.
 2. Built-in value for the selected locale.
-3. Custom `CN` value.
-4. Built-in `CN` value.
+3. Custom `EN` value.
+4. Built-in `EN` value.
 5. The key itself.
 
-This lookup also allows a custom locale such as `lang_FR.json` to define only part of the interface while the remaining keys fall back to Chinese.
+This lookup also allows a custom locale such as `lang_FR.json` to define only part of the interface while the remaining keys fall back to English.
 
 ## Translation keys
 

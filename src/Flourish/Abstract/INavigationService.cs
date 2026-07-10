@@ -1,5 +1,3 @@
-using System.Windows.Controls;
-
 namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
@@ -9,7 +7,7 @@ namespace ArkheideSystem.Flourish.Abstract;
 /// <code><![CDATA[
 /// public sealed class HomeViewModel(INavigationService navigation)
 /// {
-///     public void OpenSettings() => navigation.Navigate(NavigationRoutes.Settings);
+///     public void OpenSettings() => navigation.Navigate("Settings");
 /// }
 /// ]]></code>
 /// </example>
@@ -77,40 +75,17 @@ public interface INavigationService
     /// <summary>
     /// Navigates to a registered page by navigation key.
     /// </summary>
-    /// <param name="navigationKey">The stable key registered with <c>AddNavigable</c>.</param>
+    /// <param name="navigationKey">The case-sensitive key generated from the registered Page class name.</param>
     /// <param name="parameter">An optional parameter passed to the destination page.</param>
     /// <param name="addToBackStack">A value indicating whether the current page should be added to the back stack.</param>
     /// <returns><see langword="true" /> if navigation succeeded; otherwise, <see langword="false" />.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the service is not initialized or <paramref name="navigationKey" /> is not registered.</exception>
     /// <example>
     /// <code><![CDATA[
-    /// navigation.Navigate(NavigationRoutes.Settings);
+    /// navigation.Navigate("Settings");
     /// ]]></code>
     /// </example>
     bool Navigate(string navigationKey, object? parameter = null, bool addToBackStack = true);
-
-    /// <summary>
-    /// Navigates to a registered page type.
-    /// </summary>
-    /// <param name="sourcePageType">The registered page type to navigate to.</param>
-    /// <param name="parameter">An optional parameter passed to the destination page.</param>
-    /// <param name="addToBackStack">A value indicating whether the current page should be added to the back stack.</param>
-    /// <returns><see langword="true" /> if navigation succeeded; otherwise, <see langword="false" />.</returns>
-    bool Navigate(Type sourcePageType, object? parameter = null, bool addToBackStack = true);
-
-    /// <summary>
-    /// Navigates to a registered page type.
-    /// </summary>
-    /// <typeparam name="TPage">The registered page type to navigate to.</typeparam>
-    /// <param name="parameter">An optional parameter passed to the destination page.</param>
-    /// <param name="addToBackStack">A value indicating whether the current page should be added to the back stack.</param>
-    /// <returns><see langword="true" /> if navigation succeeded; otherwise, <see langword="false" />.</returns>
-    /// <example>
-    /// <code><![CDATA[
-    /// // Prefer Navigate(navigationKey) from view models.
-    /// ]]></code>
-    /// </example>
-    bool Navigate<TPage>(object? parameter = null, bool addToBackStack = true)
-        where TPage : Page;
 
     /// <summary>
     /// Navigates to the previous page in the back stack.

@@ -8,14 +8,14 @@ namespace ArkheideSystem.Flourish.Test.Composition;
 public sealed class FlourishCompositionContractTests
 {
     [Fact]
-    public void Build_WithoutDataConfiguration_UsesBuiltInChineseLocale()
+    public void Build_WithoutDataConfiguration_UsesBuiltInEnglishLocale()
     {
         using var flourish = FlourishBuilder.CreateDefaultBuilder([]).Build();
 
         var localization = flourish.GetRequiredService<FlourishLocalizationService>();
 
-        Assert.Equal("CN", localization.Locale);
-        Assert.Equal("关闭", localization.Get(FlourishLocaleKeys.TitleBarClose));
+        Assert.Equal("EN", localization.Locale);
+        Assert.Equal("Close", localization.Get(FlourishLocaleKeys.TitleBarClose));
     }
 
     [Fact]
@@ -70,8 +70,8 @@ public sealed class FlourishCompositionContractTests
             .CreateDefaultBuilder([])
             .ConfigureServices((_, services) =>
             {
-                services.AddNavigable<HomePage>("Home", "H", navigationKey: "home");
-                services.AddNavigable<HomePage>("Start", "S", navigationKey: "start");
+                services.AddNavigable<HomePage>("Home", "H");
+                services.AddNavigable<HomePage>("Start", "S");
             });
 
         var exception = Assert.Throws<InvalidOperationException>(builder.Build);
@@ -86,19 +86,15 @@ public sealed class FlourishCompositionContractTests
         var builder = CreateNavigationBuilder()
             .ConfigureServices((_, services) =>
             {
-                services.AddNavigable<HomePage>("Home", "H", navigationKey: "home");
-                services.AddNavigable<SettingsPage>(
-                    "Settings",
-                    "S",
-                    navigationKey: "settings"
-                );
+                services.AddNavigable<HomePage>("Home", "H");
+                services.AddNavigable<SettingsPage>("Settings", "S");
             })
             .ConfigureNavigation(navigation =>
             {
                 navigation.SetGroup(null, groupId: 0, group =>
-                    group.AddNavigableViewItem("home", isInitial: true)
+                    group.AddNavigableViewItem<HomePage>(isInitial: true)
                 );
-                navigation.AddFixedNavigableViewItem("settings", isInitial: true);
+                navigation.AddFixedNavigableViewItem<SettingsPage>(isInitial: true);
             });
 
         var exception = Assert.Throws<InvalidOperationException>(builder.Build);
@@ -112,20 +108,16 @@ public sealed class FlourishCompositionContractTests
         var builder = CreateNavigationBuilder()
             .ConfigureServices((_, services) =>
             {
-                services.AddNavigable<HomePage>("Home", "H", navigationKey: "home");
-                services.AddNavigable<SettingsPage>(
-                    "Settings",
-                    "S",
-                    navigationKey: "settings"
-                );
+                services.AddNavigable<HomePage>("Home", "H");
+                services.AddNavigable<SettingsPage>("Settings", "S");
             })
             .ConfigureNavigation(navigation =>
             {
                 navigation.SetGroup("Second", groupId: 2, group =>
-                    group.AddNavigableViewItem("settings")
+                    group.AddNavigableViewItem<SettingsPage>()
                 );
                 navigation.SetGroup("First", groupId: 1, group =>
-                    group.AddNavigableViewItem("home")
+                    group.AddNavigableViewItem<HomePage>()
                 );
             });
 
@@ -139,13 +131,13 @@ public sealed class FlourishCompositionContractTests
                 Assert.True(header.IsGroupHeader);
                 Assert.Equal("First", header.Label);
             },
-            home => Assert.Equal("home", home.Key),
+            home => Assert.Equal("Home", home.Key),
             header =>
             {
                 Assert.True(header.IsGroupHeader);
                 Assert.Equal("Second", header.Label);
             },
-            settings => Assert.Equal("settings", settings.Key)
+            settings => Assert.Equal("Settings", settings.Key)
         );
     }
 

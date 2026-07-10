@@ -29,24 +29,13 @@ public sealed class NavigationServiceTests
         var fixture = CreateFixture();
 
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            fixture.Sut.Navigate("unknown")
+            fixture.Sut.Navigate("Setings")
         );
 
-        Assert.Contains("unknown", exception.Message);
-        fixture.PageProvider.VerifyNoOtherCalls();
-        fixture.ContentHost.VerifyNoOtherCalls();
-    }
-
-    [Fact]
-    public void Navigate_WithUnregisteredType_ThrowsWithoutCreatingPage()
-    {
-        var fixture = CreateFixture();
-
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-            fixture.Sut.Navigate(typeof(UnregisteredPage))
-        );
-
-        Assert.Contains(typeof(UnregisteredPage).FullName!, exception.Message);
+        Assert.Contains("Setings", exception.Message);
+        Assert.Contains("spelling", exception.Message);
+        Assert.Contains("casing", exception.Message);
+        Assert.Contains("SettingsPage", exception.Message);
         fixture.PageProvider.VerifyNoOtherCalls();
         fixture.ContentHost.VerifyNoOtherCalls();
     }
@@ -62,7 +51,7 @@ public sealed class NavigationServiceTests
         fixture.ContentHost.Setup(host => host.Navigate(page)).Returns(true);
         fixture.Sut.Navigated += (_, args) => navigated = args;
 
-        var result = fixture.Sut.Navigate<HomePage>(parameter);
+        var result = fixture.Sut.Navigate(HomeKey, parameter);
 
         Assert.True(result);
         Assert.Equal(HomeKey, fixture.Sut.CurrentNavigationKey);
@@ -386,11 +375,9 @@ public sealed class NavigationServiceTests
 
     private sealed class GalleryPage : Page { }
 
-    private sealed class UnregisteredPage : Page { }
-
     private sealed class PageCreationException : Exception { }
 
-    private const string HomeKey = "home";
-    private const string SettingsKey = "settings";
-    private const string GalleryKey = "gallery";
+    private const string HomeKey = "Home";
+    private const string SettingsKey = "Settings";
+    private const string GalleryKey = "Gallery";
 }

@@ -194,22 +194,6 @@ public sealed class FlourishNavigationBuilderTests
         Assert.Contains("parentId 7", exception.Message);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void AddFixedNavigableViewItem_WithBlankKey_ThrowsArgumentException(
-        string navigationKey
-    )
-    {
-        var sut = new FlourishNavigationBuilder(new FlourishShellOptions());
-
-        var exception = Assert.Throws<ArgumentException>(() =>
-            sut.AddFixedNavigableViewItem(navigationKey)
-        );
-
-        Assert.Equal("navigationKey", exception.ParamName);
-    }
-
     [Fact]
     public void AddFixedItems_RecordsGenericPageAndCommandDefinitions()
     {

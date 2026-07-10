@@ -22,16 +22,18 @@ builder.ConfigureServices((_, services) =>
     services.AddNavigable<SettingsPage>(
         displayName: "Settings",
         iconGlyph: "\uE713",
-        cacheMode: FlourishPageCacheMode.Enabled,
-        navigationKey: NavigationRoutes.Settings);
+        cacheMode: FlourishPageCacheMode.Enabled);
 });
 ```
 
-Pages must derive from `System.Windows.Controls.Page`. The display name and icon set here are reused by `AddNavigableViewItem`, so view items do not ask for those values again.
+Pages must derive from `System.Windows.Controls.Page`. Flourish generates the navigation key from the simple class name by removing one trailing, case-sensitive `Page` suffix: `SettingsPage` becomes `Settings`, `ReportPagePage` becomes `ReportPage`, and `Page1` remains `Page1`. Display names do not affect keys. The display name and icon set here are reused by `AddNavigableViewItem`, so view items do not ask for those values again.
 
 ```csharp
 services.AddNavigable<ReportsPage>("Reports", "\uE9D2");
-services.AddNavigable<EditorPage>("Editor", "\uE70F", cacheMode: FlourishPageCacheMode.Disabled);
+services.AddNavigable<EditorPage>(
+    "Editor",
+    "\uE70F",
+    cacheMode: FlourishPageCacheMode.Disabled);
 ```
 
 Use `FlourishPageCacheMode.Enabled` for pages that should keep state while the user navigates away. Use `Disabled` for pages that should be recreated when revisited after navigating away.
@@ -183,23 +185,20 @@ nav.SetGroup("Two", groupId: 2, group =>
 });
 ```
 
-Common validation failures include duplicate group IDs, non-zero groups without names, duplicate page display positions, unregistered view item pages, duplicate `parentId` values in the same scope, and child IDs that do not match any parent.
+Common validation failures include duplicate generated navigation keys, duplicate group IDs, non-zero groups without names, duplicate page display positions, unregistered view item pages, duplicate `parentId` values in the same scope, and child IDs that do not match any parent. Two pages with the same simple class name generate the same key even when their namespaces differ; `Build()` rejects them and reports the key and both full type names.
 
 ## Navigate from code
 
-For runtime navigation, request `INavigationService` from dependency injection and navigate by a stable navigation key. Register that key with `AddNavigable`, then keep it in a shared contracts class so view models do not reference WPF `Page` types.
+For runtime navigation, request `INavigationService` from dependency injection and pass the generated, case-sensitive string key. View models therefore do not reference WPF `Page` types.
 
 ```csharp
-public static class NavigationRoutes
-{
-    public const string Settings = "settings";
-}
-
 public sealed class HomeViewModel(INavigationService navigation)
 {
     public void OpenSettings()
     {
-        navigation.Navigate(NavigationRoutes.Settings);
+        navigation.Navigate("Settings");
     }
 }
 ```
+
+If a key is unknown, `Navigate` throws an `InvalidOperationException` containing the supplied key, the generation rule, and a prompt to check spelling and casing. Renaming a Page class also changes its generated key, so update string navigation calls in the same change.

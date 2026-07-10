@@ -209,7 +209,6 @@ internal sealed class FlourishCompositionRoot(
             FinalizeNavigationItems(
                 group.Items,
                 registeredPagesByPageType,
-                registeredPagesByKey,
                 $"group {group.GroupId}"
             );
         }
@@ -217,7 +216,6 @@ internal sealed class FlourishCompositionRoot(
         FinalizeNavigationItems(
             fixedNavigationItems,
             registeredPagesByPageType,
-            registeredPagesByKey,
             "fixed navigation items"
         );
 
@@ -273,14 +271,23 @@ internal sealed class FlourishCompositionRoot(
         var duplicateKeys = registeredPages
             .GroupBy(page => page.NavigationKey, StringComparer.Ordinal)
             .Where(group => group.Count() > 1)
-            .Select(group => group.Key)
+            .Select(group => new
+            {
+                Key = group.Key,
+                PageTypes = group.Select(page => page.PageType.FullName ?? page.PageType.Name),
+            })
             .ToArray();
 
         if (duplicateKeys.Length > 0)
         {
             throw new InvalidOperationException(
                 "Navigation keys must be unique. Duplicate keys: "
-                    + string.Join(", ", duplicateKeys)
+                    + string.Join(
+                        "; ",
+                        duplicateKeys.Select(duplicate =>
+                            $"'{duplicate.Key}' ({string.Join(", ", duplicate.PageTypes)})"
+                        )
+                    )
             );
         }
 
@@ -440,7 +447,6 @@ internal sealed class FlourishCompositionRoot(
     private void FinalizeNavigationItems(
         IReadOnlyList<FlourishNavigationItem> items,
         IReadOnlyDictionary<Type, NavigablePageRegistration> registeredPagesByPageType,
-        IReadOnlyDictionary<string, NavigablePageRegistration> registeredPagesByKey,
         string scopeName
     )
     {
@@ -458,16 +464,12 @@ internal sealed class FlourishCompositionRoot(
 
             if (item.IsPageItem)
             {
-                var page = item.PageType is null
-                    ? registeredPagesByKey.GetValueOrDefault(item.Key)
-                    : registeredPagesByPageType.GetValueOrDefault(item.PageType);
+                var page = registeredPagesByPageType.GetValueOrDefault(item.PageType!);
 
                 if (page is null)
                 {
                     throw new InvalidOperationException(
-                        item.PageType is null
-                            ? $"Navigation key '{item.Key}' must be registered with AddNavigable before it is added to the navigation panel."
-                            : $"{item.PageType.FullName} must be registered with AddNavigable before it is added to the navigation panel."
+                        $"{item.PageType!.FullName} must be registered with AddNavigable before it is added to the navigation panel."
                     );
                 }
 

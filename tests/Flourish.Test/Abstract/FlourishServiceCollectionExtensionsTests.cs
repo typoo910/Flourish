@@ -15,8 +15,7 @@ public sealed class FlourishServiceCollectionExtensionsTests
         var result = services.AddNavigable<TestPage>(
             "Test page",
             "T",
-            FlourishPageCacheMode.Disabled,
-            "test"
+            FlourishPageCacheMode.Disabled
         );
 
         Assert.Same(services, result);
@@ -28,7 +27,7 @@ public sealed class FlourishServiceCollectionExtensionsTests
         Assert.Equal(typeof(TestPage), pageDescriptor.ImplementationType);
 
         var registration = Assert.Single(GetState(services).NavigablePages);
-        Assert.Equal("test", registration.NavigationKey);
+        Assert.Equal("Test", registration.NavigationKey);
         Assert.Equal(typeof(TestPage), registration.PageType);
         Assert.Equal("Test page", registration.DisplayName);
         Assert.Equal("T", registration.IconGlyph);
@@ -36,14 +35,58 @@ public sealed class FlourishServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddNavigable_WithoutNavigationKey_UsesPageFullName()
+    public void AddNavigable_WithoutPageSuffix_UsesCompleteClassName()
+    {
+        var services = new ServiceCollection();
+
+        services.AddNavigable<Dashboard>("Dashboard", "D");
+
+        var registration = Assert.Single(GetState(services).NavigablePages);
+        Assert.Equal("Dashboard", registration.NavigationKey);
+    }
+
+    [Fact]
+    public void AddNavigable_WithoutNavigationKey_UsesClassNameWithoutPageSuffix()
     {
         var services = new ServiceCollection();
 
         services.AddNavigable<TestPage>("Test page", "T");
 
         var registration = Assert.Single(GetState(services).NavigablePages);
-        Assert.Equal(typeof(TestPage).FullName, registration.NavigationKey);
+        Assert.Equal("Test", registration.NavigationKey);
+    }
+
+    [Fact]
+    public void AddNavigable_WithClassNamedPage_DoesNotGenerateEmptyKey()
+    {
+        var services = new ServiceCollection();
+
+        services.AddNavigable<Pages.Page>("Page", "P");
+
+        var registration = Assert.Single(GetState(services).NavigablePages);
+        Assert.Equal("Page", registration.NavigationKey);
+    }
+
+    [Fact]
+    public void AddNavigable_WithDifferentSuffixCasing_DoesNotRemoveSuffix()
+    {
+        var services = new ServiceCollection();
+
+        services.AddNavigable<Homepage>("Homepage", "H");
+
+        var registration = Assert.Single(GetState(services).NavigablePages);
+        Assert.Equal("Homepage", registration.NavigationKey);
+    }
+
+    [Fact]
+    public void AddNavigable_WithRepeatedPageSuffix_RemovesOnlyTrailingSuffix()
+    {
+        var services = new ServiceCollection();
+
+        services.AddNavigable<ReportPagePage>("Report", "R");
+
+        var registration = Assert.Single(GetState(services).NavigablePages);
+        Assert.Equal("ReportPage", registration.NavigationKey);
     }
 
     [Fact]
@@ -61,18 +104,6 @@ public sealed class FlourishServiceCollectionExtensionsTests
         );
     }
 
-    [Fact]
-    public void AddNavigable_WithNonPageType_ThrowsArgumentException()
-    {
-        var services = new ServiceCollection();
-
-        var exception = Assert.Throws<ArgumentException>(() =>
-            services.AddNavigable(typeof(string), "Invalid", "I")
-        );
-
-        Assert.Equal("pageType", exception.ParamName);
-    }
-
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -82,24 +113,10 @@ public sealed class FlourishServiceCollectionExtensionsTests
         var services = new ServiceCollection();
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            services.AddNavigable(typeof(TestPage), displayName!, "T")
+            services.AddNavigable<TestPage>(displayName!, "T")
         );
 
         Assert.Equal("displayName", exception.ParamName);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void AddNavigable_WithBlankNavigationKey_ThrowsArgumentException(string navigationKey)
-    {
-        var services = new ServiceCollection();
-
-        var exception = Assert.Throws<ArgumentException>(() =>
-            services.AddNavigable(typeof(TestPage), "Test page", "T", navigationKey: navigationKey)
-        );
-
-        Assert.Equal("navigationKey", exception.ParamName);
     }
 
     private static FlourishServiceCollectionState GetState(ServiceCollection services)
@@ -114,4 +131,15 @@ public sealed class FlourishServiceCollectionExtensionsTests
     private sealed class TestPage : Page { }
 
     private sealed class OtherPage : Page { }
+
+    private sealed class Dashboard : Page { }
+
+    private sealed class Homepage : Page { }
+
+    private sealed class ReportPagePage : Page { }
+
+    private static class Pages
+    {
+        internal sealed class Page : System.Windows.Controls.Page { }
+    }
 }

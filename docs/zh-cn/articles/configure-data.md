@@ -5,7 +5,7 @@ description: 配置 Flourish 的本地化、应用标识和偏好存储。
 
 # 应用数据
 
-`ConfigureData` 用于配置 Flourish 内置界面的语言、自定义翻译文件、应用标识和偏好存储。即使没有调用 `ConfigureData` 或 `SetLocale`，Flourish 也会使用内置中文（`CN`），因此内置界面始终具有可用文案。
+`ConfigureData` 用于配置 Flourish 内置界面的语言、自定义翻译文件、应用标识和偏好存储。即使没有调用 `ConfigureData` 或 `SetLocale`，Flourish 也会使用内置英文（`EN`），因此内置界面始终具有可用文案。
 
 ## 选择内置语言
 
@@ -15,7 +15,7 @@ Flourish 内置 `CN` 和 `EN`。语言标识不区分大小写，并会在构建
 builder.ConfigureData(data => data.SetLocale("EN"));
 ```
 
-`SetLocale()` 不传参数时选择 `CN`。应用传入的标题、搜索占位文本、导航标签、状态文本、对话框消息和自定义选项文本不会自动翻译。
+`SetLocale()` 不传参数时选择 `EN`。应用传入的标题、搜索占位文本、导航标签、状态文本、对话框消息和自定义选项文本不会自动翻译。
 
 ## 添加自定义语言
 
@@ -45,11 +45,11 @@ Flourish 在 `Build()` 应用配置时读取已注册的语言文件。文件不
 
 1. 选中语言的自定义值。
 2. 选中语言的内置值。
-3. 自定义 `CN` 值。
-4. 内置 `CN` 值。
+3. 自定义 `EN` 值。
+4. 内置 `EN` 值。
 5. 键本身。
 
-因此，`lang_FR.json` 等自定义语言可以只定义部分界面文本，其余键会回退到中文。
+因此，`lang_FR.json` 等自定义语言可以只定义部分界面文本，其余键会回退到英文。
 
 ## 翻译键
 

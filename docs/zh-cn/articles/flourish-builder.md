@@ -73,17 +73,16 @@ Flourish 会在构建期间注册内置服务。应用可以从 `IFlourish.Servi
 
 ## 注册导航页面
 
-`AddNavigable` 会在依赖注入中注册 WPF `Page`，并记录显示元数据、缓存模式和可选导航键。
+`AddNavigable<TPage>` 会在依赖注入中注册 WPF `Page`。Flourish 从页面类名生成区分大小写的导航键，并移除一个末尾 `Page` 后缀。
 
 ```csharp
 services.AddNavigable<HomePage>(
     displayName: "首页",
     iconGlyph: "\uE80F",
-    cacheMode: FlourishPageCacheMode.Enabled,
-    navigationKey: NavigationRoutes.Home);
+    cacheMode: FlourishPageCacheMode.Enabled);
 ```
 
-页面注册不会决定其显示位置。[导航](navigation.md)是页面元数据、缓存行为、可见分组、固定项和运行时导航的唯一完整指南。
+页面注册不会决定其显示位置。[导航](navigation.md)是生成键、页面元数据、缓存行为、可见分组、固定项、校验和运行时字符串导航的完整指南。
 
 ## 构建运行时
 

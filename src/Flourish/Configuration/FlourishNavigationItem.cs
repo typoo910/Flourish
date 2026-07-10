@@ -136,7 +136,14 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
 
     public void Validate()
     {
-        if (IsPageItem && PageType is not null && !typeof(Page).IsAssignableFrom(PageType))
+        if (IsPageItem && PageType is null)
+        {
+            throw new InvalidOperationException(
+                "Navigation page items require a registered Page type."
+            );
+        }
+
+        if (IsPageItem && !typeof(Page).IsAssignableFrom(PageType))
         {
             throw new ArgumentException(
                 $"{PageType?.FullName ?? "Navigation item"} must derive from System.Windows.Controls.Page.",

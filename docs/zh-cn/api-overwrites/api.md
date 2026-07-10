@@ -133,8 +133,8 @@ summary: 提供 Flourish 应用使用的服务集合扩展方法。
 ---
 
 ---
-uid: ArkheideSystem.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,ArkheideSystem.Flourish.Abstract.FlourishPageCacheMode,System.String)
-summary: 将 WPF 页面注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
+uid: ArkheideSystem.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,ArkheideSystem.Flourish.Abstract.FlourishPageCacheMode)
+summary: 注册 WPF 页面并根据页面类名自动生成唯一导航键。
 syntax:
   typeParameters:
   - id: TPage
@@ -150,28 +150,6 @@ syntax:
     description: 该页面使用的页面缓存模式。
   return:
     description: 用于链式注册的同一个服务集合。
----
-
----
-uid: ArkheideSystem.Flourish.Abstract.FlourishServiceCollectionExtensions.AddNavigable(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Type,System.String,System.String,ArkheideSystem.Flourish.Abstract.FlourishPageCacheMode,System.String)
-summary: 将指定的 WPF 页面类型注册为 Flourish 可导航页面，并记录页面显示元数据和缓存模式。
-syntax:
-  parameters:
-  - id: services
-    description: 接收页面注册的服务集合。
-  - id: pageType
-    description: 要注册的页面类型。
-  - id: displayName
-    description: 页面显示为导航项时使用的名称。
-  - id: iconGlyph
-    description: 页面显示为导航项时使用的图标字形。
-  - id: cacheMode
-    description: 该页面使用的页面缓存模式。
-  return:
-    description: 用于链式注册的同一个服务集合。
-exceptions:
-- type: System.ArgumentException
-  description: 当 pageType 未派生自 System.Windows.Controls.Page 时引发。
 ---
 
 ---
@@ -293,11 +271,11 @@ summary: 配置 Flourish 使用的本地化、应用标识和偏好存储。
 ---
 uid: ArkheideSystem.Flourish.Abstract.IFlourishDataBuilder.SetLocale(System.String)
 summary: 选择 Flourish 内置界面文案使用的语言。
-remarks: 即使省略 ConfigureData 和 SetLocale，Flourish 也会使用内置 CN 语言。内置语言标识为 CN 和 EN，标识不区分大小写。
+remarks: 即使省略 ConfigureData 和 SetLocale，Flourish 也会使用内置 EN 语言。内置语言标识为 CN 和 EN，标识不区分大小写。
 syntax:
   parameters:
   - id: locale
-    description: 语言标识；默认为 CN。
+    description: 语言标识；默认为 EN。
   return:
     description: 用于链式配置的当前 builder。
 ---
@@ -308,7 +286,7 @@ summary: 添加可扩展或覆盖内置翻译的自定义语言文件。
 remarks: |
   文件在 `Build()` 应用配置时读取，必须是使用 UTF-8 编码的非空扁平 JSON 对象，并命名为 `lang_<locale>.json`。键和值必须是非空字符串，键不能重复。语言部分可以包含字母、数字、连字符和下划线。
 
-  同一语言的多个文件按注册顺序合并，后添加文件中的同名键优先。查找顺序为：选中语言的自定义值、选中语言的内置值、自定义 `CN`、内置 `CN`，最后返回键本身。
+  同一语言的多个文件按注册顺序合并，后添加文件中的同名键优先。查找顺序为：选中语言的自定义值、选中语言的内置值、自定义 `EN`、内置 `EN`，最后返回键本身。
 
   文件不存在时抛出 `FileNotFoundException`；文件名无效时抛出 `ArgumentException`；文件不可读或 JSON 无效时抛出 `InvalidDataException`。
 
@@ -721,11 +699,6 @@ syntax:
 ---
 
 ---
-uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationBuilder.AddFixedNavigableViewItem(System.String,System.Boolean,System.Int32,System.Int32)
-summary: 按导航键在导航栏底部固定区域添加已注册页面项。
----
-
----
 uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationBuilder.AddFixedNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
 summary: 在导航栏底部固定区域添加一个按钮类型命令项。
 syntax:
@@ -765,11 +738,6 @@ syntax:
     description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
   return:
     description: 用于链式配置的当前分组 builder。
----
-
----
-uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableViewItem(System.String,System.Boolean,System.Int32,System.Int32)
-summary: 按导航键将已注册 WPF 页面添加到当前导航分组。
 ---
 
 ---
@@ -1192,38 +1160,7 @@ summary: 获取当前导航键。
 
 ---
 uid: ArkheideSystem.Flourish.Abstract.INavigationService.Navigate(System.String,System.Object,System.Boolean)
-summary: 按导航键导航到已注册页面。
----
-
----
-uid: ArkheideSystem.Flourish.Abstract.INavigationService.Navigate(System.Type,System.Object,System.Boolean)
-summary: 导航到已注册的页面类型。
-syntax:
-  parameters:
-  - id: sourcePageType
-    description: 要导航到的已注册页面类型。
-  - id: parameter
-    description: 传递给目标页面的可选参数。
-  - id: addToBackStack
-    description: 指示是否将当前页面加入后退栈。
-  return:
-    description: 如果导航成功，则为 true；否则为 false。
----
-
----
-uid: ArkheideSystem.Flourish.Abstract.INavigationService.Navigate``1(System.Object,System.Boolean)
-summary: 导航到已注册的泛型页面类型。
-syntax:
-  typeParameters:
-  - id: TPage
-    description: 要导航到的已注册页面类型。
-  parameters:
-  - id: parameter
-    description: 传递给目标页面的可选参数。
-  - id: addToBackStack
-    description: 指示是否将当前页面加入后退栈。
-  return:
-    description: 如果导航成功，则为 true；否则为 false。
+summary: 使用从 Page 类名自动生成、区分大小写的字符串键导航到已注册页面。
 ---
 
 ---

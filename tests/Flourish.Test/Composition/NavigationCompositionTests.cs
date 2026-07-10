@@ -12,40 +12,39 @@ public sealed class NavigationCompositionTests
         var builder = CreateNavigationBuilder()
             .ConfigureServices((_, services) =>
             {
-                services.AddNavigable<HomePage>("Home", "H", navigationKey: "home");
+                services.AddNavigable<HomePage>("Home", "H");
                 services.AddNavigable<SettingsPage>(
                     "Settings",
                     "S",
-                    FlourishPageCacheMode.Disabled,
-                    "settings"
+                    FlourishPageCacheMode.Disabled
                 );
             })
             .ConfigureNavigation(navigation =>
             {
                 navigation.SetGroup(null, groupId: 0, group =>
                 {
-                    group.AddNavigableViewItem("home", isInitial: true, parentId: 10);
-                    group.AddNavigableViewItem("settings", childId: 10);
+                    group.AddNavigableViewItem<HomePage>(isInitial: true, parentId: 10);
+                    group.AddNavigableViewItem<SettingsPage>(childId: 10);
                 });
             });
 
         using var flourish = builder.Build();
         var options = flourish.GetRequiredService<FlourishShellOptions>();
 
-        Assert.Equal(typeof(HomePage), options.PageTypesByNavigationKey["home"]);
-        Assert.Equal("settings", options.NavigationKeysByPageType[typeof(SettingsPage)]);
+        Assert.Equal(typeof(HomePage), options.PageTypesByNavigationKey["Home"]);
+        Assert.Equal("Settings", options.NavigationKeysByPageType[typeof(SettingsPage)]);
         Assert.Equal(
             FlourishPageCacheMode.Disabled,
             options.PageCacheModesByPageType[typeof(SettingsPage)]
         );
-        Assert.Equal("home", options.InitialNavigationKey);
+        Assert.Equal("Home", options.InitialNavigationKey);
         Assert.Equal(typeof(HomePage), options.InitialNavigationPageType);
 
         Assert.Collection(
             options.NavigationItems,
             home =>
             {
-                Assert.Equal("home", home.Key);
+                Assert.Equal("Home", home.Key);
                 Assert.Equal("Home", home.Label);
                 Assert.Equal("H", home.IconGlyph);
                 Assert.True(home.HasChildren);
@@ -53,7 +52,7 @@ public sealed class NavigationCompositionTests
             },
             settings =>
             {
-                Assert.Equal("settings", settings.Key);
+                Assert.Equal("Settings", settings.Key);
                 Assert.Equal("Settings", settings.Label);
                 Assert.Equal("S", settings.IconGlyph);
                 Assert.True(settings.IsChild);
@@ -65,34 +64,34 @@ public sealed class NavigationCompositionTests
     [Fact]
     public void Build_WithDuplicateNavigationKey_ThrowsInvalidOperationException()
     {
-        var builder = CreateNavigationBuilder().ConfigureServices((_, services) =>
-        {
-            services.AddNavigable<HomePage>("Home", "H", navigationKey: "duplicate");
-            services.AddNavigable<SettingsPage>(
-                "Settings",
-                "S",
-                navigationKey: "duplicate"
-            );
-        });
+        var builder = FlourishBuilder
+            .CreateDefaultBuilder([])
+            .ConfigureServices((_, services) =>
+            {
+                services.AddNavigable<FirstFeature.SettingsPage>("First settings", "1");
+                services.AddNavigable<SecondFeature.SettingsPage>("Second settings", "2");
+            });
 
         var exception = Assert.Throws<InvalidOperationException>(builder.Build);
 
         Assert.Contains("Navigation keys must be unique", exception.Message);
-        Assert.Contains("duplicate", exception.Message);
+        Assert.Contains("'Settings'", exception.Message);
+        Assert.Contains(typeof(FirstFeature.SettingsPage).FullName!, exception.Message);
+        Assert.Contains(typeof(SecondFeature.SettingsPage).FullName!, exception.Message);
     }
 
     [Fact]
-    public void Build_WithUnregisteredNavigationKey_ThrowsInvalidOperationException()
+    public void Build_WithUnregisteredPageType_ThrowsInvalidOperationException()
     {
         var builder = CreateNavigationBuilder().ConfigureNavigation(navigation =>
             navigation.SetGroup(null, groupId: 0, group =>
-                group.AddNavigableViewItem("missing")
+                group.AddNavigableViewItem<UnregisteredPage>()
             )
         );
 
         var exception = Assert.Throws<InvalidOperationException>(builder.Build);
 
-        Assert.Contains("Navigation key 'missing'", exception.Message);
+        Assert.Contains(typeof(UnregisteredPage).FullName!, exception.Message);
         Assert.Contains("must be registered with AddNavigable", exception.Message);
     }
 
@@ -101,14 +100,14 @@ public sealed class NavigationCompositionTests
     {
         var builder = CreateNavigationBuilder()
             .ConfigureServices((_, services) =>
-                services.AddNavigable<HomePage>("Home", "H", navigationKey: "home")
+                services.AddNavigable<HomePage>("Home", "H")
             )
             .ConfigureNavigation(navigation =>
             {
                 navigation.SetGroup(null, groupId: 0, group =>
-                    group.AddNavigableViewItem("home")
+                    group.AddNavigableViewItem<HomePage>()
                 );
-                navigation.AddFixedNavigableViewItem("home");
+                navigation.AddFixedNavigableViewItem<HomePage>();
             });
 
         var exception = Assert.Throws<InvalidOperationException>(builder.Build);
@@ -139,12 +138,8 @@ public sealed class NavigationCompositionTests
     {
         var builder = CreateNavigationBuilder().ConfigureServices((_, services) =>
         {
-            services.AddNavigable<HomePage>("Home", "H", navigationKey: "home");
-            services.AddNavigable<SettingsPage>(
-                "Settings",
-                "S",
-                navigationKey: "settings"
-            );
+            services.AddNavigable<HomePage>("Home", "H");
+            services.AddNavigable<SettingsPage>("Settings", "S");
         });
 
         using var flourish = builder.Build();
@@ -152,8 +147,8 @@ public sealed class NavigationCompositionTests
 
         Assert.Collection(
             options.NavigationItems,
-            home => Assert.Equal("home", home.Key),
-            settings => Assert.Equal("settings", settings.Key)
+            home => Assert.Equal("Home", home.Key),
+            settings => Assert.Equal("Settings", settings.Key)
         );
     }
 
@@ -164,7 +159,7 @@ public sealed class NavigationCompositionTests
             .CreateDefaultBuilder([])
             .ConfigureNavigation(navigation =>
                 navigation.SetGroup(null, groupId: 0, group =>
-                    group.AddNavigableViewItem("not-registered")
+                    group.AddNavigableViewItem<UnregisteredPage>()
                 )
             );
 
@@ -186,4 +181,16 @@ public sealed class NavigationCompositionTests
     private sealed class HomePage : Page { }
 
     private sealed class SettingsPage : Page { }
+
+    private sealed class UnregisteredPage : Page { }
+
+    private static class FirstFeature
+    {
+        internal sealed class SettingsPage : Page { }
+    }
+
+    private static class SecondFeature
+    {
+        internal sealed class SettingsPage : Page { }
+    }
 }

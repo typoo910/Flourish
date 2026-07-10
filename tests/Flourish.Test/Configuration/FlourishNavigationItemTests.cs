@@ -169,7 +169,7 @@ public sealed class FlourishNavigationItemTests
     }
 
     [Fact]
-    public void Validate_WithNullPageTypeOrNonPageItem_DoesNotThrow()
+    public void Validate_WithNullPageType_ThrowsInvalidOperationException()
     {
         var pageWithoutType = new FlourishNavigationItem(
             "unresolved",
@@ -178,6 +178,14 @@ public sealed class FlourishNavigationItemTests
             groupId: 0,
             FlourishNavigationItemKind.Page
         );
+        var exception = Assert.Throws<InvalidOperationException>(pageWithoutType.Validate);
+
+        Assert.Contains("Page type", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_WithNonPageItemUsingUnusedPageType_DoesNotThrow()
+    {
         var commandWithUnusedPageType = new FlourishNavigationItem(
             "command",
             "Command",
@@ -187,7 +195,6 @@ public sealed class FlourishNavigationItemTests
             typeof(string)
         );
 
-        pageWithoutType.Validate();
         commandWithUnusedPageType.Validate();
     }
 

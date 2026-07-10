@@ -5,7 +5,7 @@ namespace ArkheideSystem.Flourish.Composition;
 
 internal sealed class FlourishDataBuilder(FlourishDataOptions options) : IFlourishDataBuilder
 {
-    public IFlourishDataBuilder SetLocale(string locale = "CN")
+    public IFlourishDataBuilder SetLocale(string locale = "EN")
     {
         options.Locale = ValidateNotBlank(locale, nameof(locale)).Trim();
         return this;

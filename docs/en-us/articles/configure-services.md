@@ -15,8 +15,8 @@ builder.ConfigureServices((context, services) =>
     services.AddSingleton<App>();
     services.AddSingleton<ICommandParser, AppCommandParser>();
 
-    services.AddNavigable<HomePage>("Home", "\uE80F", navigationKey: NavigationRoutes.Home);
-    services.AddNavigable<ReportsPage>("Reports", "\uE9D2", navigationKey: NavigationRoutes.Reports);
+    services.AddNavigable<HomePage>("Home", "\uE80F");
+    services.AddNavigable<ReportsPage>("Reports", "\uE9D2");
 });
 ```
 
@@ -24,9 +24,9 @@ The callback receives `HostBuilderContext`, so registrations can use the active 
 
 ## Register navigable pages
 
-`AddNavigable` registers a `System.Windows.Controls.Page` and its navigation metadata. Registration makes the page resolvable; [Navigation](navigation.md) determines where it appears and which page is shown first.
+`AddNavigable<TPage>` registers a `System.Windows.Controls.Page` and its navigation metadata. Flourish generates the case-sensitive navigation key from the class name by removing one trailing `Page` suffix: `SettingsPage` becomes `Settings`, while `Page1` remains `Page1`. Registration makes the page resolvable; [Navigation](navigation.md) determines where it appears and which page is shown first.
 
-Use a stable `navigationKey` when view models navigate through `INavigationService` without referencing page types.
+View models navigate with that generated string, for example `navigation.Navigate("Settings")`, without referencing the WPF page. Flourish rejects duplicate generated keys when `Build()` applies the registrations.
 
 ## Replace Flourish services
 

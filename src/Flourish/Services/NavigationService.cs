@@ -56,24 +56,6 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
         return NavigateCore(navigationKey, parameter, addToBackStack);
     }
 
-    public bool Navigate(Type sourcePageType, object? parameter = null, bool addToBackStack = true)
-    {
-        if (!options.NavigationKeysByPageType.TryGetValue(sourcePageType, out var navigationKey))
-        {
-            throw new InvalidOperationException(
-                $"{sourcePageType.FullName} must be registered with AddNavigable before it can be navigated to."
-            );
-        }
-
-        return Navigate(navigationKey, parameter, addToBackStack);
-    }
-
-    public bool Navigate<TPage>(object? parameter = null, bool addToBackStack = true)
-        where TPage : Page
-    {
-        return Navigate(typeof(TPage), parameter, addToBackStack);
-    }
-
     public bool GoBack()
     {
         if (!pageHistoryService.TryPopBack(out var entry))
@@ -147,7 +129,7 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
             if (!options.PageTypesByNavigationKey.TryGetValue(navigationKey, out var sourcePageType))
             {
                 throw new InvalidOperationException(
-                    $"Navigation key '{navigationKey}' must be registered with AddNavigable before it can be navigated to."
+                    $"Navigation key '{navigationKey}' is not registered. Check its spelling and casing. Keys are generated from Page class names by removing the trailing, case-sensitive 'Page' suffix (for example, SettingsPage becomes 'Settings')."
                 );
             }
 

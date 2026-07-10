@@ -42,26 +42,6 @@ public interface IFlourishNavigationGroupBuilder
         where TPage : Page;
 
     /// <summary>
-    /// Adds a registered WPF page to this navigation group by navigation key.
-    /// </summary>
-    /// <param name="navigationKey">The key registered with <c>AddNavigable</c>.</param>
-    /// <param name="isInitial">A value indicating whether this page is the first page shown by the shell.</param>
-    /// <param name="parentId">The optional parent node ID. Must be 0 when <paramref name="childId" /> is non-zero.</param>
-    /// <param name="childId">The optional parent ID that this child follows. Must be 0 when <paramref name="parentId" /> is non-zero.</param>
-    /// <returns>The current group builder for chained configuration.</returns>
-    /// <example>
-    /// <code><![CDATA[
-    /// group.AddNavigableViewItem(NavigationRoutes.Home, isInitial: true);
-    /// ]]></code>
-    /// </example>
-    IFlourishNavigationGroupBuilder AddNavigableViewItem(
-        string navigationKey,
-        bool isInitial = false,
-        int parentId = 0,
-        int childId = 0
-    );
-
-    /// <summary>
     /// Adds a command item to this navigation group.
     /// </summary>
     /// <param name="displayName">The text displayed by the command item.</param>

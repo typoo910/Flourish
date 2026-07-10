@@ -7,7 +7,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FlourishLocalizationService
 {
-    private const string DefaultLocale = "CN";
+    private const string DefaultLocale = "EN";
     private const string EmbeddedResourcePrefix = "ArkheideSystem.Flourish.Assets.lang_";
 
     private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> builtInLocales;
@@ -23,7 +23,7 @@ internal sealed class FlourishLocalizationService
             StringComparer.OrdinalIgnoreCase
         )
         {
-            [DefaultLocale] = LoadEmbeddedLocale(DefaultLocale),
+            ["CN"] = LoadEmbeddedLocale("CN"),
             ["EN"] = LoadEmbeddedLocale("EN"),
         };
 

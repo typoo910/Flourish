@@ -19,15 +19,15 @@ public interface IFlourishDataBuilder
     /// <summary>
     /// Sets the locale used by Flourish built-in interface text.
     /// </summary>
-    /// <param name="locale">The locale identifier. The default is <c>CN</c>.</param>
+    /// <param name="locale">The locale identifier. The default is <c>EN</c>.</param>
     /// <returns>The current builder for chained configuration.</returns>
     /// <remarks>
-    /// Flourish uses the built-in Chinese locale when this method and
+    /// Flourish uses the built-in English locale when this method and
     /// <see cref="IFlourishBuilder.ConfigureData(Action{IFlourishDataBuilder})" /> are omitted.
     /// Built-in locale identifiers are <c>CN</c> and <c>EN</c>. Identifiers are
     /// case-insensitive and are normalized when the application is built.
     /// </remarks>
-    IFlourishDataBuilder SetLocale(string locale = "CN");
+    IFlourishDataBuilder SetLocale(string locale = "EN");
 
     /// <summary>
     /// Adds a custom locale file that can extend or override built-in translations.
@@ -44,7 +44,7 @@ public interface IFlourishDataBuilder
     /// <para>
     /// Files registered for the same locale are merged in registration order; a later file
     /// replaces earlier values for matching keys. Lookup priority is: custom selected locale,
-    /// built-in selected locale, custom <c>CN</c>, built-in <c>CN</c>, then the key itself.
+    /// built-in selected locale, custom <c>EN</c>, built-in <c>EN</c>, then the key itself.
     /// A missing file throws <see cref="System.IO.FileNotFoundException" />. Invalid file names throw
     /// <see cref="ArgumentException" />. Unreadable files and invalid locale JSON throw
     /// <see cref="System.IO.InvalidDataException" />.

@@ -7,7 +7,7 @@ description: 使用 Flourish 构建并运行一个基本 WPF 应用。
 
 基本的 Flourish 应用由 Shell 托管 WPF `Application`：引用主题资源，在 `App.xaml.cs` 或其他应用起始点构建 `IFlourish` 运行时，用 `AddNavigable` 注册页面，在[导航](navigation.md)配置中放置导航项，然后显示 Shell。
 
-Flourish 内置文案默认使用中文，即使省略 `ConfigureData` 也会生效。如需英文，可在 `Build()` 前添加 `builder.ConfigureData(data => data.SetLocale("EN"))`。[应用数据](configure-data.md)说明内置语言和自定义翻译文件。
+Flourish 内置文案默认使用英文，即使省略 `ConfigureData` 也会生效。如需中文，可在 `Build()` 前添加 `builder.ConfigureData(data => data.SetLocale("CN"))`。[应用数据](configure-data.md)说明内置语言和自定义翻译文件。
 
 ## 引用主题资源
 

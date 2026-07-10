@@ -30,7 +30,7 @@ public sealed class FlourishNavigatedEventArgs(
     /// </summary>
     /// <example>
     /// <code><![CDATA[
-    /// var route = args.NavigationKey;
+    /// var navigationKey = args.NavigationKey;
     /// ]]></code>
     /// </example>
     public string NavigationKey { get; } = navigationKey;

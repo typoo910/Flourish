@@ -73,17 +73,16 @@ Flourish registers its built-in services during build. Applications can resolve 
 
 ## Register navigation pages
 
-`AddNavigable` registers a WPF `Page` in dependency injection and records its display metadata, cache mode, and optional navigation key.
+`AddNavigable<TPage>` registers a WPF `Page` in dependency injection. Flourish derives its case-sensitive navigation key from the page class name by removing one trailing `Page` suffix.
 
 ```csharp
 services.AddNavigable<HomePage>(
     displayName: "Home",
     iconGlyph: "\uE80F",
-    cacheMode: FlourishPageCacheMode.Enabled,
-    navigationKey: NavigationRoutes.Home);
+    cacheMode: FlourishPageCacheMode.Enabled);
 ```
 
-Registration does not determine where a page appears. [Navigation](navigation.md) is the canonical guide to page metadata, cache behavior, visible groups, fixed items, and runtime navigation.
+Registration does not determine where a page appears. [Navigation](navigation.md) is the canonical guide to generated keys, page metadata, cache behavior, visible groups, fixed items, validation, and runtime string navigation.
 
 ## Build the runtime
 

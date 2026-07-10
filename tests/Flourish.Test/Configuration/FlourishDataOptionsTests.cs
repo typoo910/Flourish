@@ -6,11 +6,11 @@ namespace ArkheideSystem.Flourish.Test.Configuration;
 public sealed class FlourishDataOptionsTests
 {
     [Fact]
-    public void Defaults_UseChineseLocaleWithoutCustomFiles()
+    public void Defaults_UseEnglishLocaleWithoutCustomFiles()
     {
         var options = new FlourishDataOptions();
 
-        Assert.Equal("CN", options.Locale);
+        Assert.Equal("EN", options.Locale);
         Assert.Empty(options.LocalePaths);
         Assert.False(options.HasConfiguration);
     }

@@ -22,16 +22,18 @@ builder.ConfigureServices((_, services) =>
     services.AddNavigable<SettingsPage>(
         displayName: "设置",
         iconGlyph: "\uE713",
-        cacheMode: FlourishPageCacheMode.Enabled,
-        navigationKey: NavigationRoutes.Settings);
+        cacheMode: FlourishPageCacheMode.Enabled);
 });
 ```
 
-页面类型必须派生自 `System.Windows.Controls.Page`。这里设置的显示名称和图标会被 `AddNavigableViewItem` 复用，因此 ViewItem 不会再次要求传入这些值。
+页面类型必须派生自 `System.Windows.Controls.Page`。Flourish 从简单类名生成导航键，并移除一个末尾、区分大小写的 `Page` 后缀：`SettingsPage` 生成 `Settings`，`ReportPagePage` 生成 `ReportPage`，`Page1` 仍生成 `Page1`。显示名称不会影响 key。这里设置的显示名称和图标会被 `AddNavigableViewItem` 复用，因此 ViewItem 不会再次要求传入这些值。
 
 ```csharp
 services.AddNavigable<ReportsPage>("报表", "\uE9D2");
-services.AddNavigable<EditorPage>("编辑", "\uE70F", cacheMode: FlourishPageCacheMode.Disabled);
+services.AddNavigable<EditorPage>(
+    "编辑",
+    "\uE70F",
+    cacheMode: FlourishPageCacheMode.Disabled);
 ```
 
 需要在离开页面后保留局部状态时，使用 `FlourishPageCacheMode.Enabled`。希望离开后再次进入页面时重新创建实例，则使用 `Disabled`。
@@ -183,23 +185,20 @@ nav.SetGroup("Two", groupId: 2, group =>
 });
 ```
 
-常见校验错误包括：重复的分组 ID、非 0 分组没有名称、同一页面被加入多个导航位置、ViewItem 页面未通过 `AddNavigable` 注册、同一范围内 `parentId` 重复，以及子项的 `childId` 找不到对应父节点。
+常见校验错误包括：重复的生成导航键、重复的分组 ID、非 0 分组没有名称、同一页面被加入多个导航位置、ViewItem 页面未通过 `AddNavigable` 注册、同一范围内 `parentId` 重复，以及子项的 `childId` 找不到对应父节点。即使命名空间不同，两个简单类名相同的页面仍会生成相同 key；`Build()` 会拒绝它们，并报告重复 key 和两个页面的完整类型名。
 
 ## 从代码导航
 
-运行时导航可以从依赖注入中获取 `INavigationService`，再按稳定的导航键跳转。导航键通过 `AddNavigable` 注册，可以集中定义在共享契约类中，因此 ViewModel 不需要引用 WPF `Page` 类型。
+运行时导航可以从依赖注入中获取 `INavigationService`，再传入自动生成、区分大小写的字符串 key。ViewModel 因此无需引用 WPF `Page` 类型。
 
 ```csharp
-public static class NavigationRoutes
-{
-    public const string Settings = "settings";
-}
-
 public sealed class HomeViewModel(INavigationService navigation)
 {
     public void OpenSettings()
     {
-        navigation.Navigate(NavigationRoutes.Settings);
+        navigation.Navigate("Settings");
     }
 }
 ```
+
+如果 key 未注册，`Navigate` 会抛出 `InvalidOperationException`，消息包含实际传入的 key、生成规则，并提示检查拼写和大小写。重命名 Page 类也会改变生成 key，因此应在同一次修改中更新字符串导航调用。
