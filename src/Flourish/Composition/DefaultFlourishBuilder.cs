@@ -25,6 +25,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
 
     public IFlourishBuilder ConfigureData(Action<IFlourishDataBuilder> configureData)
     {
+        ArgumentNullException.ThrowIfNull(configureData);
         dataConfigurations.Add(configureData);
         return this;
     }
@@ -33,12 +34,14 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<HostBuilderContext, IServiceCollection> configureServices
     )
     {
+        ArgumentNullException.ThrowIfNull(configureServices);
         serviceConfigurations.Add(configureServices);
         return this;
     }
 
     public IFlourishBuilder ConfigureShell(Action<IFlourishShellBuilder> configureShell)
     {
+        ArgumentNullException.ThrowIfNull(configureShell);
         shellConfigurations.Add(configureShell);
         return this;
     }
@@ -47,6 +50,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<IFlourishTitlebarBuilder> configureTitleBar
     )
     {
+        ArgumentNullException.ThrowIfNull(configureTitleBar);
         titleBarConfigurations.Add(configureTitleBar);
         return this;
     }
@@ -55,6 +59,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<IFlourishNavigationBuilder> configureNavigation
     )
     {
+        ArgumentNullException.ThrowIfNull(configureNavigation);
         navigationConfigurations.Add(configureNavigation);
         return this;
     }
@@ -63,6 +68,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<IFlourishCustomHandlerBuilder> configureCustomHandler
     )
     {
+        ArgumentNullException.ThrowIfNull(configureCustomHandler);
         customHandlerConfigurations.Add(configureCustomHandler);
         return this;
     }
@@ -71,18 +77,21 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<IFlourishDynamicToolbarBuilder> configureToolbar
     )
     {
+        ArgumentNullException.ThrowIfNull(configureToolbar);
         toolbarConfigurations.Add(configureToolbar);
         return this;
     }
 
     public IFlourishBuilder ConfigureTips(Action<IFlourishTipsBuilder> configureTips)
     {
+        ArgumentNullException.ThrowIfNull(configureTips);
         tipsConfigurations.Add(configureTips);
         return this;
     }
 
     public IFlourishBuilder ConfigureMotion(Action<IFlourishMotionBuilder> configureMotion)
     {
+        ArgumentNullException.ThrowIfNull(configureMotion);
         motionConfigurations.Add(configureMotion);
         return this;
     }
@@ -91,6 +100,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
         Action<IFlourishWindowPropertyBuilder> configureWindow
     )
     {
+        ArgumentNullException.ThrowIfNull(configureWindow);
         windowConfigurations.Add(configureWindow);
         return this;
     }
@@ -123,6 +133,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
 
     public IFlourishBuilder ConfigureFooter(Action<IFlourishFooterBuilder> configureFooter)
     {
+        ArgumentNullException.ThrowIfNull(configureFooter);
         footerConfigurations.Add(configureFooter);
         return this;
     }

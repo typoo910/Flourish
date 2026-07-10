@@ -7,6 +7,18 @@ namespace ArkheideSystem.Flourish.Test.Composition;
 public sealed class FlourishNavigationBuilderTests
 {
     [Fact]
+    public void SetInitiallyOpen_UpdatesOptionsAndReturnsBuilder()
+    {
+        var options = new FlourishShellOptions();
+        var sut = new FlourishNavigationBuilder(options);
+
+        var result = sut.SetInitiallyOpen();
+
+        Assert.Same(sut, result);
+        Assert.True(options.IsNavigationPanelInitiallyOpen);
+    }
+
+    [Fact]
     public void SetPanelWidth_WithValidValues_UpdatesOptions()
     {
         var options = new FlourishShellOptions();
@@ -76,6 +88,30 @@ public sealed class FlourishNavigationBuilderTests
         );
 
         Assert.Equal("openWidth", exception.ParamName);
+    }
+
+    [Fact]
+    public void SetPanelWidth_WithNonPositiveOpenWidth_ThrowsArgumentOutOfRangeException()
+    {
+        var sut = new FlourishNavigationBuilder(new FlourishShellOptions());
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetPanelWidth(openWidth: 0, closedWidth: 0, maxWidth: 400, minWidth: 100)
+        );
+
+        Assert.Equal("openWidth", exception.ParamName);
+    }
+
+    [Fact]
+    public void SetPanelWidth_WithNegativeClosedWidth_ThrowsArgumentOutOfRangeException()
+    {
+        var sut = new FlourishNavigationBuilder(new FlourishShellOptions());
+
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetPanelWidth(openWidth: 200, closedWidth: -1, maxWidth: 400, minWidth: 100)
+        );
+
+        Assert.Equal("closedWidth", exception.ParamName);
     }
 
     [Theory]
@@ -172,6 +208,59 @@ public sealed class FlourishNavigationBuilderTests
         );
 
         Assert.Equal("navigationKey", exception.ParamName);
+    }
+
+    [Fact]
+    public void AddFixedItems_RecordsGenericPageAndCommandDefinitions()
+    {
+        var options = new FlourishShellOptions();
+        var sut = new FlourishNavigationBuilder(options);
+
+        sut.AddFixedNavigableViewItem<TestPage>(isInitial: true, parentId: 7);
+        sut.AddFixedNavigableItem(
+            "Refresh",
+            "app.refresh",
+            childId: 7,
+            iconGlyph: "R"
+        );
+
+        Assert.Collection(
+            options.FixedNavigationItemDefinitions,
+            page =>
+            {
+                Assert.True(page.IsPageItem);
+                Assert.Equal(typeof(TestPage), page.PageType);
+                Assert.True(page.IsInitial);
+                Assert.True(page.IsFixed);
+                Assert.Equal(7, page.ParentId);
+            },
+            command =>
+            {
+                Assert.True(command.IsCommandItem);
+                Assert.Equal("Refresh", command.Label);
+                Assert.Equal("app.refresh", command.CommandKey);
+                Assert.Equal("R", command.IconGlyph);
+                Assert.True(command.IsFixed);
+                Assert.Equal(7, command.ChildId);
+            }
+        );
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void AddFixedNavigableItem_WithMissingDisplayName_ThrowsArgumentException(
+        string? displayName
+    )
+    {
+        var sut = new FlourishNavigationBuilder(new FlourishShellOptions());
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            sut.AddFixedNavigableItem(displayName!, "command")
+        );
+
+        Assert.Equal("displayName", exception.ParamName);
     }
 
     private sealed class TestPage : Page { }

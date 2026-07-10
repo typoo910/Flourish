@@ -4,11 +4,21 @@ using ArkheideSystem.Flourish.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class PageCacheService(IServiceProvider serviceProvider, FlourishShellOptions options)
+internal sealed class PageCacheService : INavigationPageProvider
 {
+    private readonly IPageFactory pageFactory;
     private readonly Dictionary<Type, Page> cachedPages = [];
-    private readonly Dictionary<Type, FlourishPageCacheMode> cacheModesByPageType =
-        CreateCacheModeMap(options);
+    private readonly Dictionary<Type, FlourishPageCacheMode> cacheModesByPageType;
+
+    public PageCacheService(IServiceProvider serviceProvider, FlourishShellOptions options)
+        : this(new ServiceProviderPageFactory(serviceProvider), options) { }
+
+    internal PageCacheService(IPageFactory pageFactory, FlourishShellOptions options)
+    {
+        this.pageFactory = pageFactory ?? throw new ArgumentNullException(nameof(pageFactory));
+        ArgumentNullException.ThrowIfNull(options);
+        cacheModesByPageType = CreateCacheModeMap(options);
+    }
 
     private static Dictionary<Type, FlourishPageCacheMode> CreateCacheModeMap(
         FlourishShellOptions options
@@ -19,6 +29,8 @@ internal sealed class PageCacheService(IServiceProvider serviceProvider, Flouris
 
     public Page GetPage(Type sourcePageType)
     {
+        ArgumentNullException.ThrowIfNull(sourcePageType);
+
         if (
             cacheModesByPageType.TryGetValue(sourcePageType, out var cacheMode)
             && cacheMode == FlourishPageCacheMode.Enabled
@@ -38,8 +50,7 @@ internal sealed class PageCacheService(IServiceProvider serviceProvider, Flouris
 
     private Page CreatePage(Type sourcePageType)
     {
-        var page =
-            serviceProvider.GetService(sourcePageType) ?? Activator.CreateInstance(sourcePageType);
+        var page = pageFactory.Create(sourcePageType);
 
         return page as Page
             ?? throw new InvalidOperationException(

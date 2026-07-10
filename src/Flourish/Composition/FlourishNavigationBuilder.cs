@@ -13,6 +13,7 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
         NavigationPanelDirection direction = NavigationPanelDirection.Left
     )
     {
+        ValidateEnum(direction, nameof(direction));
         options.NavigationPanelDirection = direction;
         return this;
     }
@@ -355,6 +356,15 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
         if (double.IsNaN(value) || double.IsInfinity(value))
         {
             throw new ArgumentOutOfRangeException(parameterName, value, "Value must be finite.");
+        }
+    }
+
+    private static void ValidateEnum<TEnum>(TEnum value, string parameterName)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Unknown value.");
         }
     }
 }

@@ -132,6 +132,11 @@ internal sealed class FlourishCompositionRoot(
             return;
         }
 
+        if (!string.IsNullOrWhiteSpace(dataOptions.AppPreferenceDataPath))
+        {
+            return;
+        }
+
         dataOptions.GetRequiredAppName(shellOptions);
         dataOptions.GetRequiredCompanyName();
     }
@@ -157,14 +162,10 @@ internal sealed class FlourishCompositionRoot(
 
     private void ApplyNavigationRegistrations(FlourishServiceCollectionState? state)
     {
-        var registeredPagesByPageType =
-            state
-                ?.NavigablePages.GroupBy(page => page.PageType)
-                .ToDictionary(group => group.Key, group => group.Last())
-            ?? [];
-        var registeredPagesByKey = CreateRegisteredPagesByKey(
-            state?.NavigablePages ?? []
-        );
+        IReadOnlyList<NavigablePageRegistration> registeredPages =
+            state?.NavigablePages ?? [];
+        var registeredPagesByPageType = CreateRegisteredPagesByPageType(registeredPages);
+        var registeredPagesByKey = CreateRegisteredPagesByKey(registeredPages);
         var hasConfiguredNavigation =
             shellOptions.NavigationGroups.Count > 0
             || shellOptions.FixedNavigationItemDefinitions.Count > 0;
@@ -174,6 +175,8 @@ internal sealed class FlourishCompositionRoot(
         shellOptions.PageCacheModesByPageType.Clear();
         shellOptions.PageTypesByNavigationKey.Clear();
         shellOptions.NavigationKeysByPageType.Clear();
+        shellOptions.InitialNavigationKey = null;
+        shellOptions.InitialNavigationPageType = null;
         foreach (var page in registeredPagesByPageType.Values)
         {
             shellOptions.PageCacheModesByPageType[page.PageType] = page.CacheMode;
@@ -215,6 +218,7 @@ internal sealed class FlourishCompositionRoot(
         );
 
         ValidateUniqueNavigationPageItems(navigationGroups, fixedNavigationItems);
+        ApplyInitialNavigationItem(navigationGroups, fixedNavigationItems);
 
         foreach (var group in navigationGroups)
         {
@@ -235,6 +239,27 @@ internal sealed class FlourishCompositionRoot(
         }
 
         shellOptions.FixedNavigationItems.AddRange(fixedNavigationItems);
+    }
+
+    private static IReadOnlyDictionary<Type, NavigablePageRegistration> CreateRegisteredPagesByPageType(
+        IReadOnlyList<NavigablePageRegistration> registeredPages
+    )
+    {
+        var duplicatePageTypes = registeredPages
+            .GroupBy(page => page.PageType)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key.FullName ?? group.Key.Name)
+            .ToArray();
+
+        if (duplicatePageTypes.Length > 0)
+        {
+            throw new InvalidOperationException(
+                "Navigable page types must be unique. Duplicate page types: "
+                    + string.Join(", ", duplicatePageTypes)
+            );
+        }
+
+        return registeredPages.ToDictionary(page => page.PageType);
     }
 
     private static IReadOnlyDictionary<string, NavigablePageRegistration> CreateRegisteredPagesByKey(
@@ -357,6 +382,33 @@ internal sealed class FlourishCompositionRoot(
         }
     }
 
+    private void ApplyInitialNavigationItem(
+        IReadOnlyList<FlourishNavigationGroup> navigationGroups,
+        IReadOnlyList<FlourishNavigationItem> fixedNavigationItems
+    )
+    {
+        var initialItems = navigationGroups
+            .SelectMany(group => group.Items)
+            .Concat(fixedNavigationItems)
+            .Where(item => item.IsInitial && item.IsPageItem && item.PageType is not null)
+            .ToArray();
+
+        if (initialItems.Length > 1)
+        {
+            throw new InvalidOperationException(
+                "Only one navigable page can be configured as the initial page."
+            );
+        }
+
+        if (initialItems.FirstOrDefault() is not { } initialItem)
+        {
+            return;
+        }
+
+        shellOptions.InitialNavigationKey = initialItem.Key;
+        shellOptions.InitialNavigationPageType = initialItem.PageType;
+    }
+
     private static void AddNavigationPageLocations(
         Dictionary<Type, List<string>> pageLocationsByType,
         IReadOnlyList<FlourishNavigationItem> items,
@@ -432,11 +484,6 @@ internal sealed class FlourishCompositionRoot(
                 }
             }
 
-            if (item.IsInitial && item.PageType is not null)
-            {
-                shellOptions.InitialNavigationKey = item.Key;
-                shellOptions.InitialNavigationPageType = item.PageType;
-            }
         }
 
         foreach (var child in items.Where(item => item.ChildId != 0))

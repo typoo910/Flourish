@@ -10,6 +10,7 @@ internal sealed class FlourishMotionBuilder(FlourishMotionOptions options) : IFl
         TimeSpan? duration = null
     )
     {
+        ValidateEnum(transition, nameof(transition));
         options.PageTransition = transition;
         if (duration is { } value)
         {
@@ -24,6 +25,7 @@ internal sealed class FlourishMotionBuilder(FlourishMotionOptions options) : IFl
         TimeSpan? duration = null
     )
     {
+        ValidateEnum(transition, nameof(transition));
         options.NavigationPanelTransition = transition;
         if (duration is { } value)
         {
@@ -62,5 +64,14 @@ internal sealed class FlourishMotionBuilder(FlourishMotionOptions options) : IFl
         }
 
         return duration;
+    }
+
+    private static void ValidateEnum<TEnum>(TEnum value, string parameterName)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Unknown value.");
+        }
     }
 }

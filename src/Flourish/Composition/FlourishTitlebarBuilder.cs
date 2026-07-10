@@ -122,6 +122,7 @@ internal sealed class FlourishTitlebarBuilder(FlourishShellOptions options)
         BreadcrumbShowOption behavior = BreadcrumbShowOption.Auto
     )
     {
+        ValidateEnum(behavior, nameof(behavior));
         options.BreadcrumbShowOption = behavior;
         return this;
     }
@@ -134,6 +135,15 @@ internal sealed class FlourishTitlebarBuilder(FlourishShellOptions options)
         }
 
         return value;
+    }
+
+    private static void ValidateEnum<TEnum>(TEnum value, string parameterName)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Unknown value.");
+        }
     }
 
 }

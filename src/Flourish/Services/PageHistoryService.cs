@@ -52,6 +52,11 @@ internal sealed class PageHistoryService
         forwardStack.Clear();
     }
 
+    public void ClearBack()
+    {
+        backStack.Clear();
+    }
+
     public void Clear()
     {
         backStack.Clear();

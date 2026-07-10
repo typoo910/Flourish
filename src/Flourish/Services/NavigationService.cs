@@ -4,14 +4,32 @@ using ArkheideSystem.Flourish.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class NavigationService(
-    PageCacheService pageCacheService,
-    PageHistoryService pageHistoryService,
-    FlourishShellOptions options
-) : INavigationService, IFrameNavigationService
+internal sealed class NavigationService : INavigationService, IFrameNavigationService
 {
-    private Frame? contentFrame;
+    private readonly INavigationPageProvider pageProvider;
+    private readonly PageHistoryService pageHistoryService;
+    private readonly FlourishShellOptions options;
+    private INavigationContentHost? contentHost;
     private object? currentParameter;
+
+    public NavigationService(
+        PageCacheService pageCacheService,
+        PageHistoryService pageHistoryService,
+        FlourishShellOptions options
+    )
+        : this((INavigationPageProvider)pageCacheService, pageHistoryService, options) { }
+
+    internal NavigationService(
+        INavigationPageProvider pageProvider,
+        PageHistoryService pageHistoryService,
+        FlourishShellOptions options
+    )
+    {
+        this.pageProvider = pageProvider ?? throw new ArgumentNullException(nameof(pageProvider));
+        this.pageHistoryService =
+            pageHistoryService ?? throw new ArgumentNullException(nameof(pageHistoryService));
+        this.options = options ?? throw new ArgumentNullException(nameof(options));
+    }
 
     public event EventHandler<FlourishNavigatedEventArgs>? Navigated;
 
@@ -25,7 +43,12 @@ internal sealed class NavigationService(
 
     public void Initialize(Frame contentFrame)
     {
-        this.contentFrame = contentFrame;
+        Initialize(new FrameNavigationContentHost(contentFrame));
+    }
+
+    internal void Initialize(INavigationContentHost contentHost)
+    {
+        this.contentHost = contentHost ?? throw new ArgumentNullException(nameof(contentHost));
     }
 
     public bool Navigate(string navigationKey, object? parameter = null, bool addToBackStack = true)
@@ -58,19 +81,20 @@ internal sealed class NavigationService(
             return false;
         }
 
-        if (CreateCurrentEntry() is { } currentEntry)
-        {
-            pageHistoryService.PushForward(currentEntry);
-        }
-
-        if (NavigateCore(entry.NavigationKey, entry.Parameter, false))
-        {
-            return true;
-        }
-
-        pageHistoryService.TryPopForward(out _);
-        pageHistoryService.Push(entry);
-        return false;
+        var currentEntry = CreateCurrentEntry();
+        return NavigateCore(
+            entry.NavigationKey,
+            entry.Parameter,
+            false,
+            commitHistory: () =>
+            {
+                if (currentEntry is not null)
+                {
+                    pageHistoryService.PushForward(currentEntry);
+                }
+            },
+            rollbackHistory: () => pageHistoryService.Push(entry)
+        );
     }
 
     public bool GoForward()
@@ -80,66 +104,93 @@ internal sealed class NavigationService(
             return false;
         }
 
-        if (CreateCurrentEntry() is { } currentEntry)
-        {
-            pageHistoryService.Push(currentEntry);
-        }
-
-        if (NavigateCore(entry.NavigationKey, entry.Parameter, false))
-        {
-            return true;
-        }
-
-        pageHistoryService.TryPopBack(out _);
-        pageHistoryService.PushForward(entry);
-        return false;
+        var currentEntry = CreateCurrentEntry();
+        return NavigateCore(
+            entry.NavigationKey,
+            entry.Parameter,
+            false,
+            commitHistory: () =>
+            {
+                if (currentEntry is not null)
+                {
+                    pageHistoryService.Push(currentEntry);
+                }
+            },
+            rollbackHistory: () => pageHistoryService.PushForward(entry)
+        );
     }
 
     public void ClearBackStack()
     {
-        pageHistoryService.Clear();
+        pageHistoryService.ClearBack();
     }
 
-    private bool NavigateCore(string navigationKey, object? parameter, bool addToBackStack)
+    private bool NavigateCore(
+        string navigationKey,
+        object? parameter,
+        bool addToBackStack,
+        Action? commitHistory = null,
+        Action? rollbackHistory = null
+    )
     {
-        if (contentFrame is null)
+        var historyCommitted = false;
+
+        try
         {
-            throw new InvalidOperationException(
-                "NavigationService must be initialized with a frame."
+            if (contentHost is null)
+            {
+                throw new InvalidOperationException(
+                    "NavigationService must be initialized with a frame."
+                );
+            }
+
+            if (!options.PageTypesByNavigationKey.TryGetValue(navigationKey, out var sourcePageType))
+            {
+                throw new InvalidOperationException(
+                    $"Navigation key '{navigationKey}' must be registered with AddNavigable before it can be navigated to."
+                );
+            }
+
+            if (CurrentNavigationKey == navigationKey && Equals(currentParameter, parameter))
+            {
+                rollbackHistory?.Invoke();
+                return false;
+            }
+
+            var page = pageProvider.GetPage(sourcePageType);
+            if (!contentHost.Navigate(page))
+            {
+                rollbackHistory?.Invoke();
+                return false;
+            }
+
+            commitHistory?.Invoke();
+            if (addToBackStack && CreateCurrentEntry() is { } currentEntry)
+            {
+                pageHistoryService.Push(currentEntry);
+                pageHistoryService.ClearForward();
+            }
+
+            historyCommitted = true;
+            CurrentSourcePageType = sourcePageType;
+            CurrentNavigationKey = navigationKey;
+            currentParameter = parameter;
+
+            Navigated?.Invoke(
+                this,
+                new FlourishNavigatedEventArgs(navigationKey, sourcePageType, page, parameter)
             );
+            return true;
         }
-
-        if (!options.PageTypesByNavigationKey.TryGetValue(navigationKey, out var sourcePageType))
+        catch
         {
-            throw new InvalidOperationException(
-                $"Navigation key '{navigationKey}' must be registered with AddNavigable before it can be navigated to."
-            );
+            if (!historyCommitted)
+            {
+                rollbackHistory?.Invoke();
+            }
+
+            throw;
         }
-
-        if (CurrentNavigationKey == navigationKey && Equals(currentParameter, parameter))
-        {
-            return false;
-        }
-
-        if (addToBackStack && CurrentNavigationKey is not null)
-        {
-            pageHistoryService.Push(
-                new FlourishPageStackEntry(CurrentNavigationKey, currentParameter)
-            );
-            pageHistoryService.ClearForward();
-        }
-
-        var page = pageCacheService.GetPage(sourcePageType);
-        contentFrame.Navigate(page);
-        CurrentSourcePageType = sourcePageType;
-        CurrentNavigationKey = navigationKey;
-        currentParameter = parameter;
-
-        Navigated?.Invoke(
-            this,
-            new FlourishNavigatedEventArgs(navigationKey, sourcePageType, page, parameter)
-        );
-        return true;
     }
 
     private FlourishPageStackEntry? CreateCurrentEntry()

@@ -51,6 +51,7 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         WindowStartupLocation startupLocation = WindowStartupLocation.CenterScreen
     )
     {
+        ValidateEnum(startupLocation, nameof(startupLocation));
         options.WindowStartupLocation = startupLocation;
         if (startupLocation != WindowStartupLocation.Manual)
         {
@@ -76,6 +77,7 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         WindowState windowState = WindowState.Normal
     )
     {
+        ValidateEnum(windowState, nameof(windowState));
         options.WindowState = windowState;
         return this;
     }
@@ -84,6 +86,7 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
         ResizeMode resizeMode = ResizeMode.CanResize
     )
     {
+        ValidateEnum(resizeMode, nameof(resizeMode));
         options.WindowResizeMode = resizeMode;
         return this;
     }
@@ -162,6 +165,15 @@ internal sealed class FlourishWindowPropertyBuilder(FlourishShellOptions options
                 maxValue,
                 "Maximum size cannot be below minimum size."
             );
+        }
+    }
+
+    private static void ValidateEnum<TEnum>(TEnum value, string parameterName)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Unknown value.");
         }
     }
 }

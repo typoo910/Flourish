@@ -21,6 +21,9 @@ internal sealed class FlourishDynamicToolbarBuilder(FlourishShellOptions options
         params FlourishToolbarItem[] items
     )
     {
+        ArgumentNullException.ThrowIfNull(pageType);
+        ArgumentNullException.ThrowIfNull(items);
+
         if (!typeof(Page).IsAssignableFrom(pageType))
         {
             throw new ArgumentException(
@@ -29,7 +32,12 @@ internal sealed class FlourishDynamicToolbarBuilder(FlourishShellOptions options
             );
         }
 
-        options.DynamicToolbarItems[pageType] = items;
+        if (items.Any(item => item is null))
+        {
+            throw new ArgumentException("Toolbar items cannot contain null.", nameof(items));
+        }
+
+        options.DynamicToolbarItems[pageType] = items.ToArray();
         options.DynamicToolbarIconModes[pageType] = icon;
         return this;
     }
