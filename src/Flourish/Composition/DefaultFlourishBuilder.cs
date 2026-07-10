@@ -1,9 +1,9 @@
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace AckSS.Flourish.Composition;
+namespace ArkheideSystem.Flourish.Composition;
 
 internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
 {

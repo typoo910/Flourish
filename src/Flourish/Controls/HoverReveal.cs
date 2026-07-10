@@ -3,7 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfControl = System.Windows.Controls.Control;
 
-namespace AckSS.Flourish.Controls;
+namespace ArkheideSystem.Flourish.Controls;
 
 internal static class HoverReveal
 {

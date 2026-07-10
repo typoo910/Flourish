@@ -1,10 +1,10 @@
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 using Application = System.Windows.Application;
 using FontFamily = System.Windows.Media.FontFamily;
 using Window = System.Windows.Window;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FontService(FlourishShellOptions options)
 {

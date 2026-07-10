@@ -1,11 +1,11 @@
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Identifies a Flourish shell region that can host application-provided WPF content.
 /// </summary>
 /// <remarks>
 /// Region content is configured during application composition with
-/// <see cref="IFlourishBuilder.ConfigureCustomHandler(System.Action{AckSS.Flourish.Abstract.IFlourishCustomHandlerBuilder})" />.
+/// <see cref="IFlourishBuilder.ConfigureCustomHandler(System.Action{ArkheideSystem.Flourish.Abstract.IFlourishCustomHandlerBuilder})" />.
 /// </remarks>
 public enum FlourishRegion
 {

@@ -1,4 +1,4 @@
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Specifies the side of the shell where the navigation panel is displayed.

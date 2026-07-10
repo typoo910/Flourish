@@ -1,10 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
-using AckSS.Flourish.Services;
+using ArkheideSystem.Flourish.Services;
 using Button = System.Windows.Controls.Button;
 using Orientation = System.Windows.Controls.Orientation;
 
-namespace AckSS.Flourish.Composition;
+namespace ArkheideSystem.Flourish.Composition;
 
 internal static class FlourishRegionElementFactory
 {

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class WindowFrameFixService
 {

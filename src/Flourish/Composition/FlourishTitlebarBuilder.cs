@@ -1,9 +1,9 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 
-namespace AckSS.Flourish.Composition;
+namespace ArkheideSystem.Flourish.Composition;
 
 internal sealed class FlourishTitlebarBuilder(FlourishShellOptions options)
     : IFlourishTitlebarBuilder

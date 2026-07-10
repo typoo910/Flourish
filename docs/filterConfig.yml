@@ -1,5 +1,5 @@
 apiRules:
 - include:
-    uidRegex: ^AckSS\.Flourish\.Abstract
+    uidRegex: ^ArkheideSystem\.Flourish\.Abstract
 - exclude:
-    uidRegex: ^AckSS\.Flourish\.
+    uidRegex: ^ArkheideSystem\.Flourish\.

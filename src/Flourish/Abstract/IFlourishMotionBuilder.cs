@@ -1,4 +1,4 @@
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Configures motion and animation behavior for the Flourish shell.

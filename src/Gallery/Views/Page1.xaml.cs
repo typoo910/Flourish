@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AckSS.Gallery.Views;
+namespace ArkheideSystem.Gallery.Views;
 
 public partial class Page1 : Page
 {

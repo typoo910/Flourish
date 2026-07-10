@@ -1,8 +1,8 @@
 using System.Windows.Controls;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Provides service collection extensions used by Flourish applications.
@@ -17,6 +17,11 @@ namespace AckSS.Flourish.Abstract;
 /// </example>
 public static class FlourishServiceCollectionExtensions
 {
+    internal static string CreateDefaultNavigationKey(Type pageType)
+    {
+        return pageType.FullName ?? pageType.Name;
+    }
+
     /// <summary>
     /// Registers a WPF page as a navigable Flourish page.
     /// </summary>
@@ -32,24 +37,33 @@ public static class FlourishServiceCollectionExtensions
     /// <param name="displayName">The display name used when the page is displayed in navigation UI.</param>
     /// <param name="iconGlyph">The icon glyph used when the page is displayed in navigation UI.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
+    /// <param name="navigationKey">The stable key used by <see cref="INavigationService" /> for runtime navigation.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <example>
     /// <code><![CDATA[
     /// services.AddNavigable<HomePage>(
     ///     displayName: "Home",
     ///     iconGlyph: "\uE80F",
-    ///     cacheMode: FlourishPageCacheMode.Enabled);
+    ///     cacheMode: FlourishPageCacheMode.Enabled,
+    ///     navigationKey: "home");
     /// ]]></code>
     /// </example>
     public static IServiceCollection AddNavigable<TPage>(
         this IServiceCollection services,
         string displayName,
         string iconGlyph,
-        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
+        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled,
+        string? navigationKey = null
     )
         where TPage : Page
     {
-        return services.AddNavigable(typeof(TPage), displayName, iconGlyph, cacheMode);
+        return services.AddNavigable(
+            typeof(TPage),
+            displayName,
+            iconGlyph,
+            cacheMode,
+            navigationKey
+        );
     }
 
     /// <summary>
@@ -65,6 +79,7 @@ public static class FlourishServiceCollectionExtensions
     /// <param name="displayName">The display name used when the page is displayed in navigation UI.</param>
     /// <param name="iconGlyph">The icon glyph used when the page is displayed in navigation UI.</param>
     /// <param name="cacheMode">The page caching mode used for this page.</param>
+    /// <param name="navigationKey">The stable key used by <see cref="INavigationService" /> for runtime navigation.</param>
     /// <returns>The same service collection for chained registration.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="pageType" /> does not derive from <see cref="Page" />.</exception>
     /// <example>
@@ -72,7 +87,8 @@ public static class FlourishServiceCollectionExtensions
     /// services.AddNavigable(
     ///     typeof(SettingsPage),
     ///     displayName: "Settings",
-    ///     iconGlyph: "\uE713");
+    ///     iconGlyph: "\uE713",
+    ///     navigationKey: "settings");
     /// ]]></code>
     /// </example>
     public static IServiceCollection AddNavigable(
@@ -80,7 +96,8 @@ public static class FlourishServiceCollectionExtensions
         Type pageType,
         string displayName,
         string iconGlyph,
-        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled
+        FlourishPageCacheMode cacheMode = FlourishPageCacheMode.Enabled,
+        string? navigationKey = null
     )
     {
         if (!typeof(Page).IsAssignableFrom(pageType))
@@ -96,10 +113,22 @@ public static class FlourishServiceCollectionExtensions
             throw new ArgumentException("A navigable page requires a display name.", nameof(displayName));
         }
 
+        navigationKey ??= CreateDefaultNavigationKey(pageType);
+        if (string.IsNullOrWhiteSpace(navigationKey))
+        {
+            throw new ArgumentException("A navigable page requires a navigation key.", nameof(navigationKey));
+        }
+
         services.AddTransient(pageType);
         GetOrCreateState(services)
             .NavigablePages.Add(
-                new NavigablePageRegistration(pageType, displayName, iconGlyph, cacheMode)
+                new NavigablePageRegistration(
+                    navigationKey,
+                    pageType,
+                    displayName,
+                    iconGlyph,
+                    cacheMode
+                )
             );
 
         return services;

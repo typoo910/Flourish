@@ -1,10 +1,10 @@
 using System.Windows;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Windows;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Windows;
 using Application = System.Windows.Application;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class MessageService : IMessageService
 {

@@ -1,8 +1,8 @@
 using System.Windows.Controls;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 
-namespace AckSS.Flourish.Composition;
+namespace ArkheideSystem.Flourish.Composition;
 
 internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
     : IFlourishNavigationBuilder
@@ -114,7 +114,28 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
             options.FixedNavigationItemDefinitions,
             FixedItemsGroupId,
             isFixed: true,
+            FlourishServiceCollectionExtensions.CreateDefaultNavigationKey(typeof(TPage)),
             typeof(TPage),
+            isInitial,
+            parentId,
+            childId
+        );
+        return this;
+    }
+
+    public IFlourishNavigationBuilder AddFixedNavigableViewItem(
+        string navigationKey,
+        bool isInitial = false,
+        int parentId = 0,
+        int childId = 0
+    )
+    {
+        AddPageItem(
+            options.FixedNavigationItemDefinitions,
+            FixedItemsGroupId,
+            isFixed: true,
+            navigationKey,
+            pageType: null,
             isInitial,
             parentId,
             childId
@@ -147,19 +168,27 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
         List<FlourishNavigationItem> items,
         int groupId,
         bool isFixed,
-        Type pageType,
+        string navigationKey,
+        Type? pageType,
         bool isInitial,
         int parentId,
         int childId
     )
     {
+        if (string.IsNullOrWhiteSpace(navigationKey))
+        {
+            throw new ArgumentException(
+                "Navigation view items require a navigation key.",
+                nameof(navigationKey)
+            );
+        }
+
         ValidateParentChild(items, parentId, childId);
 
-        var key = pageType.FullName ?? pageType.Name;
         items.Add(
             new FlourishNavigationItem(
-                key,
-                pageType.Name,
+                navigationKey,
+                pageType?.Name ?? navigationKey,
                 null,
                 groupId,
                 FlourishNavigationItemKind.Page,
@@ -240,7 +269,36 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
         )
             where TPage : Page
         {
-            AddPageItem(items, groupId, isFixed, typeof(TPage), isInitial, parentId, childId);
+            AddPageItem(
+                items,
+                groupId,
+                isFixed,
+                FlourishServiceCollectionExtensions.CreateDefaultNavigationKey(typeof(TPage)),
+                typeof(TPage),
+                isInitial,
+                parentId,
+                childId
+            );
+            return this;
+        }
+
+        public IFlourishNavigationGroupBuilder AddNavigableViewItem(
+            string navigationKey,
+            bool isInitial = false,
+            int parentId = 0,
+            int childId = 0
+        )
+        {
+            AddPageItem(
+                items,
+                groupId,
+                isFixed,
+                navigationKey,
+                pageType: null,
+                isInitial,
+                parentId,
+                childId
+            );
             return this;
         }
 

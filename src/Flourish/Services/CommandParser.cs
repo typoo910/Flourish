@@ -1,6 +1,6 @@
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class CommandParser(IEnumerable<ICommandParser> parsers)
 {

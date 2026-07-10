@@ -1,10 +1,11 @@
 using System.Windows.Controls;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Provides data for Flourish navigation events.
 /// </summary>
+/// <param name="navigationKey">The registered navigation key that was navigated to.</param>
 /// <param name="sourcePageType">The registered page type that was navigated to.</param>
 /// <param name="page">The page instance displayed in the content frame.</param>
 /// <param name="parameter">The optional navigation parameter supplied by the caller.</param>
@@ -12,13 +13,28 @@ namespace AckSS.Flourish.Abstract;
 /// <code><![CDATA[
 /// navigation.Navigated += (_, args) =>
 /// {
-///     Console.WriteLine(args.SourcePageType.FullName);
+///     Console.WriteLine(args.NavigationKey);
 /// };
 /// ]]></code>
 /// </example>
-public sealed class FlourishNavigatedEventArgs(Type sourcePageType, Page page, object? parameter)
+public sealed class FlourishNavigatedEventArgs(
+    string navigationKey,
+    Type sourcePageType,
+    Page page,
+    object? parameter
+)
     : EventArgs
 {
+    /// <summary>
+    /// Gets the registered navigation key that was navigated to.
+    /// </summary>
+    /// <example>
+    /// <code><![CDATA[
+    /// var route = args.NavigationKey;
+    /// ]]></code>
+    /// </example>
+    public string NavigationKey { get; } = navigationKey;
+
     /// <summary>
     /// Gets the registered page type that was navigated to.
     /// </summary>

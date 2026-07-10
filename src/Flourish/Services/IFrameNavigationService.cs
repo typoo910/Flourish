@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal interface IFrameNavigationService
 {

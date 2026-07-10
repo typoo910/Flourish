@@ -1,11 +1,13 @@
 using System.Windows.Controls;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class NavigationService(
     PageCacheService pageCacheService,
-    PageHistoryService pageHistoryService
+    PageHistoryService pageHistoryService,
+    FlourishShellOptions options
 ) : INavigationService, IFrameNavigationService
 {
     private Frame? contentFrame;
@@ -19,14 +21,28 @@ internal sealed class NavigationService(
 
     public Type? CurrentSourcePageType { get; private set; }
 
+    public string? CurrentNavigationKey { get; private set; }
+
     public void Initialize(Frame contentFrame)
     {
         this.contentFrame = contentFrame;
     }
 
+    public bool Navigate(string navigationKey, object? parameter = null, bool addToBackStack = true)
+    {
+        return NavigateCore(navigationKey, parameter, addToBackStack);
+    }
+
     public bool Navigate(Type sourcePageType, object? parameter = null, bool addToBackStack = true)
     {
-        return NavigateCore(sourcePageType, parameter, addToBackStack);
+        if (!options.NavigationKeysByPageType.TryGetValue(sourcePageType, out var navigationKey))
+        {
+            throw new InvalidOperationException(
+                $"{sourcePageType.FullName} must be registered with AddNavigable before it can be navigated to."
+            );
+        }
+
+        return Navigate(navigationKey, parameter, addToBackStack);
     }
 
     public bool Navigate<TPage>(object? parameter = null, bool addToBackStack = true)
@@ -47,7 +63,7 @@ internal sealed class NavigationService(
             pageHistoryService.PushForward(currentEntry);
         }
 
-        if (NavigateCore(entry.SourcePageType, entry.Parameter, false))
+        if (NavigateCore(entry.NavigationKey, entry.Parameter, false))
         {
             return true;
         }
@@ -69,7 +85,7 @@ internal sealed class NavigationService(
             pageHistoryService.Push(currentEntry);
         }
 
-        if (NavigateCore(entry.SourcePageType, entry.Parameter, false))
+        if (NavigateCore(entry.NavigationKey, entry.Parameter, false))
         {
             return true;
         }
@@ -84,7 +100,7 @@ internal sealed class NavigationService(
         pageHistoryService.Clear();
     }
 
-    private bool NavigateCore(Type sourcePageType, object? parameter, bool addToBackStack)
+    private bool NavigateCore(string navigationKey, object? parameter, bool addToBackStack)
     {
         if (contentFrame is null)
         {
@@ -93,15 +109,22 @@ internal sealed class NavigationService(
             );
         }
 
-        if (CurrentSourcePageType == sourcePageType && Equals(currentParameter, parameter))
+        if (!options.PageTypesByNavigationKey.TryGetValue(navigationKey, out var sourcePageType))
+        {
+            throw new InvalidOperationException(
+                $"Navigation key '{navigationKey}' must be registered with AddNavigable before it can be navigated to."
+            );
+        }
+
+        if (CurrentNavigationKey == navigationKey && Equals(currentParameter, parameter))
         {
             return false;
         }
 
-        if (addToBackStack && CurrentSourcePageType is not null)
+        if (addToBackStack && CurrentNavigationKey is not null)
         {
             pageHistoryService.Push(
-                new FlourishPageStackEntry(CurrentSourcePageType, currentParameter)
+                new FlourishPageStackEntry(CurrentNavigationKey, currentParameter)
             );
             pageHistoryService.ClearForward();
         }
@@ -109,16 +132,20 @@ internal sealed class NavigationService(
         var page = pageCacheService.GetPage(sourcePageType);
         contentFrame.Navigate(page);
         CurrentSourcePageType = sourcePageType;
+        CurrentNavigationKey = navigationKey;
         currentParameter = parameter;
 
-        Navigated?.Invoke(this, new FlourishNavigatedEventArgs(sourcePageType, page, parameter));
+        Navigated?.Invoke(
+            this,
+            new FlourishNavigatedEventArgs(navigationKey, sourcePageType, page, parameter)
+        );
         return true;
     }
 
     private FlourishPageStackEntry? CreateCurrentEntry()
     {
-        return CurrentSourcePageType is null
+        return CurrentNavigationKey is null
             ? null
-            : new FlourishPageStackEntry(CurrentSourcePageType, currentParameter);
+            : new FlourishPageStackEntry(CurrentNavigationKey, currentParameter);
     }
 }

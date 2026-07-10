@@ -1,6 +1,6 @@
-using AckSS.Flourish.Composition;
+using ArkheideSystem.Flourish.Composition;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Provides factory methods for creating Flourish application builders.

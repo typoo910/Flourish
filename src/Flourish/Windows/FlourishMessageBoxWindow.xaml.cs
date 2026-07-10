@@ -2,14 +2,14 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 using Button = System.Windows.Controls.Button;
 using Key = System.Windows.Input.Key;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBoxOptions = System.Windows.MessageBoxOptions;
 using WpfFlowDirection = System.Windows.FlowDirection;
 
-namespace AckSS.Flourish.Windows;
+namespace ArkheideSystem.Flourish.Windows;
 
 internal partial class FlourishMessageBoxWindow : Window
 {

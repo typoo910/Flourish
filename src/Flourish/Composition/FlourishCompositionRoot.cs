@@ -1,11 +1,11 @@
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
-using AckSS.Flourish.Services;
-using AckSS.Flourish.Windows;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
+using ArkheideSystem.Flourish.Services;
+using ArkheideSystem.Flourish.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace AckSS.Flourish.Composition;
+namespace ArkheideSystem.Flourish.Composition;
 
 internal sealed class FlourishCompositionRoot(
     FlourishShellOptions shellOptions,
@@ -157,11 +157,14 @@ internal sealed class FlourishCompositionRoot(
 
     private void ApplyNavigationRegistrations(FlourishServiceCollectionState? state)
     {
-        var registeredPages =
+        var registeredPagesByPageType =
             state
                 ?.NavigablePages.GroupBy(page => page.PageType)
                 .ToDictionary(group => group.Key, group => group.Last())
             ?? [];
+        var registeredPagesByKey = CreateRegisteredPagesByKey(
+            state?.NavigablePages ?? []
+        );
         var hasConfiguredNavigation =
             shellOptions.NavigationGroups.Count > 0
             || shellOptions.FixedNavigationItemDefinitions.Count > 0;
@@ -169,9 +172,17 @@ internal sealed class FlourishCompositionRoot(
         shellOptions.NavigationItems.Clear();
         shellOptions.FixedNavigationItems.Clear();
         shellOptions.PageCacheModesByPageType.Clear();
-        foreach (var page in registeredPages.Values)
+        shellOptions.PageTypesByNavigationKey.Clear();
+        shellOptions.NavigationKeysByPageType.Clear();
+        foreach (var page in registeredPagesByPageType.Values)
         {
             shellOptions.PageCacheModesByPageType[page.PageType] = page.CacheMode;
+        }
+
+        foreach (var page in registeredPagesByKey.Values)
+        {
+            shellOptions.PageTypesByNavigationKey[page.NavigationKey] = page.PageType;
+            shellOptions.NavigationKeysByPageType[page.PageType] = page.NavigationKey;
         }
 
         var navigationGroups = shellOptions.IsNavigationPanelEnabled
@@ -180,11 +191,28 @@ internal sealed class FlourishCompositionRoot(
                     .NavigationGroups.OrderBy(group => group.GroupId)
                     .Select(CloneNavigationGroup)
                     .ToList()
-                : CreateLegacyNavigationGroups(registeredPages)
+                : CreateLegacyNavigationGroups(registeredPagesByPageType)
             : [];
         var fixedNavigationItems = shellOptions.IsNavigationPanelEnabled
             ? CloneNavigationItems(shellOptions.FixedNavigationItemDefinitions)
             : [];
+
+        foreach (var group in navigationGroups)
+        {
+            FinalizeNavigationItems(
+                group.Items,
+                registeredPagesByPageType,
+                registeredPagesByKey,
+                $"group {group.GroupId}"
+            );
+        }
+
+        FinalizeNavigationItems(
+            fixedNavigationItems,
+            registeredPagesByPageType,
+            registeredPagesByKey,
+            "fixed navigation items"
+        );
 
         ValidateUniqueNavigationPageItems(navigationGroups, fixedNavigationItems);
 
@@ -203,12 +231,31 @@ internal sealed class FlourishCompositionRoot(
                 );
             }
 
-            FinalizeNavigationItems(group.Items, registeredPages, $"group {group.GroupId}");
             shellOptions.NavigationItems.AddRange(group.Items);
         }
 
-        FinalizeNavigationItems(fixedNavigationItems, registeredPages, "fixed navigation items");
         shellOptions.FixedNavigationItems.AddRange(fixedNavigationItems);
+    }
+
+    private static IReadOnlyDictionary<string, NavigablePageRegistration> CreateRegisteredPagesByKey(
+        IReadOnlyList<NavigablePageRegistration> registeredPages
+    )
+    {
+        var duplicateKeys = registeredPages
+            .GroupBy(page => page.NavigationKey, StringComparer.Ordinal)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToArray();
+
+        if (duplicateKeys.Length > 0)
+        {
+            throw new InvalidOperationException(
+                "Navigation keys must be unique. Duplicate keys: "
+                    + string.Join(", ", duplicateKeys)
+            );
+        }
+
+        return registeredPages.ToDictionary(page => page.NavigationKey, StringComparer.Ordinal);
     }
 
     private IReadOnlyList<FlourishNavigationGroup> CreateLegacyNavigationGroups(
@@ -224,7 +271,7 @@ internal sealed class FlourishCompositionRoot(
         {
             legacyGroup.Items.Add(
                 new FlourishNavigationItem(
-                    page.PageType.FullName ?? page.PageType.Name,
+                    page.NavigationKey,
                     page.DisplayName ?? page.PageType.Name,
                     page.IconGlyph,
                     0,
@@ -336,7 +383,8 @@ internal sealed class FlourishCompositionRoot(
 
     private void FinalizeNavigationItems(
         IReadOnlyList<FlourishNavigationItem> items,
-        IReadOnlyDictionary<Type, NavigablePageRegistration> registeredPages,
+        IReadOnlyDictionary<Type, NavigablePageRegistration> registeredPagesByPageType,
+        IReadOnlyDictionary<string, NavigablePageRegistration> registeredPagesByKey,
         string scopeName
     )
     {
@@ -352,16 +400,28 @@ internal sealed class FlourishCompositionRoot(
                 );
             }
 
-            if (item.IsPageItem && item.PageType is not null)
+            if (item.IsPageItem)
             {
-                if (!registeredPages.TryGetValue(item.PageType, out var page))
+                var page = item.PageType is null
+                    ? registeredPagesByKey.GetValueOrDefault(item.Key)
+                    : registeredPagesByPageType.GetValueOrDefault(item.PageType);
+
+                if (page is null)
                 {
                     throw new InvalidOperationException(
-                        $"{item.PageType.FullName} must be registered with AddNavigable before it is added to the navigation panel."
+                        item.PageType is null
+                            ? $"Navigation key '{item.Key}' must be registered with AddNavigable before it is added to the navigation panel."
+                            : $"{item.PageType.FullName} must be registered with AddNavigable before it is added to the navigation panel."
                     );
                 }
 
-                if (item.Label == item.PageType.Name && !string.IsNullOrWhiteSpace(page.DisplayName))
+                item.Key = page.NavigationKey;
+                item.PageType = page.PageType;
+
+                if (
+                    (item.Label == page.PageType.Name || item.Label == page.NavigationKey)
+                    && !string.IsNullOrWhiteSpace(page.DisplayName)
+                )
                 {
                     item.Label = page.DisplayName;
                 }
@@ -374,6 +434,7 @@ internal sealed class FlourishCompositionRoot(
 
             if (item.IsInitial && item.PageType is not null)
             {
+                shellOptions.InitialNavigationKey = item.Key;
                 shellOptions.InitialNavigationPageType = item.PageType;
             }
         }

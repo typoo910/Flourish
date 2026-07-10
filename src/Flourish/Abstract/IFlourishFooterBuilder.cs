@@ -1,4 +1,4 @@
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Configures the Flourish shell footer status area.

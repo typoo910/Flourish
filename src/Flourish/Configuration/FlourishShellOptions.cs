@@ -1,8 +1,8 @@
 using System.Windows.Media;
 using System.Windows;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 
-namespace AckSS.Flourish.Configuration;
+namespace ArkheideSystem.Flourish.Configuration;
 
 internal sealed class FlourishShellOptions
 {
@@ -114,6 +114,10 @@ internal sealed class FlourishShellOptions
     public Type? InitialNavigationPageType { get; set; }
 
     public Dictionary<Type, FlourishPageCacheMode> PageCacheModesByPageType { get; } = [];
+
+    public Dictionary<string, Type> PageTypesByNavigationKey { get; } = new(StringComparer.Ordinal);
+
+    public Dictionary<Type, string> NavigationKeysByPageType { get; } = [];
 
     public List<FlourishNavigationGroup> NavigationGroups { get; } = [];
 

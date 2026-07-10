@@ -5,17 +5,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shell;
 using System.ComponentModel;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
-using AckSS.Flourish.Controls;
-using AckSS.Flourish.Services;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
+using ArkheideSystem.Flourish.Controls;
+using ArkheideSystem.Flourish.Services;
 using Button = System.Windows.Controls.Button;
 using FontFamily = System.Windows.Media.FontFamily;
 using ListBox = System.Windows.Controls.ListBox;
 using Orientation = System.Windows.Controls.Orientation;
 using WpfPanel = System.Windows.Controls.Panel;
 
-namespace AckSS.Flourish.Windows;
+namespace ArkheideSystem.Flourish.Windows;
 
 internal partial class FlourishShellWindow : Window
 {
@@ -743,9 +743,13 @@ internal partial class FlourishShellWindow : Window
     private void NavigateToInitialPage()
     {
         var initialItem =
-            options.InitialNavigationPageType is null
-                ? GetNavigationItem(options.InitialNavigationKey) ?? firstNavigationItem
-                : navigationItemsByPage.GetValueOrDefault(options.InitialNavigationPageType);
+            GetNavigationItem(options.InitialNavigationKey)
+            ?? (
+                options.InitialNavigationPageType is null
+                    ? null
+                    : navigationItemsByPage.GetValueOrDefault(options.InitialNavigationPageType)
+            )
+            ?? firstNavigationItem;
 
         if (initialItem is null)
         {
@@ -962,12 +966,12 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        if (item.PageType is null || navigationService.CurrentSourcePageType == item.PageType)
+        if (item.PageType is null || navigationService.CurrentNavigationKey == item.Key)
         {
             return;
         }
 
-        navigationService.Navigate(item.PageType, addToBackStack: addToBackStack);
+        navigationService.Navigate(item.Key, addToBackStack: addToBackStack);
 
         if (!addToBackStack && navigationService.CanGoBack)
         {

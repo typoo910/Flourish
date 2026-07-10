@@ -2,11 +2,11 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <RootNamespace>AckSS.Gallery</RootNamespace>
+    <RootNamespace>ArkheideSystem.Gallery</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <StartupObject>AckSS.Gallery.Program</StartupObject>
+    <StartupObject>ArkheideSystem.Gallery.Program</StartupObject>
     <Platforms>x86;x64;ARM64</Platforms>
   </PropertyGroup>
   <ItemGroup>

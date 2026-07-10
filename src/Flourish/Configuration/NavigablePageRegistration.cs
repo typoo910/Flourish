@@ -1,8 +1,9 @@
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 
-namespace AckSS.Flourish.Configuration;
+namespace ArkheideSystem.Flourish.Configuration;
 
 internal sealed record NavigablePageRegistration(
+    string NavigationKey,
     Type PageType,
     string DisplayName,
     string IconGlyph,

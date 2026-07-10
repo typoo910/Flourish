@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Configures the Flourish shell window.

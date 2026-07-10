@@ -78,13 +78,17 @@ Flourish also registers its own internal services during build, including naviga
 services.AddNavigable<HomePage>(
     displayName: "Home",
     iconGlyph: "\uE80F",
-    cacheMode: FlourishPageCacheMode.Enabled);
+    cacheMode: FlourishPageCacheMode.Enabled,
+    navigationKey: NavigationRoutes.Home);
 ```
 
 The generic overload is best when the page type is known at compile time.
 
 ```csharp
-services.AddNavigable<SettingsPage>("Settings", "\uE713");
+services.AddNavigable<SettingsPage>(
+    "Settings",
+    "\uE713",
+    navigationKey: NavigationRoutes.Settings);
 ```
 
 The `Type` overload is useful when page registrations come from configuration or plugins.
@@ -94,10 +98,11 @@ services.AddNavigable(
     typeof(ReportPage),
     displayName: "Reports",
     iconGlyph: "\uE9D2",
-    cacheMode: FlourishPageCacheMode.Disabled);
+    cacheMode: FlourishPageCacheMode.Disabled,
+    navigationKey: NavigationRoutes.Reports);
 ```
 
-`displayName` is shown by `AddNavigableViewItem`. `iconGlyph` is typically a Segoe Fluent Icons glyph such as `"\uE80F"`. `cacheMode` controls whether the same page instance is reused.
+`displayName` is shown by `AddNavigableViewItem`. `iconGlyph` is typically a Segoe Fluent Icons glyph such as `"\uE80F"`. `cacheMode` controls whether the same page instance is reused. `navigationKey` is the stable route used by view models through `INavigationService`.
 
 Place registered pages in the visible navigation model with [`ConfigureNavigation`](configure-navigation.md). Navigation panel display settings such as direction, width, and initial open state are also configured there.
 

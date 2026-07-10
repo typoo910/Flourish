@@ -28,7 +28,7 @@ Flourish 的 API 表面保持小而清晰。应用启动可以集中在 `Program
 - [Shell 配置](articles/shell-configuration.md)
 - [导航](articles/navigation.md)
 - [动态工具栏](articles/dynamic-toolbar.md)
-- [API 参考](xref:AckSS.Flourish.Abstract)
+- [API 参考](xref:ArkheideSystem.Flourish.Abstract)
 
 ## 项目链接
 

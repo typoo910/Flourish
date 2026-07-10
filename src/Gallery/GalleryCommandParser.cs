@@ -1,7 +1,7 @@
 using System.Windows;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 
-namespace AckSS.Gallery;
+namespace ArkheideSystem.Gallery;
 
 internal sealed class GalleryCommandParser(IMessageService messages) : ICommandParser
 {

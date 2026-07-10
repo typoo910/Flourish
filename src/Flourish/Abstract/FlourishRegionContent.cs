@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Describes application-provided WPF content displayed in a Flourish shell region.

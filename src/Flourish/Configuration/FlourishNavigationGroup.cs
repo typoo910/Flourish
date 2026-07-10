@@ -1,4 +1,4 @@
-namespace AckSS.Flourish.Configuration;
+namespace ArkheideSystem.Flourish.Configuration;
 
 internal sealed class FlourishNavigationGroup(int groupId, string? title)
 {

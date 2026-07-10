@@ -37,7 +37,7 @@ description: 用最短路径把 Flourish 接入 WPF 应用。
 
 ```csharp
 using System.Windows;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MyApp;

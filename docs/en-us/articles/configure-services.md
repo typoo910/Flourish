@@ -13,14 +13,14 @@ builder.ConfigureServices((context, services) =>
     services.AddSingleton<App>();
     services.AddSingleton<ICommandParser, AppCommandParser>();
 
-    services.AddNavigable<HomePage>("Home", "\uE80F");
-    services.AddNavigable<SettingsPage>("Settings", "\uE713");
+    services.AddNavigable<HomePage>("Home", "\uE80F", navigationKey: NavigationRoutes.Home);
+    services.AddNavigable<SettingsPage>("Settings", "\uE713", navigationKey: NavigationRoutes.Settings);
 });
 ```
 
 ## Details
 
-Pages shown by the navigation panel are registered with `AddNavigable`. The page must derive from `System.Windows.Controls.Page`; Flourish resolves it from dependency injection during navigation.
+Pages shown by the navigation panel are registered with `AddNavigable`. The page must derive from `System.Windows.Controls.Page`; Flourish resolves it from dependency injection during navigation. Use `navigationKey` for runtime navigation from view models so they do not reference page classes.
 
 Command parsers implement `ICommandParser` and are registered here. Navigation items, dynamic toolbar buttons, title bar actions, and footer commands can all send command keys into this parser chain.
 

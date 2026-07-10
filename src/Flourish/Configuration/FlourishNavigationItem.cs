@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 
-namespace AckSS.Flourish.Configuration;
+namespace ArkheideSystem.Flourish.Configuration;
 
 internal enum FlourishNavigationItemKind
 {
@@ -48,7 +48,7 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Key { get; }
+    public string Key { get; internal set; }
 
     public string Label { get; internal set; }
 
@@ -58,7 +58,7 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
 
     public FlourishNavigationItemKind Kind { get; }
 
-    public Type? PageType { get; }
+    public Type? PageType { get; internal set; }
 
     public string? CommandKey { get; }
 
@@ -136,7 +136,7 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
 
     public void Validate()
     {
-        if (IsPageItem && (PageType is null || !typeof(Page).IsAssignableFrom(PageType)))
+        if (IsPageItem && PageType is not null && !typeof(Page).IsAssignableFrom(PageType))
         {
             throw new ArgumentException(
                 $"{PageType?.FullName ?? "Navigation item"} must derive from System.Windows.Controls.Page.",

@@ -1,11 +1,11 @@
 using System.Drawing;
 using System.Windows;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 using Application = System.Windows.Application;
 using Forms = System.Windows.Forms;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class TrayIconService(FlourishShellOptions options) : IDisposable
 {

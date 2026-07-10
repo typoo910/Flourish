@@ -1,10 +1,10 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AckSS.Flourish.Abstract;
-using AckSS.Flourish.Configuration;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Configuration;
 
-namespace AckSS.Flourish.Services;
+namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class AppPreferenceService(
     FlourishDataOptions dataOptions,

@@ -6,7 +6,7 @@ using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 using ToolTip = System.Windows.Controls.ToolTip;
 
-namespace AckSS.Flourish.Controls;
+namespace ArkheideSystem.Flourish.Controls;
 
 /// <summary>
 /// Provides shell-region-aware placement for Flourish tooltips.

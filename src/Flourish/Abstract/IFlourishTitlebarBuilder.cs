@@ -1,6 +1,6 @@
 using System.Windows.Media;
 
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Configures the Flourish shell title bar.

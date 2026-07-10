@@ -1,9 +1,9 @@
 using System.Windows;
-using AckSS.Flourish.Abstract;
-using AckSS.Gallery.Views;
+using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Gallery.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AckSS.Gallery;
+namespace ArkheideSystem.Gallery;
 
 internal static class Program
 {
@@ -26,7 +26,7 @@ internal static class Program
             .ConfigureData(
                 data =>
                 {
-                    data.SetAppCompany("Acksheed System Team").SetAppName("Flourish Gallery");
+                    data.SetAppCompany("Arkheide System Team").SetAppName("Flourish Gallery");
                 }
             )
             .ConfigureServices(
@@ -35,13 +35,41 @@ internal static class Program
                     services.AddSingleton<App>();
                     services.AddSingleton<ICommandParser, GalleryCommandParser>();
 
-                    services.AddNavigable<HomePage>("首页", "\uE80F");
-                    services.AddNavigable<GalleryPage>("图库", "\uE91B");
-                    services.AddNavigable<EditorPage>("编辑", "\uE70F");
-                    services.AddNavigable<SettingsPage>("设置", "\uE713");
-                    services.AddNavigable<TreeParentPage>("页面父节点", "\uE8A5");
-                    services.AddNavigable<Page1>("Page1", "\uE8A5");
-                    services.AddNavigable<Page2>("Page2", "\uE8A5");
+                    services.AddNavigable<HomePage>(
+                        "Home",
+                        "\uE80F",
+                        navigationKey: GalleryNavigationRoutes.Home
+                    );
+                    services.AddNavigable<GalleryPage>(
+                        "Gallery",
+                        "\uE91B",
+                        navigationKey: GalleryNavigationRoutes.Gallery
+                    );
+                    services.AddNavigable<EditorPage>(
+                        "Editor",
+                        "\uE70F",
+                        navigationKey: GalleryNavigationRoutes.Editor
+                    );
+                    services.AddNavigable<SettingsPage>(
+                        "Settings",
+                        "\uE713",
+                        navigationKey: GalleryNavigationRoutes.Settings
+                    );
+                    services.AddNavigable<TreeParentPage>(
+                        "Tree",
+                        "\uE8A5",
+                        navigationKey: GalleryNavigationRoutes.TreeParent
+                    );
+                    services.AddNavigable<Page1>(
+                        "Page1",
+                        "\uE8A5",
+                        navigationKey: GalleryNavigationRoutes.Page1
+                    );
+                    services.AddNavigable<Page2>(
+                        "Page2",
+                        "\uE8A5",
+                        navigationKey: GalleryNavigationRoutes.Page2
+                    );
                 }
             )
             .ConfigureShell(
@@ -116,9 +144,12 @@ internal static class Program
                             groupId: 0,
                             group =>
                             {
-                                group.AddNavigableViewItem<HomePage>(isInitial: true);
-                                group.AddNavigableViewItem<GalleryPage>();
-                                group.AddNavigableViewItem<EditorPage>();
+                                group.AddNavigableViewItem(
+                                    GalleryNavigationRoutes.Home,
+                                    isInitial: true
+                                );
+                                group.AddNavigableViewItem(GalleryNavigationRoutes.Gallery);
+                                group.AddNavigableViewItem(GalleryNavigationRoutes.Editor);
                             }
                         )
                         .SetGroup(
@@ -139,11 +170,14 @@ internal static class Program
                             }
                         )
                         .SetGroup(
-                            "树",
+                            "Tree",
                             groupId: 2,
                             group =>
                             {
-                                group.AddNavigableViewItem<TreeParentPage>(parentId: 1);
+                                group.AddNavigableViewItem(
+                                    GalleryNavigationRoutes.TreeParent,
+                                    parentId: 1
+                                );
                                 group.AddNavigableItem(
                                     "Button1",
                                     "tree.button1",
@@ -163,11 +197,17 @@ internal static class Program
                                     parentId: 2,
                                     iconGlyph: "\uE8A5"
                                 );
-                                group.AddNavigableViewItem<Page1>(childId: 2);
-                                group.AddNavigableViewItem<Page2>(childId: 2);
+                                group.AddNavigableViewItem(
+                                    GalleryNavigationRoutes.Page1,
+                                    childId: 2
+                                );
+                                group.AddNavigableViewItem(
+                                    GalleryNavigationRoutes.Page2,
+                                    childId: 2
+                                );
                             }
                         )
-                        .AddFixedNavigableViewItem<SettingsPage>()
+                        .AddFixedNavigableViewItem(GalleryNavigationRoutes.Settings)
                         .AddFixedNavigableItem("关于", "app.about", iconGlyph: "\uE946");
                 }
             )

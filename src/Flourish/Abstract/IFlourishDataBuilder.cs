@@ -1,4 +1,4 @@
-namespace AckSS.Flourish.Abstract;
+namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
 /// Configures application-level data and preference storage used by Flourish.
@@ -7,7 +7,7 @@ namespace AckSS.Flourish.Abstract;
 /// <code><![CDATA[
 /// builder.ConfigureData(data =>
 /// {
-///     data.SetAppCompany("Acksheed System Team")
+///     data.SetAppCompany("Arkheide System Team")
 ///         .SetAppName("Gallery");
 /// });
 /// ]]></code>

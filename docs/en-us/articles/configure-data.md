@@ -11,7 +11,7 @@ description: Configure Flourish application data and preference storage.
 builder.ConfigureData(data =>
 {
     data
-        .SetAppCompany("Acksheed System Team")
+        .SetAppCompany("Arkheide System Team")
         .SetAppName("Flourish Gallery");
 });
 ```

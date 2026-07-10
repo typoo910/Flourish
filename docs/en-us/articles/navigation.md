@@ -203,14 +203,19 @@ Common validation failures include duplicate group IDs, non-zero groups without 
 
 ## Navigate from code
 
-For runtime navigation, request `INavigationService` from dependency injection and navigate by page type. Navigation services are available after the application configures services through [`ConfigureServices`](configure-services.md):
+For runtime navigation, request `INavigationService` from dependency injection and navigate by a stable navigation key. Register that key with `AddNavigable`, then keep it in a shared contracts class so view models do not reference WPF `Page` types.
 
 ```csharp
+public static class NavigationRoutes
+{
+    public const string Settings = "settings";
+}
+
 public sealed class HomeViewModel(INavigationService navigation)
 {
     public void OpenSettings()
     {
-        navigation.Navigate<SettingsPage>();
+        navigation.Navigate(NavigationRoutes.Settings);
     }
 }
 ```

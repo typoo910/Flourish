@@ -203,14 +203,19 @@ nav.SetGroup("Two", groupId: 2, group =>
 
 ## 从代码导航
 
-运行时导航可以从依赖注入中获取 `INavigationService`，再按页面类型跳转。导航服务会在应用通过 [`ConfigureServices`](configure-services.md) 完成服务配置后可用：
+运行时导航可以从依赖注入中获取 `INavigationService`，再按稳定的 navigation key 跳转。这个 key 通过 `AddNavigable` 注册，通常放在共享 contracts 类中，因此 ViewModel 不需要引用 WPF `Page` 类型。
 
 ```csharp
+public static class NavigationRoutes
+{
+    public const string Settings = "settings";
+}
+
 public sealed class HomeViewModel(INavigationService navigation)
 {
     public void OpenSettings()
     {
-        navigation.Navigate<SettingsPage>();
+        navigation.Navigate(NavigationRoutes.Settings);
     }
 }
 ```

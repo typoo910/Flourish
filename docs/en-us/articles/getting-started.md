@@ -37,7 +37,7 @@ Most WPF applications can build and own the Flourish runtime from `App.xaml.cs`.
 
 ```csharp
 using System.Windows;
-using AckSS.Flourish.Abstract;
+using ArkheideSystem.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MyApp;
