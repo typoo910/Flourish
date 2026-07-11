@@ -3,9 +3,13 @@ using ArkheideSystem.Flourish.Abstract;
 
 namespace ArkheideSystem.Gallery;
 
-internal sealed class GalleryCommandParser(IMessageService messages) : ICommandParser
+internal sealed class GalleryCommandParser(
+    IMessageService messages,
+    IBackgroundTaskService backgroundTasks
+) : ICommandParser
 {
     private readonly IMessageService messages = messages;
+    private readonly IBackgroundTaskService backgroundTasks = backgroundTasks;
 
     public bool TryParse(string commandKey)
     {
@@ -16,6 +20,23 @@ internal sealed class GalleryCommandParser(IMessageService messages) : ICommandP
                 return true;
             case "demo.world":
                 ShowCommandOutput("World");
+                return true;
+            case "demo.background":
+                backgroundTasks.AddTask(
+                    new FlourishBackgroundTaskMetadata(
+                        "Gallery background task",
+                        "A cancellable ten-second task that reports progress.",
+                        "\uE895"
+                    ),
+                    async context =>
+                    {
+                        for (var step = 1; step <= 40; step++)
+                        {
+                            await Task.Delay(250, context.CancellationToken);
+                            context.ReportProgress(step / 40d);
+                        }
+                    }
+                );
                 return true;
             case "tree.button1":
                 ShowCommandOutput("Button1");

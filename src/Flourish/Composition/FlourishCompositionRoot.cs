@@ -121,7 +121,7 @@ internal sealed class FlourishCompositionRoot(
             configureWindow(windowBuilder);
         }
 
-        var statusBarBuilder = new FlourishStatusBarBuilder(shellOptions, localizationService);
+        var statusBarBuilder = new FlourishStatusBarBuilder(shellOptions);
         foreach (var configureStatusBar in statusBarConfigurations)
         {
             configureStatusBar(statusBarBuilder);
@@ -501,6 +501,13 @@ internal sealed class FlourishCompositionRoot(
         services.AddSingleton<FlourishShellWindow>();
         services.AddSingleton<FlourishToolbarService>();
         services.AddSingleton<FlourishStatusService>();
+        services.AddSingleton<FlourishBackgroundTaskService>();
+        services.AddSingleton<IBackgroundTaskService>(provider =>
+            provider.GetRequiredService<FlourishBackgroundTaskService>()
+        );
+        services.AddSingleton<IHostedService>(provider =>
+            provider.GetRequiredService<FlourishBackgroundTaskService>()
+        );
         services.AddSingleton<IMessageService, MessageService>();
         services.AddSingleton<TrayIconService>();
         services.AddSingleton<FontService>();

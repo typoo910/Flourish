@@ -165,7 +165,10 @@ public interface IFlourishBuilder
     /// <code><![CDATA[
     /// builder.ConfigureStatusBar(statusBar =>
     /// {
-    ///     statusBar.SetStatusText("Ready").ShowPowerStatus();
+    ///     statusBar
+    ///         .AddStatusItem("Ready", "\uE73E")
+    ///         .ShowLANConnectionStatus()
+    ///         .ShowPowerStatus();
     /// });
     /// ]]></code>
     /// </example>

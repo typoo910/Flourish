@@ -46,13 +46,14 @@ return flourish.Run<App>();
 | [导航](navigation.md) | `ConfigureNavigation` | 配置导航栏展示、页面位置、命令项、分组和固定项。 |
 | [自定义 Shell 内容](configure-custom-handler.md) | `ConfigureCustomHandler` | 将自定义 WPF 元素或命令插入预定义 Shell 区域。 |
 | [动态工具栏](dynamic-toolbar.md) | `ConfigureDynamicToolbar` | 注册按页面变化的工具栏项。 |
+| [后台任务](background-tasks.md) | `IBackgroundTaskService` | 通过 Host 管理的工作池运行可取消异步任务。 |
 | [提示浮层](configure-tips.md) | `ConfigureShell` | 使用 `UseTips` 配置并启用提示浮层。 |
 | [动效](configure-motion.md) | `ConfigureMotion` | 配置页面过渡、导航栏过渡和悬停揭示动画。 |
 | [窗口](configure-window.md) | `ConfigureWindow` | 配置 Shell 窗口尺寸、位置、状态、任务栏、置顶和托盘行为。 |
 | [排版](configure-font.md) | `ConfigureShell` | 使用 `UseGlobalFont` 配置 Shell 排版。 |
 | [材质特效](configure-material-effect.md) | `ConfigureShell` | 使用 `UseMaterialEffect` 应用窗口材质。 |
 | [主题](configure-themes.md) | `ConfigureTitleBar` | 使用 `SetThemeToggle` 启用主题功能并显示切换入口。 |
-| [状态栏](status-bar.md) | `ConfigureStatusBar` | 配置状态文本和状态项。 |
+| [状态栏](status-bar.md) | `ConfigureStatusBar` | 配置自定义状态项和合并的系统状态入口。 |
 
 Builder 入口可以调用多次。同一入口的重复回调会在 `Build()` 时按注册顺序应用；重复设置同一选项时使用最后一次配置的值。提示、字体和材质等 Shell 选项分别由 `UseTips`、`UseGlobalFont` 和 `UseMaterialEffect` 配置；主题由标题栏的 `SetThemeToggle` 配置。
 
@@ -71,6 +72,8 @@ builder.ConfigureServices((_, services) =>
 ```
 
 Flourish 会在构建期间注册内置服务。应用可以从 `IFlourish.Services` 解析公开服务，无需直接创建 Shell 基础设施。
+
+其中包括由 Host 管理的 `IBackgroundTaskService`。应用通过 DI 解析它并提交异步工作，不需要额外的 builder 入口；完整用法参见[后台任务](background-tasks.md)。
 
 ## 注册导航页面
 

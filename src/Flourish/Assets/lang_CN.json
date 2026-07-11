@@ -34,6 +34,19 @@
   "Profile.EnterName": "请输入名字或姓氏。",
   "Profile.EnterPassword": "请输入密码。",
   "Profile.RememberLoginRequiresSignIn": "仅可在个人资料已登录时更改记住登录状态。",
+  "BackgroundTask.Title": "后台任务",
+  "BackgroundTask.Running": "运行中",
+  "BackgroundTask.Queued": "等待中",
+  "BackgroundTask.Cancelling": "正在取消",
+  "BackgroundTask.Cancel": "取消",
+  "BackgroundTask.WaitingCount": "{0} 个任务等待中",
+  "BackgroundTask.NoActiveTasks": "没有活动的后台任务",
+  "SystemStatus.Title": "系统状态",
+  "SystemStatus.Network": "网络",
+  "SystemStatus.Power": "电源",
+  "SystemStatus.AC": "外接电源",
+  "SystemStatus.Battery": "电池供电",
+  "SystemStatus.Unknown": "未知",
   "MessageBox.OK": "确定",
   "MessageBox.Cancel": "取消",
   "MessageBox.Yes": "是",
@@ -43,6 +56,5 @@
   "Tray.Show": "显示",
   "Tray.Exit": "退出",
   "Status.Connected": "已连接",
-  "Status.Disconnected": "未连接",
-  "Status.Power": "电源"
+  "Status.Disconnected": "未连接"
 }

@@ -65,12 +65,12 @@ public enum FlourishRegion
     ToolbarEnd,
 
     /// <summary>
-    /// The start of the footer, before the primary status text.
+    /// The start of the footer, after active background-task indicators.
     /// </summary>
     FooterStart,
 
     /// <summary>
-    /// The end of the footer, after built-in status items.
+    /// The end of the footer, after custom and built-in status indicators.
     /// </summary>
     FooterEnd,
 }

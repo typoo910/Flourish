@@ -18,7 +18,7 @@ Application setup normally lives in `App.xaml.cs` or another entry point configu
 - Shell window configuration for title bar, navigation panel, material effect, font, and window sizing
 - Page registration and navigation through dependency injection
 - Contextual dynamic toolbar items connected to command parsing
-- Status bar text, custom status items, and built-in LAN/power items
+- Host-managed background tasks, status indicators, custom status items, and consolidated LAN/power details
 - Motion settings for page transitions, navigation panel animation, and hover reveal
 - Theme resources that can be merged from `App.xaml`
 
@@ -28,6 +28,7 @@ Application setup normally lives in `App.xaml.cs` or another entry point configu
 - [Shell configuration](articles/shell-configuration.md)
 - [Navigation](articles/navigation.md)
 - [Dynamic toolbar](articles/dynamic-toolbar.md)
+- [Background tasks](articles/background-tasks.md)
 - [API reference](xref:ArkheideSystem.Flourish.Abstract)
 
 ## Project links

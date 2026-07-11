@@ -21,7 +21,10 @@ Flourish uses its built-in boundary margin to keep tooltips away from shell edge
 
 Omit `UseTips` when Flourish tooltips should remain disabled.
 
+Background-task metadata tooltips are not controlled by `UseTips`. They are part of the [background-task](background-tasks.md) status surface and use their own initial delay. Hovering the waiting-queue icon opens an interactive flyout rather than a tooltip.
+
 ## Related features
 
 - [Shell configuration](shell-configuration.md) configures and enables tooltips.
-- [Title bar](configure-title-bar.md), [Navigation](navigation.md), and [Status bar](status-bar.md) contain built-in controls that can show tooltips.
+- [Title bar](configure-title-bar.md), [Navigation](navigation.md), and [Status bar](status-bar.md) contain built-in controls governed by this tooltip setting.
+- [Background tasks](background-tasks.md) provides task-owned metadata tooltips and an interactive queue flyout.

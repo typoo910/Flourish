@@ -65,7 +65,7 @@ public sealed class DefaultFlourishBuilderTests
             )
             .ConfigureMotion(motion => motion.RespectSystemReducedMotion(enabled: false))
             .ConfigureWindow(window => window.UseTopmost())
-            .ConfigureStatusBar(statusBar => statusBar.SetStatusText("Ready"));
+            .ConfigureStatusBar(statusBar => statusBar.AddStatusItem("Ready", "R"));
 
         using var flourish = builder.Build();
         var options = flourish.GetRequiredService<FlourishShellOptions>();
@@ -93,7 +93,9 @@ public sealed class DefaultFlourishBuilderTests
         Assert.Equal(MaterialEffect.None, options.MaterialEffect);
         Assert.False(options.IsMaterialEffectEnabled);
         Assert.Equal(FlourishTheme.Dark, options.DefaultTheme);
-        Assert.Equal("Ready", options.StatusText);
+        var statusItem = Assert.Single(options.StatusItems);
+        Assert.Equal("Ready", statusItem.Text);
+        Assert.Equal("R", statusItem.IconGlyph);
     }
 
     [Fact]

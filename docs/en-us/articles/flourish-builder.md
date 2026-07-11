@@ -46,13 +46,14 @@ The public builder separates hosting, application services, feature switches, an
 | [Navigation](navigation.md) | `ConfigureNavigation` | Configures the navigation panel and visible model. |
 | [Custom shell content](configure-custom-handler.md) | `ConfigureCustomHandler` | Inserts custom WPF elements into shell regions. |
 | [Dynamic toolbar](dynamic-toolbar.md) | `ConfigureDynamicToolbar` | Registers page-specific toolbar items. |
+| [Background tasks](background-tasks.md) | `IBackgroundTaskService` | Runs cancellable asynchronous work through the Host-managed worker pool. |
 | [Tooltips](configure-tips.md) | `ConfigureShell` | Configures and enables tooltips with `UseTips`. |
 | [Motion](configure-motion.md) | `ConfigureMotion` | Configures transitions and hover animation. |
 | [Window](configure-window.md) | `ConfigureWindow` | Configures shell window properties. |
 | [Typography](configure-font.md) | `ConfigureShell` | Configures shell typography with `UseGlobalFont`. |
 | [Material effects](configure-material-effect.md) | `ConfigureShell` | Applies the window material with `UseMaterialEffect`. |
 | [Themes](configure-themes.md) | `ConfigureTitleBar` | Enables theme handling with `SetThemeToggle`. |
-| [Status bar](status-bar.md) | `ConfigureStatusBar` | Configures status bar content. |
+| [Status bar](status-bar.md) | `ConfigureStatusBar` | Configures custom status items and the consolidated system-status entry. |
 
 Builder entry points can be called multiple times. Repeated callbacks for the same entry point are applied in registration order during `Build()`; repeated setting methods use the last configured value.
 
@@ -71,6 +72,8 @@ builder.ConfigureServices((_, services) =>
 ```
 
 Flourish registers its built-in services during build. Applications can resolve the public services from `IFlourish.Services` without constructing shell infrastructure directly.
+
+This includes the Host-managed `IBackgroundTaskService`. Resolve it through DI to submit asynchronous work; it is a runtime service and does not require another builder entry point. See [Background tasks](background-tasks.md).
 
 ## Register navigation pages
 

@@ -21,6 +21,8 @@ items:
   href: navigation.md
 - name: Dynamic toolbar
   href: dynamic-toolbar.md
+- name: Background tasks
+  href: background-tasks.md
 - name: Custom shell content
   href: configure-custom-handler.md
 - name: Tooltips

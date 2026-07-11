@@ -4,7 +4,9 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FlourishStatusService(FlourishShellOptions options)
 {
-    public string StatusText => options.StatusText;
-
     public IReadOnlyList<FlourishStatusItem> StatusItems => options.StatusItems;
+
+    public bool IsLANConnectionStatusEnabled => options.IsLANConnectionStatusEnabled;
+
+    public bool IsPowerStatusEnabled => options.IsPowerStatusEnabled;
 }

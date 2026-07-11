@@ -6,31 +6,31 @@ namespace ArkheideSystem.Flourish.Test.Composition;
 public sealed class FlourishStatusBarBuilderTests
 {
     [Fact]
-    public void SetStatusTextAndAddStatusItem_UpdateOptionsAndReturnBuilder()
+    public void AddStatusItem_UpdatesOptionsAndReturnsBuilder()
     {
         var options = new FlourishShellOptions();
         var sut = new FlourishStatusBarBuilder(options);
 
-        Assert.Same(sut, sut.SetStatusText("Ready"));
         Assert.Same(sut, sut.AddStatusItem("Online", "N"));
 
-        Assert.Equal("Ready", options.StatusText);
         var item = Assert.Single(options.StatusItems);
         Assert.Equal("Online", item.Text);
         Assert.Equal("N", item.IconGlyph);
     }
 
     [Fact]
-    public void ShowPowerStatus_AddsBuiltInItemAndReturnsBuilder()
+    public void ShowSystemStatuses_EnableFlagsAndReturnBuilder()
     {
         var options = new FlourishShellOptions();
         var sut = new FlourishStatusBarBuilder(options);
 
-        var result = sut.ShowPowerStatus();
+        var lanResult = sut.ShowLANConnectionStatus();
+        var powerResult = sut.ShowPowerStatus();
 
-        Assert.Same(sut, result);
-        var item = Assert.Single(options.StatusItems);
-        Assert.False(string.IsNullOrWhiteSpace(item.Text));
-        Assert.Equal("\uE850", item.IconGlyph);
+        Assert.Same(sut, lanResult);
+        Assert.Same(sut, powerResult);
+        Assert.True(options.IsLANConnectionStatusEnabled);
+        Assert.True(options.IsPowerStatusEnabled);
+        Assert.Empty(options.StatusItems);
     }
 }

@@ -22,6 +22,8 @@ builder.ConfigureServices((context, services) =>
 
 The callback receives `HostBuilderContext`, so registrations can use the active environment and the same Host configuration that supplies Flourish settings. `CreateDefaultBuilder` loads the standard appsettings providers, while an application `<UserSecretsId>` identifies the User Secrets document used for protected remembered Profile credentials. View models, repositories, and other application services use the same `IServiceCollection` patterns as any Generic Host application.
 
+Flourish also registers the Host-managed `IBackgroundTaskService`. Application services and view models can receive it directly through constructor injection; do not register a second worker-pool instance. See [Background tasks](background-tasks.md).
+
 ## Register navigable pages
 
 `AddNavigable<TPage>` registers a `System.Windows.Controls.Page` and its navigation metadata. Flourish generates the case-sensitive navigation key from the class name by removing one trailing `Page` suffix: `SettingsPage` becomes `Settings`, while `Page1` remains `Page1`. Registration makes the page resolvable; [Navigation](navigation.md) determines where it appears and which page is shown first.
@@ -37,4 +39,5 @@ Register `IProfileAuthService` to supply application authentication while keepin
 - [Navigation](navigation.md) places registered pages in the visible navigation model.
 - [Dynamic toolbar](dynamic-toolbar.md) attaches commands to registered page types.
 - [Profile](configure-profile.md) explains authentication and profile service replacement.
+- [Background tasks](background-tasks.md) explains asynchronous work, cancellation, progress, and results.
 - [Command parser](command-parser.md) explains command-key routing.

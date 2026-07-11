@@ -52,5 +52,5 @@ Footer command helpers require an explicit `FlourishRegion.FooterStart` or `Flou
 
 - [Title bar](configure-title-bar.md) controls built-in title bar content.
 - [Dynamic toolbar](dynamic-toolbar.md) provides page-specific commands.
-- [Status bar](status-bar.md) configures built-in status items.
+- [Status bar](status-bar.md) describes background-task indicators, custom items, and system status.
 - [Command parser](command-parser.md) handles command keys.

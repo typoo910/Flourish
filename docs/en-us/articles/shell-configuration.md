@@ -42,6 +42,8 @@ builder
 
 Boolean feature switches take priority over their detailed configuration. For example, toolbar items registered for a page are not displayed when `UseDynamicToolbar(false)` is active, and status items remain hidden when `UseStatusBar(false)` is active.
 
+Background-task activity is the exception to persistent status-bar visibility: active work temporarily reveals its task indicators even when `UseStatusBar()` is omitted. The bar hides again after the active list becomes empty. See [Background tasks](background-tasks.md).
+
 Simple shell features use configuration as their activation point:
 
 - `UseTips(delay)` uses the built-in tooltip boundary margin.
@@ -74,3 +76,4 @@ These settings and extension points use their own configuration entry points:
 - [Application data](configure-data.md) explains localization and Host configuration.
 - [Dependency injection](configure-services.md) registers application and replaceable Flourish services.
 - [Custom shell content](configure-custom-handler.md) inserts application elements into enabled shell regions.
+- [Background tasks](background-tasks.md) describes the Host-managed worker pool and its automatic status indicators.

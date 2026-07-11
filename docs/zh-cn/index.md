@@ -18,7 +18,7 @@ Flourish 是面向 WPF 的开源桌面应用组合库。它提供基于 Host 的
 - 标题栏、导航栏、材质特效、字体和窗口尺寸等 Shell 配置
 - 通过依赖注入注册页面并执行导航
 - 连接到命令解析器的上下文动态工具栏项
-- 状态栏文本、自定义状态项，以及内置局域网和电源项
+- Host 管理的后台任务、运行状态图标、自定义状态项，以及合并的局域网和电源详情
 - 页面过渡、导航栏动画和悬停揭示动效配置
 - 可从 `App.xaml` 合并的主题资源
 
@@ -28,6 +28,7 @@ Flourish 是面向 WPF 的开源桌面应用组合库。它提供基于 Host 的
 - [Shell 配置](articles/shell-configuration.md)
 - [导航](articles/navigation.md)
 - [动态工具栏](articles/dynamic-toolbar.md)
+- [后台任务](articles/background-tasks.md)
 - [API 参考](xref:ArkheideSystem.Flourish.Abstract)
 
 ## 项目链接

@@ -38,6 +38,19 @@ internal static class FlourishLocaleKeys
     public const string ProfileEnterPassword = "Profile.EnterPassword";
     public const string ProfileRememberLoginRequiresSignIn =
         "Profile.RememberLoginRequiresSignIn";
+    public const string BackgroundTaskTitle = "BackgroundTask.Title";
+    public const string BackgroundTaskRunning = "BackgroundTask.Running";
+    public const string BackgroundTaskQueued = "BackgroundTask.Queued";
+    public const string BackgroundTaskCancelling = "BackgroundTask.Cancelling";
+    public const string BackgroundTaskCancel = "BackgroundTask.Cancel";
+    public const string BackgroundTaskWaitingCount = "BackgroundTask.WaitingCount";
+    public const string BackgroundTaskNoActiveTasks = "BackgroundTask.NoActiveTasks";
+    public const string SystemStatusTitle = "SystemStatus.Title";
+    public const string SystemStatusNetwork = "SystemStatus.Network";
+    public const string SystemStatusPower = "SystemStatus.Power";
+    public const string SystemStatusAC = "SystemStatus.AC";
+    public const string SystemStatusBattery = "SystemStatus.Battery";
+    public const string SystemStatusUnknown = "SystemStatus.Unknown";
     public const string MessageBoxOk = "MessageBox.OK";
     public const string MessageBoxCancel = "MessageBox.Cancel";
     public const string MessageBoxYes = "MessageBox.Yes";
@@ -48,7 +61,6 @@ internal static class FlourishLocaleKeys
     public const string TrayExit = "Tray.Exit";
     public const string StatusConnected = "Status.Connected";
     public const string StatusDisconnected = "Status.Disconnected";
-    public const string StatusPower = "Status.Power";
 
     public static IReadOnlyList<string> All { get; } =
     [
@@ -87,6 +99,19 @@ internal static class FlourishLocaleKeys
         ProfileEnterName,
         ProfileEnterPassword,
         ProfileRememberLoginRequiresSignIn,
+        BackgroundTaskTitle,
+        BackgroundTaskRunning,
+        BackgroundTaskQueued,
+        BackgroundTaskCancelling,
+        BackgroundTaskCancel,
+        BackgroundTaskWaitingCount,
+        BackgroundTaskNoActiveTasks,
+        SystemStatusTitle,
+        SystemStatusNetwork,
+        SystemStatusPower,
+        SystemStatusAC,
+        SystemStatusBattery,
+        SystemStatusUnknown,
         MessageBoxOk,
         MessageBoxCancel,
         MessageBoxYes,
@@ -97,6 +122,5 @@ internal static class FlourishLocaleKeys
         TrayExit,
         StatusConnected,
         StatusDisconnected,
-        StatusPower,
     ];
 }

@@ -92,6 +92,19 @@ public interface IFlourishDataBuilder
     /// <item><term><c>Profile.EnterName</c></term><description>Enter a first or last name. / 请输入名字或姓氏。</description></item>
     /// <item><term><c>Profile.EnterPassword</c></term><description>Enter a password. / 请输入密码。</description></item>
     /// <item><term><c>Profile.RememberLoginRequiresSignIn</c></term><description>Remember login can only be changed while a profile is signed in. / 仅可在个人资料已登录时更改记住登录状态。</description></item>
+    /// <item><term><c>BackgroundTask.Title</c></term><description>Background tasks / 后台任务</description></item>
+    /// <item><term><c>BackgroundTask.Running</c></term><description>Running / 运行中</description></item>
+    /// <item><term><c>BackgroundTask.Queued</c></term><description>Waiting / 等待中</description></item>
+    /// <item><term><c>BackgroundTask.Cancelling</c></term><description>Cancelling / 正在取消</description></item>
+    /// <item><term><c>BackgroundTask.Cancel</c></term><description>Cancel / 取消</description></item>
+    /// <item><term><c>BackgroundTask.WaitingCount</c></term><description>{0} task(s) waiting / {0} 个任务等待中</description></item>
+    /// <item><term><c>BackgroundTask.NoActiveTasks</c></term><description>No active background tasks / 没有活动的后台任务</description></item>
+    /// <item><term><c>SystemStatus.Title</c></term><description>System status / 系统状态</description></item>
+    /// <item><term><c>SystemStatus.Network</c></term><description>Network / 网络</description></item>
+    /// <item><term><c>SystemStatus.Power</c></term><description>Power / 电源</description></item>
+    /// <item><term><c>SystemStatus.AC</c></term><description>AC power / 外接电源</description></item>
+    /// <item><term><c>SystemStatus.Battery</c></term><description>Battery / 电池供电</description></item>
+    /// <item><term><c>SystemStatus.Unknown</c></term><description>Unknown / 未知</description></item>
     /// <item><term><c>MessageBox.OK</c></term><description>OK / 确定</description></item>
     /// <item><term><c>MessageBox.Cancel</c></term><description>Cancel / 取消</description></item>
     /// <item><term><c>MessageBox.Yes</c></term><description>Yes / 是</description></item>
@@ -102,7 +115,6 @@ public interface IFlourishDataBuilder
     /// <item><term><c>Tray.Exit</c></term><description>Exit / 退出</description></item>
     /// <item><term><c>Status.Connected</c></term><description>Connected / 已连接</description></item>
     /// <item><term><c>Status.Disconnected</c></term><description>Disconnected / 未连接</description></item>
-    /// <item><term><c>Status.Power</c></term><description>Power / 电源</description></item>
     /// </list>
     /// </remarks>
     IFlourishDataBuilder AddLocale(string path);

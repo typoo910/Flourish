@@ -33,7 +33,7 @@ builder.ConfigureShell(shell =>
 | `UseMotion` | [动效](configure-motion.md) | 启用动效；`ConfigureMotion` 配置页面、导航栏和悬停动画。 |
 | `UseMaterialEffect` | [材质特效](configure-material-effect.md) | 选择并启用窗口材质。 |
 | `UseGlobalFont` | [排版](configure-font.md) | 设置 Shell 字体系列和基础字号。 |
-| `UseStatusBar` | [状态栏](status-bar.md) | 启用状态栏；`ConfigureStatusBar` 配置状态文本和状态项。 |
+| `UseStatusBar` | [状态栏](status-bar.md) | 启用状态栏；`ConfigureStatusBar` 配置自定义状态项和系统状态入口。 |
 
 [窗口](configure-window.md)不需要 Shell 功能开关，可直接通过 `ConfigureWindow` 设置。
 
@@ -62,6 +62,8 @@ builder
 - 自定义内容不会自动启用所属区域。向标题栏、动态工具栏或状态栏添加内容前，需要先启用相应区域；自定义 Profile 内容还需要调用 `SetProfile()`。
 - `SetThemeToggle()` 的主题偏好使用[应用数据](configure-data.md)中说明的 Host 配置。
 
+后台任务活动是常驻状态栏开关的例外：即使没有调用 `UseStatusBar()`，存在活动任务时也会临时显示任务指示器；活动列表清空后，状态栏会恢复为配置决定的可见性。参见[后台任务](background-tasks.md)。
+
 ## 禁用与省略
 
 `UseTitleBar`、`UseNavigation`、`UseDynamicToolbar`、`UseMotion` 和 `UseStatusBar` 接收可选的 `enabled` 参数。传入 `false` 会禁用对应区域，即使已经提供详细配置。
@@ -78,3 +80,5 @@ builder.ConfigureShell(shell =>
 ```
 
 `UseMaterialEffect(MaterialEffect.None)` 会禁用系统材质。提示浮层和全局字体没有独立禁用开关：不调用对应方法时，Shell 使用默认行为。
+
+后台任务由 Host 管理的运行时服务提供，不需要新的 Shell 开关；完整模型参见[后台任务](background-tasks.md)。

@@ -334,6 +334,19 @@ remarks: |
   | `Profile.EnterName` | Enter a first or last name. | 请输入名字或姓氏。 |
   | `Profile.EnterPassword` | Enter a password. | 请输入密码。 |
   | `Profile.RememberLoginRequiresSignIn` | Remember login can only be changed while a profile is signed in. | 仅可在个人资料已登录时更改记住登录状态。 |
+  | `BackgroundTask.Title` | Background tasks | 后台任务 |
+  | `BackgroundTask.Running` | Running | 运行中 |
+  | `BackgroundTask.Queued` | Waiting | 等待中 |
+  | `BackgroundTask.Cancelling` | Cancelling | 正在取消 |
+  | `BackgroundTask.Cancel` | Cancel | 取消 |
+  | `BackgroundTask.WaitingCount` | {0} task(s) waiting | {0} 个任务等待中 |
+  | `BackgroundTask.NoActiveTasks` | No active background tasks | 没有活动的后台任务 |
+  | `SystemStatus.Title` | System status | 系统状态 |
+  | `SystemStatus.Network` | Network | 网络 |
+  | `SystemStatus.Power` | Power | 电源 |
+  | `SystemStatus.AC` | AC power | 外接电源 |
+  | `SystemStatus.Battery` | Battery | 电池供电 |
+  | `SystemStatus.Unknown` | Unknown | 未知 |
   | `MessageBox.OK` | OK | 确定 |
   | `MessageBox.Cancel` | Cancel | 取消 |
   | `MessageBox.Yes` | Yes | 是 |
@@ -344,7 +357,6 @@ remarks: |
   | `Tray.Exit` | Exit | 退出 |
   | `Status.Connected` | Connected | 已连接 |
   | `Status.Disconnected` | Disconnected | 未连接 |
-  | `Status.Power` | Power | 电源 |
 syntax:
   parameters:
   - id: path
@@ -902,17 +914,6 @@ summary: 配置 Flourish Shell 状态栏。
 ---
 
 ---
-uid: ArkheideSystem.Flourish.Abstract.IFlourishStatusBarBuilder.SetStatusText(System.String)
-summary: 设置主要状态文本。
-syntax:
-  parameters:
-  - id: text
-    description: 显示在 Shell 状态栏中的文本。
-  return:
-    description: 用于链式配置的当前 builder。
----
-
----
 uid: ArkheideSystem.Flourish.Abstract.IFlourishStatusBarBuilder.AddStatusItem(System.String,System.String)
 summary: 添加包含显示文本和图标字形的状态栏项目。
 syntax:
@@ -927,7 +928,7 @@ syntax:
 
 ---
 uid: ArkheideSystem.Flourish.Abstract.IFlourishStatusBarBuilder.ShowLANConnectionStatus
-summary: 在配置时检测并显示内置 LAN 连接状态项；该状态不会自动刷新。
+summary: 在合并的系统状态浮层中启用网络详情；浮层打开时读取当前网络可用性。
 syntax:
   return:
     description: 用于链式配置的当前 builder。
@@ -935,7 +936,7 @@ syntax:
 
 ---
 uid: ArkheideSystem.Flourish.Abstract.IFlourishStatusBarBuilder.ShowPowerStatus
-summary: 显示内置静态电源状态项；该状态不表示实时电源或电池信息。
+summary: 在合并的系统状态浮层中启用电源来源和可用电池百分比。
 syntax:
   return:
     description: 用于链式配置的当前 builder。
@@ -1494,4 +1495,308 @@ summary: 设置是否在下次启动时恢复当前登录。
 ---
 uid: ArkheideSystem.Flourish.Abstract.IProfileService.SignOutAsync(System.Threading.CancellationToken)
 summary: 异步登出并删除持久化的 Profile 凭据。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService
+summary: 通过有并发上限的工作池排队并执行异步后台任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.MaxConcurrency
+summary: 获取可同时运行的最大任务数量；内置服务默认为 3。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.ActiveTasks
+summary: 获取所有等待中、运行中和正在取消任务的不可变快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.TasksChanged
+summary: 当活动任务集合、任务状态或任务进度发生变化时触发。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.AddTask(ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata,System.Func{ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskContext,System.Threading.Tasks.ValueTask})
+summary: 提交一个没有返回值的异步后台任务。
+syntax:
+  parameters:
+  - id: metadata
+    description: Shell 显示任务时使用的元信息。
+  - id: task
+    description: 接收取消与进度上下文的异步任务委托。
+  return:
+    description: 用于取消任务并等待捕获结果的 handle。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.AddTask``1(ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata,System.Func{ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskContext,System.Threading.Tasks.ValueTask{``0}})
+summary: 提交一个产生返回值的异步后台任务。
+syntax:
+  parameters:
+  - id: metadata
+    description: Shell 显示任务时使用的元信息。
+  - id: task
+    description: 接收取消与进度上下文并产生值的异步任务委托。
+  return:
+    description: 用于取消任务并等待捕获结果与返回值的泛型 handle。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.IBackgroundTaskService.CancelTask(System.Guid)
+summary: 使用任务标识符请求协作式取消。
+syntax:
+  parameters:
+  - id: taskId
+    description: 要取消的活动任务标识符。
+  return:
+    description: 本次调用改变任务状态时为 `true`；否则为 `false`。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskContext
+summary: 向后台任务提供协作式取消和进度报告能力。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskContext.CancellationToken
+summary: 获取任务取消或应用 Host 停止时收到取消请求的 token。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskContext.ReportProgress(System.Double)
+summary: 报告从 0 到 1 的有限进度值。
+syntax:
+  parameters:
+  - id: progress
+    description: 已完成比例，取值范围包含 0 和 1。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata
+summary: 描述提交前的后台任务及其 Shell 展示信息。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata.#ctor(System.String,System.String,System.String)
+summary: 使用名称、可选描述和可选图标字形创建任务元信息。
+syntax:
+  parameters:
+  - id: name
+    description: 向用户显示的非空任务名称。
+  - id: description
+    description: 可选任务描述。
+  - id: iconGlyph
+    description: 可选任务图标字形。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata.Name
+summary: 获取向用户显示的任务名称。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata.Description
+summary: 获取可选任务描述。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskMetadata.IconGlyph
+summary: 获取可选任务图标字形。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle
+summary: 控制并观察没有返回值的已提交后台任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle.Id
+summary: 获取唯一任务标识符。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle.Completion
+summary: 获取始终正常完成并携带捕获结果的任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle.Snapshot
+summary: 获取任务的最新不可变快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle.Cancel
+summary: 请求协作式取消当前任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle`1
+summary: 控制并观察产生返回值的已提交后台任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle`1.Id
+summary: 获取唯一任务标识符。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle`1.Completion
+summary: 获取始终正常完成并携带捕获结果与返回值的任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle`1.Snapshot
+summary: 获取任务的最新不可变快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskHandle`1.Cancel
+summary: 请求协作式取消当前任务。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo
+summary: 提供后台任务在某一时刻的不可变快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.Id
+summary: 获取唯一任务标识符。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.Metadata
+summary: 获取提交任务时提供的元信息。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.State
+summary: 获取当前任务生命周期状态。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.Progress
+summary: 获取从 0 到 1 的最新进度；尚未报告进度时为 `null`。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.QueuedAt
+summary: 获取任务进入队列的 UTC 时间。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.StartedAt
+summary: 获取任务开始执行的 UTC 时间。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.CompletedAt
+summary: 获取任务到达终止状态的 UTC 时间。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskInfo.Exception
+summary: 获取失败任务捕获的异常。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState
+summary: 描述 Flourish 后台任务的生命周期状态。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Queued
+summary: 任务正在等待可用执行槽。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Running
+summary: 任务委托正在运行。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Cancelling
+summary: 已请求取消，运行中的委托正在结束。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Succeeded
+summary: 任务已成功完成。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Canceled
+summary: 任务已取消。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskState.Failed
+summary: 任务因异常失败。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult
+summary: 表示没有返回值的后台任务终止结果。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult.Info
+summary: 获取最终任务快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult.Succeeded
+summary: 获取任务是否成功完成。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult.Canceled
+summary: 获取任务是否已取消。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult.Exception
+summary: 获取失败任务捕获的异常。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1
+summary: 表示后台任务终止结果及其返回值。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1.Info
+summary: 获取最终任务快照。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1.Value
+summary: 获取任务成功时的返回值；取消或失败时为默认值。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1.Succeeded
+summary: 获取任务是否成功完成。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1.Canceled
+summary: 获取任务是否已取消。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTaskResult`1.Exception
+summary: 获取失败任务捕获的异常。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTasksChangedEventArgs
+summary: 提供后台任务变化后的当前活动任务列表。
+---
+
+---
+uid: ArkheideSystem.Flourish.Abstract.FlourishBackgroundTasksChangedEventArgs.Tasks
+summary: 获取按提交顺序排列的等待中、运行中和正在取消任务。
 ---

@@ -1,11 +1,11 @@
 ---
 title: Status bar
-description: Configure the Flourish shell status bar text, custom items, and built-in items.
+description: Configure custom status items, background-task indicators, and consolidated system status.
 ---
 
 # Status bar
 
-The status bar presents low-priority state such as readiness, connection state, power state, or short contextual messages. Enable it through [Shell configuration](shell-configuration.md), then use `ConfigureStatusBar` to define its content.
+The status bar is the compact Shell surface for active background work, application-defined status items, and built-in system details. Enable its persistent surface through [Shell configuration](shell-configuration.md), then use `ConfigureStatusBar` for optional custom and system items.
 
 ```csharp
 builder
@@ -13,68 +13,66 @@ builder
     .ConfigureStatusBar(statusBar =>
     {
         statusBar
-            .SetStatusText("Ready")
             .AddStatusItem("Online", "\uE774")
             .ShowLANConnectionStatus()
             .ShowPowerStatus();
     });
 ```
 
-## Primary status text
+The status bar no longer has a primary text area. Use `AddStatusItem` for compact application state or a [custom footer region](configure-custom-handler.md) when the application needs richer content.
 
-`SetStatusText` sets the main text in the status bar.
+## Background-task indicators
 
-```csharp
-statusBar.SetStatusText("Ready");
-```
+`IBackgroundTaskService` is integrated automatically with the left side of the status bar:
 
-Use it for stable state, not for long logs or notifications. Keep the text short so it remains readable in smaller windows.
+- each running or cancelling task receives its own icon
+- hovering a running icon shows the name, optional description, state, and progress
+- clicking a running icon opens the background-task flyout
+- queued tasks share one queue icon with a count badge
+- hovering or clicking the queue icon opens the waiting list and its cancellation controls
+
+The Shell takes task names, descriptions, and glyphs from `FlourishBackgroundTaskMetadata`. A task that has not supplied an icon uses the built-in task glyph.
+
+Active work temporarily shows the status bar even when `UseStatusBar()` was omitted. When no active tasks remain, the bar returns to its configured visibility. See [Background tasks](background-tasks.md) for submission, bounded concurrency, cancellation, progress, and results.
 
 ## Custom status items
 
-`AddStatusItem` adds a compact item with display text and a glyph.
+`AddStatusItem` adds a compact, non-interactive item with display text and an icon glyph. Items appear in registration order before the system-status icon.
 
 ```csharp
 statusBar.AddStatusItem("Online", "\uE774");
 statusBar.AddStatusItem("Synced", "\uE73E");
 ```
 
-Use custom status items for application-specific state such as account state, workspace name, sync state, or current mode.
+Use custom items for application-specific state such as account state, workspace name, synchronization state, or current mode. The supplied text is application content and is not translated automatically.
 
-Items are displayed in the order in which they are added.
+## Consolidated network and power status
 
-## Built-in status items
-
-`ShowLANConnectionStatus` adds an item that reflects LAN availability when configuration is applied. It does not update automatically. `ShowPowerStatus` adds a static power item; it does not read the current battery or power-source state.
-
-These built-in labels follow the locale selected through [Application data](configure-data.md). Text passed to `SetStatusText` or `AddStatusItem` is application content and is not translated automatically.
+`ShowLANConnectionStatus` and `ShowPowerStatus` enable rows in one consolidated system-status icon on the right side of the status bar. Configuring either helper displays that single icon; configuring both does not create two separate icons.
 
 ```csharp
-statusBar.ShowLANConnectionStatus();
-statusBar.ShowPowerStatus();
+statusBar
+    .ShowLANConnectionStatus()
+    .ShowPowerStatus();
 ```
 
-Use these helpers when their snapshot or label semantics fit the application. Use application-provided status content for live monitoring.
+Hover or click the icon to open its anchored flyout. The network row reads current network availability when the flyout opens. The power row reports AC, battery, or unknown power source and includes the battery percentage when Windows supplies a valid value. These are current snapshots taken when the surface opens, not a continuous connectivity or battery monitor.
 
-## Add custom content
+Built-in labels follow the locale selected through [Application data](configure-data.md).
 
-`ConfigureStatusBar` provides status text and status items. Use [Custom shell content](configure-custom-handler.md) for application-provided controls and command buttons.
+## Add custom footer content
+
+Use [Custom shell content](configure-custom-handler.md) for application-provided controls and command buttons. `FooterStart` is placed after built-in background-task indicators; `FooterEnd` is placed after the custom and system status area.
 
 ```csharp
-var flourish = FlourishBuilder
-    .CreateDefaultBuilder(args)
-    .ConfigureShell(shell => shell.UseStatusBar())
-    .ConfigureStatusBar(statusBar =>
-    {
-        statusBar.SetStatusText("Ready").ShowLANConnectionStatus().ShowPowerStatus();
-    })
-    .ConfigureCustomHandler(custom =>
-    {
-        custom.AddFooterCommand(
-            FlourishRegion.FooterEnd,
-            "Sync",
-            "\uE895",
-            "sync.run");
-    })
-    .Build();
+builder.ConfigureCustomHandler(custom =>
+{
+    custom.AddFooterCommand(
+        FlourishRegion.FooterEnd,
+        "Sync",
+        "\uE895",
+        "sync.run");
+});
 ```
+
+Custom content does not enable the persistent status bar by itself, so call `UseStatusBar()` when it should remain visible without active background work.

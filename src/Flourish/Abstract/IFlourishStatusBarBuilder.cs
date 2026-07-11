@@ -7,19 +7,15 @@ namespace ArkheideSystem.Flourish.Abstract;
 /// <code><![CDATA[
 /// builder.ConfigureStatusBar(statusBar =>
 /// {
-///     statusBar.SetStatusText("Ready").ShowPowerStatus();
+///     statusBar
+///         .AddStatusItem("Ready", "\uE73E")
+///         .ShowLANConnectionStatus()
+///         .ShowPowerStatus();
 /// });
 /// ]]></code>
 /// </example>
 public interface IFlourishStatusBarBuilder
 {
-    /// <summary>
-    /// Sets the primary status text.
-    /// </summary>
-    /// <param name="text">The text displayed in the shell status bar.</param>
-    /// <returns>The current builder for chained configuration.</returns>
-    IFlourishStatusBarBuilder SetStatusText(string text);
-
     /// <summary>
     /// Adds a status item with display text and an icon glyph.
     /// </summary>
@@ -29,15 +25,13 @@ public interface IFlourishStatusBarBuilder
     IFlourishStatusBarBuilder AddStatusItem(string displayText, string iconGlyph);
 
     /// <summary>
-    /// Captures LAN availability during configuration and adds the built-in status item.
-    /// The displayed status does not update automatically.
+    /// Enables the built-in LAN connection status in the consolidated system status surface.
     /// </summary>
     /// <returns>The current builder for chained configuration.</returns>
     IFlourishStatusBarBuilder ShowLANConnectionStatus();
 
     /// <summary>
-    /// Adds the built-in static power status item.
-    /// The item does not report live power or battery state.
+    /// Enables the built-in power status in the consolidated system status surface.
     /// </summary>
     /// <returns>The current builder for chained configuration.</returns>
     IFlourishStatusBarBuilder ShowPowerStatus();

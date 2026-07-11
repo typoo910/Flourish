@@ -152,6 +152,7 @@ The startup example keeps each feature responsibility separate:
 - [Shell configuration](shell-configuration.md) enables shell features and explains their prerequisites.
 - [Title bar](configure-title-bar.md) configures application identity and title bar controls.
 - [Navigation](navigation.md) configures panel display and visible items.
+- [Background tasks](background-tasks.md) runs cancellable asynchronous work and integrates its state with the status bar.
 - [Tooltips](configure-tips.md), [Typography](configure-font.md), and [Window](configure-window.md) tune supporting shell behavior.
 
 ## Create pages

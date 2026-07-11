@@ -33,19 +33,20 @@ public sealed class FlourishCompositionContractTests
     }
 
     [Fact]
-    public void Build_AppliesLocaleBeforeBuiltInStatusItems()
+    public void Build_EnablesBuiltInSystemStatusFlags()
     {
         var builder = FlourishBuilder
             .CreateDefaultBuilder([])
-            .ConfigureData(data => data.SetLocale("EN"))
-            .ConfigureStatusBar(statusBar => statusBar.ShowPowerStatus());
+            .ConfigureStatusBar(statusBar =>
+                statusBar.ShowLANConnectionStatus().ShowPowerStatus()
+            );
 
         using var flourish = builder.Build();
-        var item = Assert.Single(
-            flourish.GetRequiredService<FlourishShellOptions>().StatusItems
-        );
+        var options = flourish.GetRequiredService<FlourishShellOptions>();
 
-        Assert.Equal("Power", item.Text);
+        Assert.True(options.IsLANConnectionStatusEnabled);
+        Assert.True(options.IsPowerStatusEnabled);
+        Assert.Empty(options.StatusItems);
     }
 
     [Fact]

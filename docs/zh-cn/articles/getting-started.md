@@ -152,6 +152,7 @@ return FlourishBuilder
 - [Shell 配置](shell-configuration.md)启用高层 Shell 功能。
 - [标题栏](configure-title-bar.md)配置标题栏内容和入口。
 - [导航](navigation.md)配置导航栏展示和可见导航项。
+- [后台任务](background-tasks.md)运行可取消异步工作，并把状态集成到状态栏。
 - [提示浮层](configure-tips.md)、[排版](configure-font.md)和[窗口](configure-window.md)调整 Shell 的交互和外观。
 
 ## 创建页面

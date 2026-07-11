@@ -34,6 +34,19 @@
   "Profile.EnterName": "Enter a first or last name.",
   "Profile.EnterPassword": "Enter a password.",
   "Profile.RememberLoginRequiresSignIn": "Remember login can only be changed while a profile is signed in.",
+  "BackgroundTask.Title": "Background tasks",
+  "BackgroundTask.Running": "Running",
+  "BackgroundTask.Queued": "Waiting",
+  "BackgroundTask.Cancelling": "Cancelling",
+  "BackgroundTask.Cancel": "Cancel",
+  "BackgroundTask.WaitingCount": "{0} task(s) waiting",
+  "BackgroundTask.NoActiveTasks": "No active background tasks",
+  "SystemStatus.Title": "System status",
+  "SystemStatus.Network": "Network",
+  "SystemStatus.Power": "Power",
+  "SystemStatus.AC": "AC power",
+  "SystemStatus.Battery": "Battery",
+  "SystemStatus.Unknown": "Unknown",
   "MessageBox.OK": "OK",
   "MessageBox.Cancel": "Cancel",
   "MessageBox.Yes": "Yes",
@@ -43,6 +56,5 @@
   "Tray.Show": "Show",
   "Tray.Exit": "Exit",
   "Status.Connected": "Connected",
-  "Status.Disconnected": "Disconnected",
-  "Status.Power": "Power"
+  "Status.Disconnected": "Disconnected"
 }

@@ -13,8 +13,6 @@ internal sealed class FlourishShellOptions
 
     public string SearchPlaceholder { get; set; } = "Search";
 
-    public string StatusText { get; set; } = string.Empty;
-
     public Action<IServiceProvider, string>? TitlebarSearchTextChanged { get; set; }
 
     public string? LogoPath { get; set; }
@@ -101,6 +99,10 @@ internal sealed class FlourishShellOptions
     public bool IsBreadcrumbEnabled { get; set; }
 
     public bool IsStatusBarEnabled { get; set; }
+
+    public bool IsLANConnectionStatusEnabled { get; set; }
+
+    public bool IsPowerStatusEnabled { get; set; }
 
     public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.Auto;
 

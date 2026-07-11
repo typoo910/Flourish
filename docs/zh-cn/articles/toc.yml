@@ -21,6 +21,8 @@ items:
   href: navigation.md
 - name: 动态工具栏
   href: dynamic-toolbar.md
+- name: 后台任务
+  href: background-tasks.md
 - name: 自定义 Shell 内容
   href: configure-custom-handler.md
 - name: 提示浮层

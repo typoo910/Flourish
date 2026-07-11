@@ -17,7 +17,10 @@ builder.ConfigureShell(shell => shell.UseTips(delay: 200));
 
 提示浮层会使用默认边界间距，避免贴近 Shell 窗口边缘显示。该间距适用于标题栏、折叠导航栏、动态工具栏和状态栏附近的提示。
 
+后台任务元信息提示不受 `UseTips` 控制。它属于[后台任务](background-tasks.md)状态界面，并使用自己的初始延迟；悬停等待队列图标时打开的是可交互浮层，而不是 tooltip。
+
 ## 相关功能
 
-- [标题栏](configure-title-bar.md)、[导航](navigation.md)、[动态工具栏](dynamic-toolbar.md)和[状态栏](status-bar.md)包含可显示提示的 Shell 控件。
+- [标题栏](configure-title-bar.md)、[导航](navigation.md)、[动态工具栏](dynamic-toolbar.md)和[状态栏](status-bar.md)包含受此设置控制的 Shell 提示。
+- [后台任务](background-tasks.md)提供任务自身管理的元信息提示和可交互队列浮层。
 - [动效](configure-motion.md)配置与提示浮层相互独立的过渡和悬停动画。

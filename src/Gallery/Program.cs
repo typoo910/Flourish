@@ -87,6 +87,7 @@ internal static class Program
                         {
                             group.AddNavigableItem("Hello", "\uE8F2", "demo.hello");
                             group.AddNavigableItem("World", "\uE774", "demo.world");
+                            group.AddNavigableItem("Background task", "\uE895", "demo.background");
                         }
                     )
                     .SetGroup(
@@ -120,7 +121,7 @@ internal static class Program
             })
             .ConfigureStatusBar(statusBar =>
             {
-                statusBar.SetStatusText("就绪").ShowLANConnectionStatus().ShowPowerStatus();
+                statusBar.ShowLANConnectionStatus().ShowPowerStatus();
             })
             .ConfigureMotion(motion =>
             {

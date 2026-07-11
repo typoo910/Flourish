@@ -22,6 +22,8 @@ builder.ConfigureServices((context, services) =>
 
 ViewModel、仓储和应用服务按照普通 .NET 依赖注入规则注册。Shell 和导航页面从 Host 根服务提供器解析；只有应用显式创建并管理 `IServiceScope` 时，才应让相关对象依赖 scoped 服务。
 
+Flourish 还会随 Host 注册 `IBackgroundTaskService`。应用服务和 ViewModel 可直接通过构造函数注入该服务，不应再注册第二个工作池实例；参见[后台任务](background-tasks.md)。
+
 Flourish 通过同一容器解析页面、命令解析器和 Profile 服务，因此这些类型可以在构造函数中声明应用服务依赖。自定义 Shell 内容则由应用提供工厂创建；工厂可以通过收到的 `IServiceProvider` 显式解析依赖。
 
 ## 注册可导航页面
@@ -45,4 +47,5 @@ Shell 的展示和行为配置由对应功能负责，例如[导航](navigation.
 - [导航](navigation.md) 将已注册页面放入可见导航模型。
 - [动态工具栏](dynamic-toolbar.md) 将页面命令绑定到已注册页面类型。
 - [用户资料（Profile）](configure-profile.md)说明 Profile 页面、认证和持久化。
+- [后台任务](background-tasks.md)说明异步工作、取消、进度和结果。
 - [命令解析器](command-parser.md)说明命令键路由。

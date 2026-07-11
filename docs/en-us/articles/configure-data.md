@@ -15,7 +15,7 @@ Flourish includes `CN` and `EN`. Locale identifiers are case-insensitive and nor
 builder.ConfigureData(data => data.SetLocale("EN"));
 ```
 
-Flourish uses `EN` when `ConfigureData` is omitted. Call `SetLocale(locale)` only when selecting another built-in or custom locale. Application-provided text such as titles, search placeholders, navigation labels, status text, dialog messages, and custom option text is not translated automatically.
+Flourish uses `EN` when `ConfigureData` is omitted. Call `SetLocale(locale)` only when selecting another built-in or custom locale. Application-provided text such as titles, search placeholders, navigation labels, custom status-item labels, dialog messages, and custom option text is not translated automatically.
 
 ## Add a custom locale
 
@@ -92,6 +92,19 @@ The built-in locale files define the following keys. `{0}` is a format placehold
 | `Profile.EnterName` | Enter a first or last name. | 请输入名字或姓氏。 |
 | `Profile.EnterPassword` | Enter a password. | 请输入密码。 |
 | `Profile.RememberLoginRequiresSignIn` | Remember login can only be changed while a profile is signed in. | 仅可在个人资料已登录时更改记住登录状态。 |
+| `BackgroundTask.Title` | Background tasks | 后台任务 |
+| `BackgroundTask.Running` | Running | 运行中 |
+| `BackgroundTask.Queued` | Waiting | 等待中 |
+| `BackgroundTask.Cancelling` | Cancelling | 正在取消 |
+| `BackgroundTask.Cancel` | Cancel | 取消 |
+| `BackgroundTask.WaitingCount` | {0} task(s) waiting | {0} 个任务等待中 |
+| `BackgroundTask.NoActiveTasks` | No active background tasks | 没有活动的后台任务 |
+| `SystemStatus.Title` | System status | 系统状态 |
+| `SystemStatus.Network` | Network | 网络 |
+| `SystemStatus.Power` | Power | 电源 |
+| `SystemStatus.AC` | AC power | 外接电源 |
+| `SystemStatus.Battery` | Battery | 电池供电 |
+| `SystemStatus.Unknown` | Unknown | 未知 |
 | `MessageBox.OK` | OK | 确定 |
 | `MessageBox.Cancel` | Cancel | 取消 |
 | `MessageBox.Yes` | Yes | 是 |
@@ -102,7 +115,6 @@ The built-in locale files define the following keys. `{0}` is a format placehold
 | `Tray.Exit` | Exit | 退出 |
 | `Status.Connected` | Connected | 已连接 |
 | `Status.Disconnected` | Disconnected | 未连接 |
-| `Status.Power` | Power | 电源 |
 
 ## Host configuration
 
@@ -157,7 +169,7 @@ The appsettings and User Secrets providers remain part of the same Host configur
 
 ## Related features
 
-- [Title bar](configure-title-bar.md), [Profile](configure-profile.md), [Window](configure-window.md), [Status bar](status-bar.md), and [Message service](message-service.md) use localized built-in text.
+- [Title bar](configure-title-bar.md), [Profile](configure-profile.md), [Window](configure-window.md), [Background tasks](background-tasks.md), [Status bar](status-bar.md), and [Message service](message-service.md) use localized built-in text.
 - [Themes](configure-themes.md) persist the selected theme through Host configuration.
 - [Profile](configure-profile.md) explains remembered credentials and User Secrets.
 - [IFlourishBuilder](flourish-builder.md) explains when configuration callbacks are applied.

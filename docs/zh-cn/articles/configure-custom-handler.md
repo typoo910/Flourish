@@ -54,5 +54,5 @@ Footer 命令必须显式选择 `FlourishRegion.FooterStart` 或 `FlourishRegion
 
 - [标题栏](configure-title-bar.md)控制内置标题栏内容和行为。
 - [动态工具栏](dynamic-toolbar.md) 配置随当前页面变化的工具栏命令。
-- [状态栏](status-bar.md)配置内置状态文本和状态项。
+- [状态栏](status-bar.md)配置后台任务指示器、自定义状态项和系统状态入口。
 - [依赖注入](configure-services.md) 为自定义内容和命令解析器提供应用服务。

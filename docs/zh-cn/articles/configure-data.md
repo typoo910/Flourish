@@ -15,7 +15,7 @@ Flourish 内置 `CN` 和 `EN`。语言标识不区分大小写，并会在构建
 builder.ConfigureData(data => data.SetLocale("EN"));
 ```
 
-省略 `ConfigureData` 时，Flourish 默认使用 `EN`。只有在选择其他内置或自定义语言时才需要调用 `SetLocale(locale)`。应用传入的标题、搜索占位文本、导航标签、状态文本、对话框消息和自定义选项文本不会自动翻译。
+省略 `ConfigureData` 时，Flourish 默认使用 `EN`。只有在选择其他内置或自定义语言时才需要调用 `SetLocale(locale)`。应用传入的标题、搜索占位文本、导航标签、自定义状态项标签、对话框消息和自定义选项文本不会自动翻译。
 
 ## 添加自定义语言
 
@@ -92,6 +92,19 @@ Flourish 在 `Build()` 应用配置时读取已注册的语言文件。文件不
 | `Profile.EnterName` | Enter a first or last name. | 请输入名字或姓氏。 |
 | `Profile.EnterPassword` | Enter a password. | 请输入密码。 |
 | `Profile.RememberLoginRequiresSignIn` | Remember login can only be changed while a profile is signed in. | 仅可在个人资料已登录时更改记住登录状态。 |
+| `BackgroundTask.Title` | Background tasks | 后台任务 |
+| `BackgroundTask.Running` | Running | 运行中 |
+| `BackgroundTask.Queued` | Waiting | 等待中 |
+| `BackgroundTask.Cancelling` | Cancelling | 正在取消 |
+| `BackgroundTask.Cancel` | Cancel | 取消 |
+| `BackgroundTask.WaitingCount` | {0} task(s) waiting | {0} 个任务等待中 |
+| `BackgroundTask.NoActiveTasks` | No active background tasks | 没有活动的后台任务 |
+| `SystemStatus.Title` | System status | 系统状态 |
+| `SystemStatus.Network` | Network | 网络 |
+| `SystemStatus.Power` | Power | 电源 |
+| `SystemStatus.AC` | AC power | 外接电源 |
+| `SystemStatus.Battery` | Battery | 电池供电 |
+| `SystemStatus.Unknown` | Unknown | 未知 |
 | `MessageBox.OK` | OK | 确定 |
 | `MessageBox.Cancel` | Cancel | 取消 |
 | `MessageBox.Yes` | Yes | 是 |
@@ -102,7 +115,6 @@ Flourish 在 `Build()` 应用配置时读取已注册的语言文件。文件不
 | `Tray.Exit` | Exit | 退出 |
 | `Status.Connected` | Connected | 已连接 |
 | `Status.Disconnected` | Disconnected | 未连接 |
-| `Status.Power` | Power | 电源 |
 
 ## Host 配置
 
@@ -157,7 +169,7 @@ appsettings 与 User Secrets provider 都属于同一个 Host 配置；应用服
 
 ## 相关功能
 
-- [标题栏](configure-title-bar.md)、[用户资料（Profile）](configure-profile.md)、[窗口](configure-window.md)、[状态栏](status-bar.md)和[消息服务](message-service.md)使用已本地化的内置文案。
+- [标题栏](configure-title-bar.md)、[用户资料（Profile）](configure-profile.md)、[窗口](configure-window.md)、[后台任务](background-tasks.md)、[状态栏](status-bar.md)和[消息服务](message-service.md)使用已本地化的内置文案。
 - [主题](configure-themes.md)通过 Host 配置持久化用户选择的主题。
 - [用户资料（Profile）](configure-profile.md)说明已记住凭据与 User Secrets。
 - [`IFlourishBuilder`](flourish-builder.md) 说明配置回调的应用时机。
