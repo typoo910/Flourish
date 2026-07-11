@@ -151,7 +151,7 @@ public sealed class FlourishNavigationBuilderTests
         sut.SetGroup("Main", groupId: 1, group =>
         {
             group.AddNavigableViewItem<TestPage>(isInitial: true);
-            group.AddNavigableItem("Refresh", "gallery.refresh", iconGlyph: "R");
+            group.AddNavigableItem("Refresh", "R", "gallery.refresh");
         });
 
         var navigationGroup = Assert.Single(options.NavigationGroups);
@@ -171,7 +171,7 @@ public sealed class FlourishNavigationBuilderTests
 
         var exception = Assert.Throws<ArgumentException>(() =>
             sut.SetGroup(null, groupId: 0, group =>
-                group.AddNavigableItem("Invalid", null, parentId: 1, childId: 1)
+                group.AddNavigableItem("Invalid", null, null, parentId: 1, childId: 1)
             )
         );
 
@@ -186,8 +186,8 @@ public sealed class FlourishNavigationBuilderTests
         var exception = Assert.Throws<InvalidOperationException>(() =>
             sut.SetGroup(null, groupId: 0, group =>
             {
-                group.AddNavigableItem("First", null, parentId: 7);
-                group.AddNavigableItem("Second", null, parentId: 7);
+                group.AddNavigableItem("First", null, null, parentId: 7);
+                group.AddNavigableItem("Second", null, null, parentId: 7);
             })
         );
 
@@ -203,9 +203,9 @@ public sealed class FlourishNavigationBuilderTests
         sut.AddFixedNavigableViewItem<TestPage>(isInitial: true, parentId: 7);
         sut.AddFixedNavigableItem(
             "Refresh",
+            "R",
             "app.refresh",
-            childId: 7,
-            iconGlyph: "R"
+            childId: 7
         );
 
         Assert.Collection(
@@ -241,7 +241,7 @@ public sealed class FlourishNavigationBuilderTests
         var sut = new FlourishNavigationBuilder(new FlourishShellOptions());
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            sut.AddFixedNavigableItem(displayName!, "command")
+            sut.AddFixedNavigableItem(displayName!, null, "command")
         );
 
         Assert.Equal("displayName", exception.ParamName);

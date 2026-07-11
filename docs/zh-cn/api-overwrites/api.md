@@ -775,20 +775,20 @@ syntax:
 ---
 
 ---
-uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationBuilder.AddFixedNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationBuilder.AddFixedNavigableItem(System.String,System.String,System.String,System.Int32,System.Int32)
 summary: 在导航栏底部固定区域添加一个按钮类型命令项。
 syntax:
   parameters:
   - id: displayName
     description: 命令项显示文本。
+  - id: iconGlyph
+    description: 命令项显示的图标字形；传入 null 可省略图标。
   - id: commandKey
-    description: 触发时传递给 ICommandParser 的可选命令键。
+    description: 触发时传递给 ICommandParser 的命令键；仅作为父节点时传入 null。
   - id: parentId
     description: 可选父节点 ID。childId 不为 0 时必须为 0。
   - id: childId
     description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
-  - id: iconGlyph
-    description: 命令项显示的可选图标字形。
   return:
     description: 用于链式配置的当前 builder。
 ---
@@ -817,20 +817,20 @@ syntax:
 ---
 
 ---
-uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableItem(System.String,System.String,System.Int32,System.Int32,System.String)
+uid: ArkheideSystem.Flourish.Abstract.IFlourishNavigationGroupBuilder.AddNavigableItem(System.String,System.String,System.String,System.Int32,System.Int32)
 summary: 将一个按钮类型命令项添加到当前导航分组。
 syntax:
   parameters:
   - id: displayName
     description: 命令项显示文本。
+  - id: iconGlyph
+    description: 命令项显示的图标字形；传入 null 可省略图标。
   - id: commandKey
-    description: 触发时传递给 ICommandParser 的可选命令键。
+    description: 触发时传递给 ICommandParser 的命令键；仅作为父节点时传入 null。
   - id: parentId
     description: 可选父节点 ID。childId 不为 0 时必须为 0。
   - id: childId
     description: 可选父节点归属 ID。parentId 不为 0 时必须为 0。
-  - id: iconGlyph
-    description: 命令项显示的可选图标字形。
   return:
     description: 用于链式配置的当前分组 builder。
 ---

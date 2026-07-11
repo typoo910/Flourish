@@ -15,7 +15,7 @@ namespace ArkheideSystem.Flourish.Abstract;
 ///         .SetGroup("Navigation", groupId: 0, group =>
 ///     {
 ///         group.AddNavigableViewItem<HomePage>(isInitial: true);
-///         group.AddNavigableItem("Refresh", "navigation.refresh", iconGlyph: "\uE72C");
+///         group.AddNavigableItem("Refresh", "\uE72C", "navigation.refresh");
 ///     });
 /// });
 /// ]]></code>
@@ -89,7 +89,7 @@ public interface IFlourishNavigationBuilder
     ///
     /// navigation.SetGroup("Tools", groupId: 1, group =>
     /// {
-    ///     group.AddNavigableItem("Refresh", "reports.refresh", iconGlyph: "\uE72C");
+    ///     group.AddNavigableItem("Refresh", "\uE72C", "reports.refresh");
     /// });
     /// ]]></code>
     /// </example>
@@ -127,10 +127,10 @@ public interface IFlourishNavigationBuilder
     /// Adds a fixed command item to the bottom of the navigation panel.
     /// </summary>
     /// <param name="displayName">The text displayed by the fixed command item.</param>
-    /// <param name="commandKey">The optional command key sent to <see cref="ICommandParser" /> when the item is invoked.</param>
+    /// <param name="iconGlyph">The icon glyph displayed with the item, or <see langword="null" /> to omit it.</param>
+    /// <param name="commandKey">The command key sent to <see cref="ICommandParser" />, or <see langword="null" /> for an item that only groups children.</param>
     /// <param name="parentId">The optional parent node ID. Must be 0 when <paramref name="childId" /> is non-zero.</param>
     /// <param name="childId">The optional parent ID that this child follows. Must be 0 when <paramref name="parentId" /> is non-zero.</param>
-    /// <param name="iconGlyph">The optional icon glyph displayed with the item.</param>
     /// <returns>The current builder for chained configuration.</returns>
     /// <remarks>
     /// Command items trigger <see cref="ICommandParser" /> instead of navigating to a page. If a
@@ -139,14 +139,14 @@ public interface IFlourishNavigationBuilder
     /// </remarks>
     /// <example>
     /// <code><![CDATA[
-    /// navigation.AddFixedNavigableItem("About", "app.about", iconGlyph: "\uE946");
+    /// navigation.AddFixedNavigableItem("About", "\uE946", "app.about");
     /// ]]></code>
     /// </example>
     IFlourishNavigationBuilder AddFixedNavigableItem(
         string displayName,
+        string? iconGlyph,
         string? commandKey,
         int parentId = 0,
-        int childId = 0,
-        string? iconGlyph = null
+        int childId = 0
     );
 }

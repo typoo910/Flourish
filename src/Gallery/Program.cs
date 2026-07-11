@@ -88,8 +88,8 @@ internal static class Program
                         1,
                         group =>
                         {
-                            group.AddNavigableItem("Hello", "demo.hello", iconGlyph: "\uE8F2");
-                            group.AddNavigableItem("World", "demo.world", iconGlyph: "\uE774");
+                            group.AddNavigableItem("Hello", "\uE8F2", "demo.hello");
+                            group.AddNavigableItem("World", "\uE774", "demo.world");
                         }
                     )
                     .SetGroup(
@@ -98,15 +98,15 @@ internal static class Program
                         group =>
                         {
                             group.AddNavigableViewItem<TreeParentPage>(parentId: 1);
-                            group.AddNavigableItem("Button1", "tree.button1", 0, 1, "\uE8B7");
-                            group.AddNavigableItem("Button2", "tree.button2", 0, 1, "\uE8B7");
-                            group.AddNavigableItem("普通父节点", null, 2, 0, "\uE8A5");
+                            group.AddNavigableItem("Button1", "\uE8B7", "tree.button1", 0, 1);
+                            group.AddNavigableItem("Button2", "\uE8B7", "tree.button2", 0, 1);
+                            group.AddNavigableItem("普通父节点", "\uE8A5", null, 2, 0);
                             group.AddNavigableViewItem<Page1>(childId: 2);
                             group.AddNavigableViewItem<Page2>(childId: 2);
                         }
                     )
                     .AddFixedNavigableViewItem<SettingsPage>()
-                    .AddFixedNavigableItem("关于", "app.about", iconGlyph: "\uE946");
+                    .AddFixedNavigableItem("关于", "\uE946", "app.about");
             })
             .ConfigureDynamicToolbar(tool =>
             {

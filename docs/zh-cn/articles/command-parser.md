@@ -81,10 +81,10 @@ builder.ConfigureNavigation(navigation =>
 {
     navigation.SetGroup("命令", groupId: 1, group =>
     {
-        group.AddNavigableItem("刷新", "reports.refresh", iconGlyph: "\uE72C");
+        group.AddNavigableItem("刷新", "\uE72C", "reports.refresh");
     });
 
-    navigation.AddFixedNavigableItem("关于", "app.about", iconGlyph: "\uE946");
+    navigation.AddFixedNavigableItem("关于", "\uE946", "app.about");
 });
 ```
 

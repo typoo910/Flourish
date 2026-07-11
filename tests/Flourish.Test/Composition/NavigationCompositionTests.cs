@@ -123,7 +123,7 @@ public sealed class NavigationCompositionTests
     {
         var builder = CreateNavigationBuilder().ConfigureNavigation(navigation =>
             navigation.SetGroup(null, groupId: 0, group =>
-                group.AddNavigableItem("Orphan", "orphan.command", childId: 42)
+                group.AddNavigableItem("Orphan", null, "orphan.command", childId: 42)
             )
         );
 

@@ -109,8 +109,8 @@ The default widths are `220` expanded and `48` collapsed. The default resize ran
 ```csharp
 nav.SetGroup("Commands", groupId: 2, group =>
 {
-    group.AddNavigableItem("Hello", "demo.hello", iconGlyph: "\uE8F2");
-    group.AddNavigableItem("World", "demo.world", iconGlyph: "\uE774");
+    group.AddNavigableItem("Hello", "\uE8F2", "demo.hello");
+    group.AddNavigableItem("World", "\uE774", "demo.world");
 });
 ```
 
@@ -130,7 +130,7 @@ builder.ConfigureNavigation(navigation =>
     });
 
     navigation.AddFixedNavigableViewItem<SettingsPage>();
-    navigation.AddFixedNavigableItem("About", "app.about", iconGlyph: "\uE946");
+    navigation.AddFixedNavigableItem("About", "\uE946", "app.about");
 });
 ```
 
@@ -144,10 +144,10 @@ Navigation items are flat by default. To create a one-level parent-child tree, s
 nav.SetGroup("Tree", groupId: 3, group =>
 {
     group.AddNavigableViewItem<TreeParentPage>(parentId: 1);
-    group.AddNavigableItem("Button1", "tree.button1", childId: 1, iconGlyph: "\uE8B7");
-    group.AddNavigableItem("Button2", "tree.button2", childId: 1, iconGlyph: "\uE8B7");
+    group.AddNavigableItem("Button1", "\uE8B7", "tree.button1", childId: 1);
+    group.AddNavigableItem("Button2", "\uE8B7", "tree.button2", childId: 1);
 
-    group.AddNavigableItem("Pages", null, parentId: 2, iconGlyph: "\uE8A5");
+    group.AddNavigableItem("Pages", "\uE8A5", null, parentId: 2);
     group.AddNavigableViewItem<Page1>(childId: 2);
     group.AddNavigableViewItem<Page2>(childId: 2);
 });

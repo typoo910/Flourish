@@ -10,7 +10,7 @@ namespace ArkheideSystem.Flourish.Abstract;
 /// navigation.SetGroup("Navigation", groupId: 0, group =>
 /// {
 ///     group.AddNavigableViewItem<HomePage>(isInitial: true);
-///     group.AddNavigableItem("Refresh", "navigation.refresh", iconGlyph: "\uE72C");
+///     group.AddNavigableItem("Refresh", "\uE72C", "navigation.refresh");
 /// });
 /// ]]></code>
 /// </example>
@@ -45,10 +45,10 @@ public interface IFlourishNavigationGroupBuilder
     /// Adds a command item to this navigation group.
     /// </summary>
     /// <param name="displayName">The text displayed by the command item.</param>
-    /// <param name="commandKey">The optional command key sent to <see cref="ICommandParser" /> when the item is invoked.</param>
+    /// <param name="iconGlyph">The icon glyph displayed with the item, or <see langword="null" /> to omit it.</param>
+    /// <param name="commandKey">The command key sent to <see cref="ICommandParser" />, or <see langword="null" /> for an item that only groups children.</param>
     /// <param name="parentId">The optional parent node ID. Must be 0 when <paramref name="childId" /> is non-zero.</param>
     /// <param name="childId">The optional parent ID that this child follows. Must be 0 when <paramref name="parentId" /> is non-zero.</param>
-    /// <param name="iconGlyph">The optional icon glyph displayed with the item.</param>
     /// <returns>The current group builder for chained configuration.</returns>
     /// <remarks>
     /// Command items execute <see cref="ICommandParser" /> and do not remain selected after they are
@@ -57,15 +57,15 @@ public interface IFlourishNavigationGroupBuilder
     /// </remarks>
     /// <example>
     /// <code><![CDATA[
-    /// group.AddNavigableItem("Hello", "demo.hello", iconGlyph: "\uE8F2");
-    /// group.AddNavigableItem("World", "demo.world", iconGlyph: "\uE774");
+    /// group.AddNavigableItem("Hello", "\uE8F2", "demo.hello");
+    /// group.AddNavigableItem("World", "\uE774", "demo.world");
     /// ]]></code>
     /// </example>
     IFlourishNavigationGroupBuilder AddNavigableItem(
         string displayName,
+        string? iconGlyph,
         string? commandKey,
         int parentId = 0,
-        int childId = 0,
-        string? iconGlyph = null
+        int childId = 0
     );
 }

@@ -125,10 +125,10 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
 
     public IFlourishNavigationBuilder AddFixedNavigableItem(
         string displayName,
+        string? iconGlyph,
         string? commandKey,
         int parentId = 0,
-        int childId = 0,
-        string? iconGlyph = null
+        int childId = 0
     )
     {
         AddCommandItem(
@@ -136,10 +136,10 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
             FixedItemsGroupId,
             isFixed: true,
             displayName,
+            iconGlyph,
             commandKey,
             parentId,
-            childId,
-            iconGlyph
+            childId
         );
         return this;
     }
@@ -179,10 +179,10 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
         int groupId,
         bool isFixed,
         string displayName,
+        string? iconGlyph,
         string? commandKey,
         int parentId,
-        int childId,
-        string? iconGlyph
+        int childId
     )
     {
         if (string.IsNullOrWhiteSpace(displayName))
@@ -256,10 +256,10 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
 
         public IFlourishNavigationGroupBuilder AddNavigableItem(
             string displayName,
+            string? iconGlyph,
             string? commandKey,
             int parentId = 0,
-            int childId = 0,
-            string? iconGlyph = null
+            int childId = 0
         )
         {
             AddCommandItem(
@@ -267,10 +267,10 @@ internal sealed class FlourishNavigationBuilder(FlourishShellOptions options)
                 groupId,
                 isFixed,
                 displayName,
+                iconGlyph,
                 commandKey,
                 parentId,
-                childId,
-                iconGlyph
+                childId
             );
             return this;
         }

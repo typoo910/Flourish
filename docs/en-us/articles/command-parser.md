@@ -81,10 +81,10 @@ builder.ConfigureNavigation(navigation =>
 {
     navigation.SetGroup("Commands", groupId: 1, group =>
     {
-        group.AddNavigableItem("Refresh", "reports.refresh", iconGlyph: "\uE72C");
+        group.AddNavigableItem("Refresh", "\uE72C", "reports.refresh");
     });
 
-    navigation.AddFixedNavigableItem("About", "app.about", iconGlyph: "\uE946");
+    navigation.AddFixedNavigableItem("About", "\uE946", "app.about");
 });
 ```
 
