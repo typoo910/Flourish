@@ -11,6 +11,78 @@ internal sealed class MessageService(FlourishLocalizationService localizationSer
 {
     private const string GenericThemeSource = "/Flourish;component/Themes/Generic.xaml";
 
+    public Task<MessageBoxResult> ShowAsync(
+        string messageBoxText,
+        string caption = "",
+        MessageBoxButton button = MessageBoxButton.OK,
+        MessageBoxImage icon = MessageBoxImage.None,
+        MessageBoxResult defaultResult = MessageBoxResult.None,
+        MessageBoxOptions options = MessageBoxOptions.None,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return InvokeOnDispatcherAsync(
+            () => Show(
+                GetActiveOwner(),
+                messageBoxText,
+                caption,
+                button,
+                icon,
+                defaultResult,
+                options
+            ),
+            cancellationToken
+        );
+    }
+
+    public Task<MessageBoxResult> ShowAsync(
+        Window? owner,
+        string messageBoxText,
+        string caption = "",
+        MessageBoxButton button = MessageBoxButton.OK,
+        MessageBoxImage icon = MessageBoxImage.None,
+        MessageBoxResult defaultResult = MessageBoxResult.None,
+        MessageBoxOptions options = MessageBoxOptions.None,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return InvokeOnDispatcherAsync(
+            () => Show(owner, messageBoxText, caption, button, icon, defaultResult, options),
+            cancellationToken
+        );
+    }
+
+    public Task<FlourishMessageOption?> ShowAsync(
+        string messageBoxText,
+        string caption,
+        IReadOnlyList<FlourishMessageOption> choices,
+        MessageBoxImage icon = MessageBoxImage.None,
+        MessageBoxOptions options = MessageBoxOptions.None,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return InvokeOnDispatcherAsync(
+            () => Show(GetActiveOwner(), messageBoxText, caption, choices, icon, options),
+            cancellationToken
+        );
+    }
+
+    public Task<FlourishMessageOption?> ShowAsync(
+        Window? owner,
+        string messageBoxText,
+        string caption,
+        IReadOnlyList<FlourishMessageOption> choices,
+        MessageBoxImage icon = MessageBoxImage.None,
+        MessageBoxOptions options = MessageBoxOptions.None,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return InvokeOnDispatcherAsync(
+            () => Show(owner, messageBoxText, caption, choices, icon, options),
+            cancellationToken
+        );
+    }
+
     public MessageBoxResult Show(
         string messageBoxText,
         string caption = "",
@@ -137,5 +209,26 @@ internal sealed class MessageService(FlourishLocalizationService localizationSer
         application.Resources.MergedDictionaries.Add(
             new ResourceDictionary { Source = new Uri(GenericThemeSource, UriKind.Relative) }
         );
+    }
+
+    private static async Task<TResult> InvokeOnDispatcherAsync<TResult>(
+        Func<TResult> action,
+        CancellationToken cancellationToken
+    )
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            return action();
+        }
+
+        return await dispatcher
+            .InvokeAsync(
+                action,
+                System.Windows.Threading.DispatcherPriority.Normal,
+                cancellationToken
+            )
+            .Task.ConfigureAwait(false);
     }
 }

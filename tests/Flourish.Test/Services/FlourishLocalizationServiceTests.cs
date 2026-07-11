@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Configuration;
 using ArkheideSystem.Flourish.Services;
 
@@ -244,6 +245,94 @@ public sealed class FlourishLocalizationServiceTests
         );
 
         Assert.Contains("Locale", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SetLocale_ChangesSelectedLocaleAndRaisesChanged()
+    {
+        var sut = new FlourishLocalizationService(new FlourishDataOptions());
+        FlourishLocalizationChangedEventArgs? change = null;
+        sut.Changed += (_, args) => change = args;
+
+        sut.SetLocale(" cn ");
+
+        Assert.Equal("CN", sut.CurrentLocale);
+        Assert.Equal("CN", sut.Locale);
+        Assert.NotNull(change);
+        Assert.Equal(FlourishLocalizationChangeKind.LocaleChanged, change.Kind);
+        Assert.Equal("EN", change.PreviousLocale);
+        Assert.Equal("CN", change.CurrentLocale);
+    }
+
+    [Fact]
+    public void RuntimeLocaleFile_CanBeRegisteredReloadedAndUnregistered()
+    {
+        using var directory = new TemporaryDirectory();
+        var path = directory.WriteLocale(
+            "lang_FR.json",
+            """
+            {
+              "Tray.Show": "Afficher"
+            }
+            """
+        );
+        var sut = new FlourishLocalizationService(new FlourishDataOptions());
+        var changes = new List<FlourishLocalizationChangeKind>();
+        sut.Changed += (_, args) => changes.Add(args.Kind);
+
+        var registration = sut.RegisterFile(path);
+        sut.SetLocale("FR");
+        Assert.Contains("FR", sut.AvailableLocales);
+        Assert.Equal("Afficher", sut.Get(FlourishLocaleKeys.TrayShow));
+
+        directory.WriteLocale(
+            "lang_FR.json",
+            """
+            {
+              "Tray.Show": "Ouvrir"
+            }
+            """
+        );
+        sut.ReloadFile(registration);
+        Assert.Equal("Ouvrir", sut.Get(FlourishLocaleKeys.TrayShow));
+
+        Assert.True(sut.Unregister(registration));
+        Assert.False(sut.Unregister(registration));
+        Assert.DoesNotContain("FR", sut.AvailableLocales);
+        Assert.Equal("Show", sut.Get(FlourishLocaleKeys.TrayShow));
+        Assert.Equal(
+            [
+                FlourishLocalizationChangeKind.FileRegistered,
+                FlourishLocalizationChangeKind.LocaleChanged,
+                FlourishLocalizationChangeKind.FileReloaded,
+                FlourishLocalizationChangeKind.FileUnregistered,
+            ],
+            changes
+        );
+    }
+
+    [Fact]
+    public void Unregister_LaterOverride_RevealsEarlierRegistration()
+    {
+        using var firstDirectory = new TemporaryDirectory();
+        using var secondDirectory = new TemporaryDirectory();
+        var first = firstDirectory.WriteLocale(
+            "lang_FR.json",
+            "{ \"Tray.Show\": \"First\" }"
+        );
+        var second = secondDirectory.WriteLocale(
+            "lang_FR.json",
+            "{ \"Tray.Show\": \"Second\" }"
+        );
+        var sut = new FlourishLocalizationService(new FlourishDataOptions());
+        sut.RegisterFile(first);
+        var overrideRegistration = sut.RegisterFile(second);
+        sut.SetLocale("FR");
+        Assert.Equal("Second", sut.Get(FlourishLocaleKeys.TrayShow));
+
+        sut.Unregister(overrideRegistration);
+
+        Assert.Equal("First", sut.Get(FlourishLocaleKeys.TrayShow));
     }
 
     private sealed class TemporaryDirectory : IDisposable

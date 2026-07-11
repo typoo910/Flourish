@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class FlourishLocalizationService
+internal sealed class FlourishLocalizationService : IFlourishLocalization
 {
     private const string DefaultLocale = "EN";
     private const string EmbeddedResourcePrefix = "ArkheideSystem.Flourish.Assets.lang_";
@@ -13,12 +14,17 @@ internal sealed class FlourishLocalizationService
     private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> builtInLocales;
     private readonly Dictionary<string, Dictionary<string, string>> customLocales =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<LocaleRegistrationState> registrations = [];
+    private readonly FlourishDataOptions options;
+    private readonly object gate = new();
+    private string locale;
 
     public FlourishLocalizationService(FlourishDataOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
+        this.options = options;
 
-        Locale = NormalizeLocale(options.Locale);
+        locale = NormalizeLocale(options.Locale);
         builtInLocales = new Dictionary<string, IReadOnlyDictionary<string, string>>(
             StringComparer.OrdinalIgnoreCase
         )
@@ -29,11 +35,39 @@ internal sealed class FlourishLocalizationService
 
         foreach (var path in options.LocalePaths)
         {
-            LoadCustomLocale(path);
+            RegisterFileCore(path);
         }
     }
 
-    public string Locale { get; }
+    public string Locale => CurrentLocale;
+
+    public string CurrentLocale
+    {
+        get
+        {
+            lock (gate)
+            {
+                return locale;
+            }
+        }
+    }
+
+    public IReadOnlyList<string> AvailableLocales
+    {
+        get
+        {
+            lock (gate)
+            {
+                return builtInLocales
+                    .Keys.Concat(registrations.Select(registration => registration.Handle.Locale))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(value => value, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+            }
+        }
+    }
+
+    public event EventHandler<FlourishLocalizationChangedEventArgs>? Changed;
 
     public string Get(string key)
     {
@@ -42,11 +76,14 @@ internal sealed class FlourishLocalizationService
             throw new ArgumentException("Locale key cannot be empty.", nameof(key));
         }
 
-        return TryGet(customLocales, Locale, key)
-            ?? TryGet(builtInLocales, Locale, key)
-            ?? TryGet(customLocales, DefaultLocale, key)
-            ?? TryGet(builtInLocales, DefaultLocale, key)
-            ?? key;
+        lock (gate)
+        {
+            return TryGet(customLocales, locale, key)
+                ?? TryGet(builtInLocales, locale, key)
+                ?? TryGet(customLocales, DefaultLocale, key)
+                ?? TryGet(builtInLocales, DefaultLocale, key)
+                ?? key;
+        }
     }
 
     public string Format(string key, params object?[] arguments)
@@ -55,7 +92,118 @@ internal sealed class FlourishLocalizationService
         return string.Format(CultureInfo.CurrentCulture, Get(key), arguments);
     }
 
-    private void LoadCustomLocale(string path)
+    public void SetLocale(string locale)
+    {
+        var normalizedLocale = NormalizeRuntimeLocale(locale);
+        string previousLocale;
+        lock (gate)
+        {
+            previousLocale = this.locale;
+            if (string.Equals(previousLocale, normalizedLocale, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            this.locale = normalizedLocale;
+            options.Locale = normalizedLocale;
+        }
+
+        Changed?.Invoke(
+            this,
+            new FlourishLocalizationChangedEventArgs(
+                FlourishLocalizationChangeKind.LocaleChanged,
+                previousLocale,
+                normalizedLocale,
+                normalizedLocale,
+                null
+            )
+        );
+    }
+
+    public FlourishLocaleRegistration RegisterFile(string path)
+    {
+        var registration = RegisterFileCore(path);
+        var currentLocale = CurrentLocale;
+        Changed?.Invoke(
+            this,
+            new FlourishLocalizationChangedEventArgs(
+                FlourishLocalizationChangeKind.FileRegistered,
+                currentLocale,
+                currentLocale,
+                registration.Locale,
+                registration
+            )
+        );
+        return registration;
+    }
+
+    public void ReloadFile(FlourishLocaleRegistration registration)
+    {
+        ArgumentNullException.ThrowIfNull(registration);
+        var values = LoadLocaleFile(registration.FilePath);
+        lock (gate)
+        {
+            var state = registrations.FirstOrDefault(candidate =>
+                candidate.Handle.Id == registration.Id
+            );
+            if (state is null)
+            {
+                throw new InvalidOperationException(
+                    "The locale-file registration is not active."
+                );
+            }
+
+            state.Values = values;
+            RebuildCustomLocale(state.Handle.Locale);
+        }
+
+        var currentLocale = CurrentLocale;
+        Changed?.Invoke(
+            this,
+            new FlourishLocalizationChangedEventArgs(
+                FlourishLocalizationChangeKind.FileReloaded,
+                currentLocale,
+                currentLocale,
+                registration.Locale,
+                registration
+            )
+        );
+    }
+
+    public bool Unregister(FlourishLocaleRegistration registration)
+    {
+        ArgumentNullException.ThrowIfNull(registration);
+        FlourishLocaleRegistration? removedRegistration;
+        lock (gate)
+        {
+            var index = registrations.FindIndex(candidate =>
+                candidate.Handle.Id == registration.Id
+            );
+            if (index < 0)
+            {
+                return false;
+            }
+
+            removedRegistration = registrations[index].Handle;
+            registrations.RemoveAt(index);
+            RebuildCustomLocale(removedRegistration.Locale);
+        }
+
+        var currentLocale = CurrentLocale;
+        Changed?.Invoke(
+            this,
+            new FlourishLocalizationChangedEventArgs(
+                FlourishLocalizationChangeKind.FileUnregistered,
+                currentLocale,
+                currentLocale,
+                removedRegistration.Locale,
+                removedRegistration
+            )
+        );
+        return true;
+    }
+
+    private FlourishLocaleRegistration RegisterFileCore(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -73,15 +221,40 @@ internal sealed class FlourishLocalizationService
 
         var locale = GetLocaleFromFileName(fullPath);
         var values = LoadLocaleFile(fullPath);
-        if (!customLocales.TryGetValue(locale, out var mergedValues))
+        var handle = new FlourishLocaleRegistration(Guid.NewGuid(), locale, fullPath);
+        lock (gate)
         {
-            mergedValues = new Dictionary<string, string>(StringComparer.Ordinal);
-            customLocales.Add(locale, mergedValues);
+            registrations.Add(new LocaleRegistrationState(handle, values));
+            RebuildCustomLocale(locale);
         }
 
-        foreach (var (key, value) in values)
+        return handle;
+    }
+
+    private void RebuildCustomLocale(string locale)
+    {
+        customLocales.Remove(locale);
+        Dictionary<string, string>? mergedValues = null;
+        foreach (
+            var registration in registrations.Where(candidate =>
+                string.Equals(
+                    candidate.Handle.Locale,
+                    locale,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+        )
         {
-            mergedValues[key] = value;
+            mergedValues ??= new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var (key, value) in registration.Values)
+            {
+                mergedValues[key] = value;
+            }
+        }
+
+        if (mergedValues is not null)
+        {
+            customLocales[locale] = mergedValues;
         }
     }
 
@@ -221,6 +394,25 @@ internal sealed class FlourishLocalizationService
             : locale.Trim().ToUpperInvariant();
     }
 
+    private static string NormalizeRuntimeLocale(string locale)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(locale);
+        var normalized = locale.Trim().ToUpperInvariant();
+        if (
+            normalized.Any(character =>
+                !char.IsLetterOrDigit(character) && character is not '-' and not '_'
+            )
+        )
+        {
+            throw new ArgumentException(
+                "A locale can only contain letters, digits, '-' and '_'.",
+                nameof(locale)
+            );
+        }
+
+        return normalized;
+    }
+
     private static string? TryGet<TDictionary>(
         IReadOnlyDictionary<string, TDictionary> locales,
         string locale,
@@ -232,5 +424,15 @@ internal sealed class FlourishLocalizationService
             && values.TryGetValue(key, out var value)
             ? value
             : null;
+    }
+
+    private sealed class LocaleRegistrationState(
+        FlourishLocaleRegistration handle,
+        IReadOnlyDictionary<string, string> values
+    )
+    {
+        public FlourishLocaleRegistration Handle { get; } = handle;
+
+        public IReadOnlyDictionary<string, string> Values { get; set; } = values;
     }
 }

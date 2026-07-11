@@ -8,9 +8,6 @@ internal sealed class GalleryCommandParser(
     IBackgroundTaskService backgroundTasks
 ) : ICommandParser
 {
-    private readonly IMessageService messages = messages;
-    private readonly IBackgroundTaskService backgroundTasks = backgroundTasks;
-
     public bool TryParse(string commandKey)
     {
         switch (commandKey)

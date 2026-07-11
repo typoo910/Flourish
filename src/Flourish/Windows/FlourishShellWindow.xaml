@@ -448,6 +448,17 @@
         </Grid>
       </Border>
 
+      <StackPanel
+        x:Name="NotificationItemsHost"
+        Grid.RowSpan="3"
+        Width="360"
+        Margin="0,52,16,0"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Panel.ZIndex="200"
+        AutomationProperties.LiveSetting="Polite"
+      />
+
       <Canvas
         x:Name="ProfileOverlay"
         Grid.RowSpan="3"

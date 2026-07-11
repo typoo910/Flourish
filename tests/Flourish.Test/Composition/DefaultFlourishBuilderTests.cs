@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Windows.Controls;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace ArkheideSystem.Flourish.Test.Composition;
 
@@ -96,6 +98,19 @@ public sealed class DefaultFlourishBuilderTests
         var statusItem = Assert.Single(options.StatusItems);
         Assert.Equal("Ready", statusItem.Text);
         Assert.Equal("R", statusItem.IconGlyph);
+    }
+
+    [Fact]
+    public void Build_UsesExecutableDirectoryAsContentRoot()
+    {
+        using var flourish = FlourishBuilder.CreateDefaultBuilder([]).Build();
+
+        var environment = flourish.GetRequiredService<IHostEnvironment>();
+
+        Assert.Equal(
+            Path.TrimEndingDirectorySeparator(Path.GetFullPath(AppContext.BaseDirectory)),
+            Path.TrimEndingDirectorySeparator(Path.GetFullPath(environment.ContentRootPath))
+        );
     }
 
     [Fact]

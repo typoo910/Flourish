@@ -15,8 +15,10 @@ internal enum FlourishNavigationItemKind
 internal sealed class FlourishNavigationItem : INotifyPropertyChanged
 {
     private bool isActiveChildParent;
+    private bool isEnabled = true;
     private bool isExpanded;
-    private bool isVisible = true;
+    private bool isExplicitlyVisible = true;
+    private bool isTreeVisible = true;
 
     public FlourishNavigationItem(
         string key,
@@ -29,9 +31,11 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
         bool isInitial = false,
         bool isFixed = false,
         int parentId = 0,
-        int childId = 0
+        int childId = 0,
+        string? id = null
     )
     {
+        Id = string.IsNullOrWhiteSpace(id) ? key : id;
         Key = key;
         Label = label;
         IconGlyph = iconGlyph ?? string.Empty;
@@ -46,6 +50,8 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string Id { get; }
 
     public string Key { get; internal set; }
 
@@ -121,17 +127,64 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
         }
     }
 
-    public bool IsVisible
+    public bool IsEnabled
     {
-        get => isVisible;
+        get => isEnabled;
         set
         {
-            if (isVisible == value)
+            if (isEnabled == value)
             {
                 return;
             }
 
-            isVisible = value;
+            isEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsExplicitlyVisible
+    {
+        get => isExplicitlyVisible;
+        set
+        {
+            if (isExplicitlyVisible == value)
+            {
+                return;
+            }
+
+            isExplicitlyVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsVisible));
+        }
+    }
+
+    public bool IsTreeVisible
+    {
+        get => isTreeVisible;
+        set
+        {
+            if (isTreeVisible == value)
+            {
+                return;
+            }
+
+            isTreeVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsVisible));
+        }
+    }
+
+    public bool IsVisible
+    {
+        get => IsExplicitlyVisible && IsTreeVisible;
+        set
+        {
+            if (isTreeVisible == value)
+            {
+                return;
+            }
+
+            isTreeVisible = value;
             OnPropertyChanged();
         }
     }

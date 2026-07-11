@@ -1,3 +1,4 @@
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Configuration;
 using Application = System.Windows.Application;
 using FontFamily = System.Windows.Media.FontFamily;
@@ -5,15 +6,45 @@ using Window = System.Windows.Window;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class FontService(FlourishShellOptions options)
+internal sealed class FontService(FlourishShellOptions options) : IFontService
 {
+    private readonly object gate = new();
     private Window? owner;
 
-    public string FontFamily => options.FontFamily;
+    public string FontFamily
+    {
+        get
+        {
+            lock (gate)
+            {
+                return options.FontFamily;
+            }
+        }
+    }
 
-    public string IconFontFamily => options.IconFontFamily;
+    public string IconFontFamily
+    {
+        get
+        {
+            lock (gate)
+            {
+                return options.IconFontFamily;
+            }
+        }
+    }
 
-    public double FontSize => options.FontSize;
+    public double FontSize
+    {
+        get
+        {
+            lock (gate)
+            {
+                return options.FontSize;
+            }
+        }
+    }
+
+    public event EventHandler<FlourishFontChangedEventArgs>? Changed;
 
     public void Apply(Window window)
     {
@@ -23,52 +54,117 @@ internal sealed class FontService(FlourishShellOptions options)
 
     public void SetFont(string fontFamily, double fontSize)
     {
-        options.FontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
+        fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
         ValidatePositiveFinite(fontSize, nameof(fontSize));
-        options.FontSize = fontSize;
-        ApplyToOwner();
+        lock (gate)
+        {
+            if (options.FontFamily == fontFamily && options.FontSize == fontSize)
+            {
+                return;
+            }
+
+            options.FontFamily = fontFamily;
+            options.FontSize = fontSize;
+        }
+
+        ApplyAndNotify();
     }
 
     public void SetFontFamily(string fontFamily)
     {
-        options.FontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
-        ApplyToOwner();
+        fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
+        lock (gate)
+        {
+            if (options.FontFamily == fontFamily)
+            {
+                return;
+            }
+
+            options.FontFamily = fontFamily;
+        }
+
+        ApplyAndNotify();
     }
 
     public void SetFontSize(double fontSize)
     {
         ValidatePositiveFinite(fontSize, nameof(fontSize));
-        options.FontSize = fontSize;
-        ApplyToOwner();
+        lock (gate)
+        {
+            if (options.FontSize == fontSize)
+            {
+                return;
+            }
+
+            options.FontSize = fontSize;
+        }
+
+        ApplyAndNotify();
     }
 
     public void SetIconFontFamily(string fontFamily)
     {
-        options.IconFontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
-        ApplyToOwner();
+        fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
+        lock (gate)
+        {
+            if (options.IconFontFamily == fontFamily)
+            {
+                return;
+            }
+
+            options.IconFontFamily = fontFamily;
+        }
+
+        ApplyAndNotify();
     }
 
-    private void ApplyToOwner()
+    private void ApplyAndNotify()
     {
-        if (owner is null)
+        var attachedOwner = owner;
+        if (attachedOwner is not null)
         {
+            if (attachedOwner.CheckAccess())
+            {
+                ApplyCore(attachedOwner);
+                RaiseChanged();
+            }
+            else
+            {
+                attachedOwner.Dispatcher.Invoke(() =>
+                {
+                    ApplyCore(attachedOwner);
+                    RaiseChanged();
+                });
+            }
+
             return;
         }
 
-        if (owner.CheckAccess())
-        {
-            ApplyCore(owner);
-            return;
-        }
+        RaiseChanged();
+    }
 
-        owner.Dispatcher.Invoke(() => ApplyCore(owner));
+    private void RaiseChanged()
+    {
+        Changed?.Invoke(
+            this,
+            new FlourishFontChangedEventArgs(FontFamily, IconFontFamily, FontSize)
+        );
     }
 
     private void ApplyCore(Window window)
     {
-        var fontFamily = new FontFamily(options.FontFamily);
-        var iconFontFamily = new FontFamily(options.IconFontFamily);
-        var baseSize = options.FontSize;
+        string textFontFamily;
+        string iconFontFamilyName;
+        double baseSize;
+        lock (gate)
+        {
+            textFontFamily = options.FontFamily;
+            iconFontFamilyName = options.IconFontFamily;
+            baseSize = options.FontSize;
+        }
+
+        var fontFamily = new FontFamily(textFontFamily);
+        var iconFontFamily = new FontFamily(iconFontFamilyName);
 
         window.FontFamily = fontFamily;
         window.FontSize = baseSize;

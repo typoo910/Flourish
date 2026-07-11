@@ -117,6 +117,7 @@
     BasedOn="{StaticResource FlourishNavigationListBoxItemBaseStyle}"
     TargetType="{x:Type ListBoxItem}"
   >
+    <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
     <Style.Triggers>
       <DataTrigger Binding="{Binding IsVisible}" Value="False">
         <Setter Property="Visibility" Value="Collapsed" />

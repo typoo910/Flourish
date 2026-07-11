@@ -7,38 +7,30 @@ namespace ArkheideSystem.Gallery;
 internal static class Program
 {
     private static IFlourish? flourish;
-
     public static IFlourish Flourish =>
         flourish ?? throw new InvalidOperationException("Flourish has not been built.");
-
-    public static T Fetch<T>()
-        where T : notnull
-    {
-        return Flourish.GetRequiredService<T>();
-    }
 
     [STAThread]
     public static int Main(string[] args)
     {
         flourish = FlourishBuilder
             .CreateDefaultBuilder(args)
-            .ConfigureData(data =>
-            {
-                data.SetLocale("CN");
-            })
+            .ConfigureData(data => data.SetLocale("EN"))
             .ConfigureServices(
                 (_, services) =>
                 {
                     services.AddSingleton<App>();
                     services.AddSingleton<ICommandParser, GalleryCommandParser>();
 
-                    services.AddNavigable<HomePage>("Home", "\uE80F");
-                    services.AddNavigable<GalleryPage>("Gallery", "\uE91B");
-                    services.AddNavigable<EditorPage>("Editor", "\uE70F");
-                    services.AddNavigable<SettingsPage>("Settings", "\uE713");
-                    services.AddNavigable<TreeParentPage>("Tree", "\uE8A5");
-                    services.AddNavigable<Page1>("Page1", "\uE8A5");
-                    services.AddNavigable<Page2>("Page2", "\uE8A5");
+                    services.AddNavigable<HomePage>("Overview", "\uE80F");
+                    services.AddNavigable<ConfigurationPage>("Configuration & locale", "\uE713");
+                    services.AddNavigable<AppearancePage>("Appearance & motion", "\uE790");
+                    services.AddNavigable<TitleBarRuntimePage>("Title bar & search", "\uE8A4");
+                    services.AddNavigable<NavigationRuntimePage>("Navigation & cache", "\uE700");
+                    services.AddNavigable<ToolbarStatusPage>("Toolbar, status & regions", "\uE945");
+                    services.AddNavigable<CommandsPage>("Commands & shortcuts", "\uE756");
+                    services.AddNavigable<WindowRuntimePage>("Window & notifications", "\uE737");
+                    services.AddNavigable<BackgroundTasksPage>("Background tasks", "\uE895");
                 }
             )
             .ConfigureShell(shell =>
@@ -51,7 +43,7 @@ internal static class Program
                     .UseStatusBar()
                     .UseTips()
                     .UseMaterialEffect()
-                    .UseGlobalFont("Microsoft YaHei");
+                    .UseGlobalFont("Microsoft Yahei");
             })
             .ConfigureTitleBar(titlebar =>
             {
@@ -59,69 +51,71 @@ internal static class Program
                     .SetBreadcrumbButton()
                     .SetNavToggle()
                     .SetLogo()
-                    .SetTitle("Gallery")
-                    .SetSubTitle("Flourish 示例")
+                    .SetTitle("Flourish Gallery")
+                    .SetSubTitle("Playground")
                     .SetProfile(NameOrder.FirstLast)
                     .SetThemeToggle(FlourishTheme.System)
-                    .SetSearch("输入 message 测试搜索回调", (_, text) => { });
+                    .SetSearch("Type here to exercise runtime search", (_, _) => { });
             })
             .ConfigureNavigation(nav =>
             {
                 nav.SetDirection()
                     .SetInitiallyOpen()
-                    .SetPanelWidth(openWidth: 220, closedWidth: 48, maxWidth: 480, minWidth: 150)
+                    .SetPanelWidth(openWidth: 250, closedWidth: 48, maxWidth: 520, minWidth: 180)
                     .SetGroup(
                         null,
                         0,
-                        group =>
-                        {
-                            group.AddNavigableViewItem<HomePage>(isInitial: true);
-                            group.AddNavigableViewItem<GalleryPage>();
-                            group.AddNavigableViewItem<EditorPage>();
-                        }
+                        group => group.AddNavigableViewItem<HomePage>(isInitial: true)
                     )
                     .SetGroup(
-                        "按钮",
+                        "Runtime",
                         1,
                         group =>
                         {
-                            group.AddNavigableItem("Hello", "\uE8F2", "demo.hello");
-                            group.AddNavigableItem("World", "\uE774", "demo.world");
-                            group.AddNavigableItem("Background task", "\uE895", "demo.background");
+                            group.AddNavigableViewItem<ConfigurationPage>();
+                            group.AddNavigableViewItem<CommandsPage>();
+                            group.AddNavigableViewItem<BackgroundTasksPage>();
                         }
                     )
                     .SetGroup(
-                        "Tree",
+                        "Surfaces",
                         2,
                         group =>
                         {
-                            group.AddNavigableViewItem<TreeParentPage>(parentId: 1);
-                            group.AddNavigableItem("Button1", "\uE8B7", "tree.button1", 0, 1);
-                            group.AddNavigableItem("Button2", "\uE8B7", "tree.button2", 0, 1);
-                            group.AddNavigableItem("普通父节点", "\uE8A5", null, 2, 0);
-                            group.AddNavigableViewItem<Page1>(childId: 2);
-                            group.AddNavigableViewItem<Page2>(childId: 2);
+                            group.AddNavigableViewItem<AppearancePage>();
+                            group.AddNavigableViewItem<TitleBarRuntimePage>();
+                            group.AddNavigableViewItem<NavigationRuntimePage>();
+                            group.AddNavigableViewItem<ToolbarStatusPage>();
+                            group.AddNavigableViewItem<WindowRuntimePage>();
                         }
                     )
-                    .AddFixedNavigableViewItem<SettingsPage>()
-                    .AddFixedNavigableItem("关于", "\uE946", "app.about");
+                    .SetGroup(
+                        "Commands",
+                        3,
+                        group =>
+                        {
+                            group.AddNavigableItem("Show a modal message", "\uE8F2", "demo.hello");
+                            group.AddNavigableItem(
+                                "Queue a background task",
+                                "\uE895",
+                                "demo.background"
+                            );
+                        }
+                    );
             })
-            .ConfigureDynamicToolbar(tool =>
+            .ConfigureDynamicToolbar(toolbar =>
             {
-                tool.CreateToolbarItems<HomePage>(
-                    new FlourishToolbarItem("打开", "\uE8E5", "home.open"),
-                    new FlourishToolbarItem("保存", "\uE74E", "home.save")
-                );
-
-                tool.CreateToolbarItems<GalleryPage>(
-                    new FlourishToolbarItem("打开", "\uE8E5", "gallery.open"),
-                    new FlourishToolbarItem("保存", "\uE74E", "gallery.save"),
-                    new FlourishToolbarItem("导入", "\uE898", "gallery.import")
+                toolbar.CreateToolbarItems<HomePage>(
+                    new FlourishToolbarItem("Say hello", "\uE8F2", "demo.hello"),
+                    new FlourishToolbarItem("Queue task", "\uE895", "demo.background")
                 );
             })
             .ConfigureStatusBar(statusBar =>
             {
-                statusBar.ShowLANConnectionStatus().ShowPowerStatus();
+                statusBar
+                    .AddStatusItem("Online", "\uE930")
+                    .ShowLANConnectionStatus()
+                    .ShowPowerStatus();
             })
             .ConfigureMotion(motion =>
             {

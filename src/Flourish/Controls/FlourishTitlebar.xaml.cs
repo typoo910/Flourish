@@ -91,6 +91,20 @@ internal partial class FlourishTitlebar : UserControl
         UpdateSearchPlaceholderVisibility();
     }
 
+    public void SetSearchText(string text)
+    {
+        SearchBox.Text = text ?? string.Empty;
+        SearchBox.CaretIndex = SearchBox.Text.Length;
+        UpdateSearchPlaceholderVisibility();
+    }
+
+    public void FocusSearchBox()
+    {
+        SearchBox.Focus();
+        Keyboard.Focus(SearchBox);
+        SearchBox.SelectAll();
+    }
+
     public ImageSource? SetLogo(string? logoPath, string fallbackText)
     {
         var effectiveLogoSource = LoadLogoSource(logoPath) ?? DefaultLogoSource;

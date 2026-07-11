@@ -7,13 +7,102 @@ using ArkheideSystem.Flourish.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class FlourishMotionService(FlourishShellOptions options)
+internal sealed class FlourishMotionService(FlourishShellOptions options) : IMotionService
 {
     private const double PageEntranceOffset = 14;
+    private readonly object gate = new();
+    private Window? owner;
 
-    private bool CanAnimate =>
-        options.Motion.IsEnabled
-        && (!options.Motion.RespectSystemReducedMotion || SystemParameters.ClientAreaAnimation);
+    public FlourishMotionSettings Current
+    {
+        get
+        {
+            lock (gate)
+            {
+                return CaptureSettings();
+            }
+        }
+    }
+
+    public bool CanAnimate => CanAnimateSettings(Current);
+
+    public event EventHandler<FlourishMotionChangedEventArgs>? Changed;
+
+    public void SetEnabled(bool enabled)
+    {
+        UpdateOptions(() => options.Motion.IsEnabled = enabled);
+    }
+
+    public void SetPageTransition(
+        FlourishPageTransition transition,
+        TimeSpan? duration = null
+    )
+    {
+        ValidateEnum(transition, nameof(transition));
+        if (duration.HasValue)
+        {
+            ValidateDuration(duration.Value, nameof(duration));
+        }
+
+        UpdateOptions(() =>
+        {
+            options.Motion.PageTransition = transition;
+            if (duration.HasValue)
+            {
+                options.Motion.PageTransitionDuration = duration.Value;
+            }
+        });
+    }
+
+    public void SetNavigationPanelTransition(
+        FlourishNavigationPanelTransition transition,
+        TimeSpan? duration = null
+    )
+    {
+        ValidateEnum(transition, nameof(transition));
+        if (duration.HasValue)
+        {
+            ValidateDuration(duration.Value, nameof(duration));
+        }
+
+        UpdateOptions(() =>
+        {
+            options.Motion.NavigationPanelTransition = transition;
+            if (duration.HasValue)
+            {
+                options.Motion.NavigationPanelTransitionDuration = duration.Value;
+            }
+        });
+    }
+
+    public void SetHoverReveal(bool enabled, TimeSpan? duration = null)
+    {
+        if (duration.HasValue)
+        {
+            ValidateDuration(duration.Value, nameof(duration));
+        }
+
+        UpdateOptions(() =>
+        {
+            options.Motion.IsHoverRevealEnabled = enabled;
+            if (duration.HasValue)
+            {
+                options.Motion.HoverRevealAnimationDuration = duration.Value;
+            }
+        });
+    }
+
+    public void SetRespectSystemReducedMotion(bool enabled)
+    {
+        UpdateOptions(() => options.Motion.RespectSystemReducedMotion = enabled);
+    }
+
+    internal void Attach(Window window)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+        owner = window;
+        ApplyResources(window, Current);
+    }
 
     public void AnimateNavigationPane(
         ColumnDefinition column,
@@ -22,11 +111,12 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
         Action? completed = null
     )
     {
+        var settings = Current;
         column.BeginAnimation(ColumnDefinition.WidthProperty, null);
 
         if (
-            !CanAnimate
-            || options.Motion.NavigationPanelTransition == FlourishNavigationPanelTransition.None
+            !CanAnimateSettings(settings)
+            || settings.NavigationPanelTransition == FlourishNavigationPanelTransition.None
             || AreClose(fromWidth, toWidth)
         )
         {
@@ -39,7 +129,7 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
         {
             From = new GridLength(fromWidth),
             To = new GridLength(toWidth),
-            Duration = new Duration(options.Motion.NavigationPanelTransitionDuration),
+            Duration = new Duration(settings.NavigationPanelTransitionDuration),
             EasingFunction = CreateEase(),
             FillBehavior = FillBehavior.Stop,
         };
@@ -59,18 +149,22 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
 
     public void AnimatePageEntrance(FrameworkElement frame)
     {
+        var settings = Current;
         frame.BeginAnimation(UIElement.OpacityProperty, null);
         var translate = EnsureTranslateTransform(frame);
         translate.BeginAnimation(TranslateTransform.YProperty, null);
 
-        if (!CanAnimate || options.Motion.PageTransition == FlourishPageTransition.None)
+        if (
+            !CanAnimateSettings(settings)
+            || settings.PageTransition == FlourishPageTransition.None
+        )
         {
             frame.Opacity = 1;
             translate.Y = 0;
             return;
         }
 
-        var duration = new Duration(options.Motion.PageTransitionDuration);
+        var duration = new Duration(settings.PageTransitionDuration);
         var opacityAnimation = new DoubleAnimation
         {
             From = 0,
@@ -83,7 +177,7 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
         var yAnimation = new DoubleAnimation
         {
             From =
-                options.Motion.PageTransition == FlourishPageTransition.EntranceFromBottom
+                settings.PageTransition == FlourishPageTransition.EntranceFromBottom
                     ? PageEntranceOffset
                     : 0,
             To = 0,
@@ -100,7 +194,7 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
 
         frame.Opacity = 0;
         translate.Y =
-            options.Motion.PageTransition == FlourishPageTransition.EntranceFromBottom
+            settings.PageTransition == FlourishPageTransition.EntranceFromBottom
                 ? PageEntranceOffset
                 : 0;
 
@@ -136,6 +230,112 @@ internal sealed class FlourishMotionService(FlourishShellOptions options)
     private static bool AreClose(double first, double second)
     {
         return Math.Abs(first - second) < 0.5;
+    }
+
+    private void UpdateOptions(Action update)
+    {
+        FlourishMotionSettings previous;
+        FlourishMotionSettings current;
+        lock (gate)
+        {
+            previous = CaptureSettings();
+            update();
+            current = CaptureSettings();
+            if (previous == current)
+            {
+                return;
+            }
+        }
+
+        var attachedOwner = owner;
+        if (attachedOwner is not null)
+        {
+            if (attachedOwner.Dispatcher.CheckAccess())
+            {
+                var effective = Current;
+                ApplyResources(attachedOwner, effective);
+                RaiseChanged(previous, effective);
+            }
+            else
+            {
+                attachedOwner.Dispatcher.Invoke(() =>
+                {
+                    var effective = Current;
+                    ApplyResources(attachedOwner, effective);
+                    RaiseChanged(previous, effective);
+                });
+            }
+
+            return;
+        }
+
+        RaiseChanged(previous, current);
+    }
+
+    private void RaiseChanged(
+        FlourishMotionSettings previous,
+        FlourishMotionSettings current
+    )
+    {
+        Changed?.Invoke(
+            this,
+            new FlourishMotionChangedEventArgs(
+                previous,
+                current,
+                CanAnimateSettings(current)
+            )
+        );
+    }
+
+    private FlourishMotionSettings CaptureSettings()
+    {
+        return new FlourishMotionSettings(
+            options.Motion.IsEnabled,
+            options.Motion.PageTransition,
+            options.Motion.PageTransitionDuration,
+            options.Motion.NavigationPanelTransition,
+            options.Motion.NavigationPanelTransitionDuration,
+            options.Motion.IsHoverRevealEnabled,
+            options.Motion.HoverRevealAnimationDuration,
+            options.Motion.RespectSystemReducedMotion
+        );
+    }
+
+    private static bool CanAnimateSettings(FlourishMotionSettings settings)
+    {
+        return settings.IsEnabled
+            && (!settings.RespectSystemReducedMotion || SystemParameters.ClientAreaAnimation);
+    }
+
+    private static void ApplyResources(Window window, FlourishMotionSettings settings)
+    {
+        window.Resources["FlourishHoverRevealEnabled"] =
+            CanAnimateSettings(settings) && settings.IsHoverRevealEnabled;
+        ArkheideSystem.Flourish.Controls.HoverReveal.SetAnimationDuration(
+            window,
+            settings.HoverRevealAnimationDuration
+        );
+    }
+
+    private static void ValidateDuration(TimeSpan duration, string parameterName)
+    {
+        if (duration <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                duration,
+                "Duration must be greater than zero."
+            );
+        }
+    }
+
+    private static void ValidateEnum<TEnum>(TEnum value, string parameterName)
+        where TEnum : struct, Enum
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Unknown value.");
+        }
     }
 }
 

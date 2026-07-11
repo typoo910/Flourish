@@ -21,7 +21,13 @@ public sealed record FlourishToolbarItem
         DisplayName = displayName;
         IconGlyph = iconGlyph;
         CommandKey = commandKey;
+        Id = CreateDefaultId(displayName, commandKey);
     }
+
+    /// <summary>
+    /// Gets the stable identifier used by <see cref="IToolbarService" /> runtime mutations.
+    /// </summary>
+    public string Id { get; init; }
 
     /// <summary>
     /// Gets the text displayed for the toolbar item.
@@ -38,6 +44,12 @@ public sealed record FlourishToolbarItem
     /// </summary>
     public string? CommandKey { get; init; }
 
+    /// <summary>Gets whether the item is visible.</summary>
+    public bool IsVisible { get; init; } = true;
+
+    /// <summary>Gets whether the item accepts interaction.</summary>
+    public bool IsEnabled { get; init; } = true;
+
     /// <summary>
     /// Deconstructs the toolbar item into display name, icon glyph, and command key.
     /// </summary>
@@ -49,5 +61,12 @@ public sealed record FlourishToolbarItem
         displayName = DisplayName;
         iconGlyph = IconGlyph;
         commandKey = CommandKey;
+    }
+
+    private static string CreateDefaultId(string displayName, string? commandKey)
+    {
+        var candidate = string.IsNullOrWhiteSpace(commandKey) ? displayName : commandKey;
+        candidate = string.IsNullOrWhiteSpace(candidate) ? "item" : candidate.Trim();
+        return $"toolbar:{candidate}";
     }
 }

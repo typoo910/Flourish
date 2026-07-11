@@ -1,5 +1,7 @@
 using System.Windows;
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Configuration;
+using Microsoft.Extensions.Logging;
 using Application = System.Windows.Application;
 using Forms = System.Windows.Forms;
 
@@ -7,129 +9,366 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class TrayIconService(
     FlourishShellOptions options,
-    FlourishLocalizationService localizationService
-) : IDisposable
+    FlourishLocalizationService localizationService,
+    WindowCloseService windowCloseService,
+    ILogger<TrayIconService> logger
+) : ITrayService, IDisposable
 {
     private const string DefaultIconUri =
         "pack://application:,,,/Flourish;component/Assets/favicon.ico";
 
+    private readonly object gate = new();
     private Forms.NotifyIcon? notifyIcon;
     private Icon? icon;
     private Window? owner;
     private bool isDisposed;
+    private bool isExitRequested;
+    private bool isIconVisible;
+    private bool isWindowHidden;
+    private bool isLocalizationSubscribed;
+    private string toolTipText = "Flourish";
 
-    public bool IsEnabled => options.IsTrayExitEnabled;
+    public event EventHandler<FlourishTrayStateChangedEventArgs>? StateChanged;
 
-    public bool IsExitRequested { get; private set; }
+    public bool IsEnabled
+    {
+        get
+        {
+            lock (gate)
+            {
+                return options.IsTrayExitEnabled;
+            }
+        }
+    }
+
+    public bool IsExitRequested
+    {
+        get
+        {
+            lock (gate)
+            {
+                return isExitRequested;
+            }
+        }
+    }
+
+    public FlourishTrayState Current
+    {
+        get
+        {
+            lock (gate)
+            {
+                return new FlourishTrayState(
+                    options.IsTrayExitEnabled,
+                    isIconVisible,
+                    isWindowHidden,
+                    isExitRequested,
+                    toolTipText
+                );
+            }
+        }
+    }
 
     public void Initialize(Window owner, string tooltipText)
     {
-        if (!IsEnabled || isDisposed)
+        ArgumentNullException.ThrowIfNull(owner);
+        if (!owner.Dispatcher.CheckAccess())
         {
+            owner.Dispatcher.Invoke(() => Initialize(owner, tooltipText));
             return;
         }
 
-        this.owner = owner;
-        EnsureNotifyIcon(tooltipText);
+        lock (gate)
+        {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(this.owner, owner))
+            {
+                if (this.owner is not null)
+                {
+                    this.owner.IsVisibleChanged -= Owner_IsVisibleChanged;
+                }
+
+                this.owner = owner;
+                this.owner.IsVisibleChanged += Owner_IsVisibleChanged;
+            }
+
+            isWindowHidden = !owner.IsVisible;
+            toolTipText = CreateTooltipText(tooltipText);
+            if (!isLocalizationSubscribed)
+            {
+                localizationService.Changed += LocalizationService_Changed;
+                isLocalizationSubscribed = true;
+            }
+
+            if (options.IsTrayExitEnabled)
+            {
+                EnsureNotifyIcon(toolTipText);
+            }
+        }
+
+        RaiseChanged();
+    }
+
+    public void SetEnabled(bool enabled)
+    {
+        InvokeOnOwner(() =>
+        {
+            var shouldRestore = false;
+            var shouldResetCloseBehavior = false;
+            lock (gate)
+            {
+                if (isDisposed || options.IsTrayExitEnabled == enabled)
+                {
+                    return;
+                }
+
+                options.IsTrayExitEnabled = enabled;
+                if (enabled && owner is not null)
+                {
+                    EnsureNotifyIcon(toolTipText);
+                }
+                else if (!enabled)
+                {
+                    SetIconVisibleLocked(false);
+                    shouldRestore = isWindowHidden;
+                    shouldResetCloseBehavior =
+                        windowCloseService.Behavior == WindowCloseBehavior.MinimizeToTray;
+                }
+            }
+
+            if (shouldResetCloseBehavior)
+            {
+                windowCloseService.SetBehavior(WindowCloseBehavior.Prompt);
+            }
+
+            if (shouldRestore)
+            {
+                RestoreFromTrayCore();
+            }
+
+            RaiseChanged();
+        });
+    }
+
+    public void SetToolTip(string text)
+    {
+        var normalized = CreateTooltipText(text);
+        InvokeOnOwner(() =>
+        {
+            lock (gate)
+            {
+                if (isDisposed || string.Equals(toolTipText, normalized, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                toolTipText = normalized;
+                if (notifyIcon is not null)
+                {
+                    notifyIcon.Text = toolTipText;
+                }
+            }
+
+            RaiseChanged();
+        });
     }
 
     public bool MinimizeToTray()
     {
-        if (!IsEnabled || isDisposed || owner is null)
+        return InvokeOnOwner(MinimizeToTrayCore);
+    }
+
+    private bool MinimizeToTrayCore()
+    {
+        Window? current;
+        lock (gate)
         {
-            return false;
+            if (!options.IsTrayExitEnabled || isDisposed || owner is null)
+            {
+                return false;
+            }
+
+            EnsureNotifyIcon(toolTipText);
+            if (notifyIcon is null)
+            {
+                return false;
+            }
+
+            SetIconVisibleLocked(true);
+            current = owner;
         }
 
-        EnsureNotifyIcon(owner.Title);
-        if (notifyIcon is null)
-        {
-            return false;
-        }
-
-        notifyIcon.Visible = true;
-        owner.Hide();
+        current.Hide();
+        RaiseChanged();
         return true;
     }
 
     public void RestoreFromTray()
     {
-        if (isDisposed || owner is null)
+        InvokeOnOwner(() =>
         {
-            return;
+            if (RestoreFromTrayCore())
+            {
+                RaiseChanged();
+            }
+        });
+    }
+
+    private bool RestoreFromTrayCore()
+    {
+        Window? current;
+        lock (gate)
+        {
+            if (isDisposed || owner is null)
+            {
+                return false;
+            }
+
+            current = owner;
+            SetIconVisibleLocked(false);
         }
 
-        owner.Show();
-        if (owner.WindowState == WindowState.Minimized)
+        current.Show();
+        if (current.WindowState == WindowState.Minimized)
         {
-            owner.WindowState = WindowState.Normal;
+            current.WindowState = WindowState.Normal;
         }
 
-        owner.Activate();
-        if (notifyIcon is not null)
-        {
-            notifyIcon.Visible = false;
-        }
+        current.Activate();
+        return true;
     }
 
     public void ExitFromTray()
     {
-        if (isDisposed)
+        InvokeOnOwner(() =>
         {
-            return;
-        }
-
-        IsExitRequested = true;
-        if (notifyIcon is not null)
-        {
-            notifyIcon.Visible = false;
-        }
-
-        owner?.Dispatcher.Invoke(() =>
-        {
-            if (owner is not null)
+            lock (gate)
             {
-                owner.Close();
+                if (isDisposed || isExitRequested)
+                {
+                    return;
+                }
+
+                isExitRequested = true;
+                SetIconVisibleLocked(false);
+            }
+
+            RaiseChanged();
+
+            _ = RequestExitAsync();
+        });
+    }
+
+    private async Task RequestExitAsync()
+    {
+        try
+        {
+            if (
+                await windowCloseService.RequestCloseAsync(WindowCloseRequestReason.Tray)
+            )
+            {
                 return;
             }
 
-            Application.Current?.Shutdown();
+            ResetExitRequested();
+        }
+        catch (Exception error)
+        {
+            ResetExitRequested();
+            logger.LogError(error, "The notification-area exit request failed.");
+        }
+    }
+
+    private void ResetExitRequested()
+    {
+        InvokeOnOwner(() =>
+        {
+            lock (gate)
+            {
+                if (isDisposed || !isExitRequested)
+                {
+                    return;
+                }
+
+                isExitRequested = false;
+            }
+
+            RaiseChanged();
         });
     }
 
     public void Dispose()
     {
-        if (isDisposed)
+        InvokeOnOwner(() =>
         {
-            return;
-        }
+            Forms.NotifyIcon? currentNotifyIcon;
+            Icon? currentIcon;
+            Forms.ContextMenuStrip? contextMenu;
+            lock (gate)
+            {
+                if (isDisposed)
+                {
+                    return;
+                }
 
-        isDisposed = true;
-        if (notifyIcon is not null)
-        {
-            notifyIcon.Visible = false;
-            notifyIcon.Dispose();
-        }
+                isDisposed = true;
+                if (owner is not null)
+                {
+                    owner.IsVisibleChanged -= Owner_IsVisibleChanged;
+                }
 
-        icon?.Dispose();
+                if (isLocalizationSubscribed)
+                {
+                    localizationService.Changed -= LocalizationService_Changed;
+                    isLocalizationSubscribed = false;
+                }
+
+                SetIconVisibleLocked(false);
+                currentNotifyIcon = notifyIcon;
+                currentIcon = icon;
+                contextMenu = notifyIcon?.ContextMenuStrip;
+                notifyIcon = null;
+                icon = null;
+                owner = null;
+                isWindowHidden = false;
+            }
+
+            currentNotifyIcon?.Dispose();
+            contextMenu?.Dispose();
+            currentIcon?.Dispose();
+            RaiseChanged();
+        });
     }
+
+    void ITrayService.Restore() => RestoreFromTray();
+
+    void ITrayService.Exit() => ExitFromTray();
 
     private void EnsureNotifyIcon(string tooltipText)
     {
         if (notifyIcon is not null)
         {
-            notifyIcon.Text = CreateTooltipText(tooltipText);
+            toolTipText = CreateTooltipText(tooltipText);
+            notifyIcon.Text = toolTipText;
             return;
         }
+
+        toolTipText = CreateTooltipText(tooltipText);
 
         icon = LoadDefaultIcon();
         notifyIcon = new Forms.NotifyIcon
         {
             Icon = icon,
-            Text = CreateTooltipText(tooltipText),
+            Text = toolTipText,
             Visible = false,
             ContextMenuStrip = CreateContextMenu(),
         };
-        notifyIcon.DoubleClick += (_, _) => owner?.Dispatcher.Invoke(RestoreFromTray);
+        isIconVisible = false;
+        notifyIcon.DoubleClick += (_, _) => RestoreFromTray();
     }
 
     private Forms.ContextMenuStrip CreateContextMenu()
@@ -138,7 +377,7 @@ internal sealed class TrayIconService(
         contextMenu.Items.Add(
             localizationService.Get(FlourishLocaleKeys.TrayShow),
             null,
-            (_, _) => owner?.Dispatcher.Invoke(RestoreFromTray)
+            (_, _) => RestoreFromTray()
         );
         contextMenu.Items.Add(
             localizationService.Get(FlourishLocaleKeys.TrayExit),
@@ -146,6 +385,83 @@ internal sealed class TrayIconService(
             (_, _) => ExitFromTray()
         );
         return contextMenu;
+    }
+
+    private void Owner_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        lock (gate)
+        {
+            if (isDisposed || !ReferenceEquals(sender, owner) || owner is null)
+            {
+                return;
+            }
+
+            isWindowHidden = !owner.IsVisible;
+        }
+
+        RaiseChanged();
+    }
+
+    private void LocalizationService_Changed(
+        object? sender,
+        FlourishLocalizationChangedEventArgs e
+    )
+    {
+        InvokeOnOwner(() =>
+        {
+            Forms.ContextMenuStrip? previousMenu;
+            lock (gate)
+            {
+                if (isDisposed || notifyIcon is null)
+                {
+                    return;
+                }
+
+                previousMenu = notifyIcon.ContextMenuStrip;
+                notifyIcon.ContextMenuStrip = CreateContextMenu();
+            }
+
+            previousMenu?.Dispose();
+        });
+    }
+
+    private void SetIconVisibleLocked(bool visible)
+    {
+        isIconVisible = visible && notifyIcon is not null;
+        if (notifyIcon is not null)
+        {
+            notifyIcon.Visible = isIconVisible;
+        }
+    }
+
+    private void InvokeOnOwner(Action action)
+    {
+        Window? current;
+        lock (gate)
+        {
+            current = owner;
+        }
+
+        if (current is null || current.Dispatcher.CheckAccess())
+        {
+            action();
+            return;
+        }
+
+        current.Dispatcher.Invoke(action);
+    }
+
+    private T InvokeOnOwner<T>(Func<T> action)
+    {
+        Window? current;
+        lock (gate)
+        {
+            current = owner;
+        }
+
+        return current is null || current.Dispatcher.CheckAccess()
+            ? action()
+            : current.Dispatcher.Invoke(action);
     }
 
     private static Icon LoadDefaultIcon()
@@ -164,5 +480,10 @@ internal sealed class TrayIconService(
         return string.IsNullOrWhiteSpace(tooltipText) ? "Flourish"
             : tooltipText.Length > 63 ? tooltipText[..63]
             : tooltipText;
+    }
+
+    private void RaiseChanged()
+    {
+        StateChanged?.Invoke(this, new FlourishTrayStateChangedEventArgs(Current));
     }
 }

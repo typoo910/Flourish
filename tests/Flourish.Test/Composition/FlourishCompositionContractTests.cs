@@ -33,6 +33,73 @@ public sealed class FlourishCompositionContractTests
     }
 
     [Fact]
+    public void Build_RegistersRuntimeConfigurationAndAppearanceContractsAsSingletonAdapters()
+    {
+        using var flourish = FlourishBuilder.CreateDefaultBuilder([]).Build();
+
+        Assert.Same(
+            flourish.GetRequiredService<FlourishLocalizationService>(),
+            flourish.GetRequiredService<IFlourishLocalization>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<FlourishConfigurationService>(),
+            flourish.GetRequiredService<IFlourishConfiguration>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<AppPreferenceService>(),
+            flourish.GetRequiredService<IAppSettingsStore>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<ThemeService>(),
+            flourish.GetRequiredService<IThemeService>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<FontService>(),
+            flourish.GetRequiredService<IFontService>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<FlourishToolTipService>(),
+            flourish.GetRequiredService<IToolTipService>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<FlourishMotionService>(),
+            flourish.GetRequiredService<IMotionService>()
+        );
+        Assert.Same(
+            flourish.GetRequiredService<MaterialEffectService>(),
+            flourish.GetRequiredService<IMaterialEffectService>()
+        );
+    }
+
+    [Fact]
+    public void Build_RegistersRemainingRuntimeContractsAsConcreteSingletonAdapters()
+    {
+        using var flourish = FlourishBuilder.CreateDefaultBuilder([]).Build();
+
+        AssertSingletonAdapter<NavigationPanelService, INavigationPanelService>(flourish);
+        AssertSingletonAdapter<NavigationMenuService, INavigationMenuService>(flourish);
+        AssertSingletonAdapter<FlourishToolbarService, IToolbarService>(flourish);
+        AssertSingletonAdapter<FlourishStatusService, IStatusBarService>(flourish);
+        AssertSingletonAdapter<ShellRegionService, IShellRegionService>(flourish);
+        AssertSingletonAdapter<FlourishBackgroundTaskService, IBackgroundTaskService>(flourish);
+        AssertSingletonAdapter<NotificationService, INotificationService>(flourish);
+        AssertSingletonAdapter<TrayIconService, ITrayService>(flourish);
+        AssertSingletonAdapter<CommandParser, ICommandRegistry>(flourish);
+        AssertSingletonAdapter<CommandParser, ICommandDispatcher>(flourish);
+        AssertSingletonAdapter<ShortcutService, IShortcutService>(flourish);
+        AssertSingletonAdapter<TitleBarService, ITitleBarService>(flourish);
+        AssertSingletonAdapter<TitleBarSearchService, ITitleBarSearchService>(flourish);
+        AssertSingletonAdapter<WindowService, IWindowService>(flourish);
+        AssertSingletonAdapter<WindowCloseService, IWindowCloseService>(flourish);
+        AssertSingletonAdapter<ProfileFlyoutService, IProfileFlyoutService>(flourish);
+        AssertSingletonAdapter<ShellFeatureService, IShellFeatureService>(flourish);
+        AssertSingletonAdapter<NavigationRouteRegistry, INavigationRouteRegistry>(flourish);
+        AssertSingletonAdapter<PageCacheService, IPageCacheService>(flourish);
+        AssertSingletonAdapter<NavigationService, INavigationService>(flourish);
+        AssertSingletonAdapter<NavigationService, IFrameNavigationService>(flourish);
+    }
+
+    [Fact]
     public void Build_EnablesBuiltInSystemStatusFlags()
     {
         var builder = FlourishBuilder
@@ -132,6 +199,16 @@ public sealed class FlourishCompositionContractTests
         return FlourishBuilder
             .CreateDefaultBuilder([])
             .ConfigureShell(shell => shell.UseNavigation());
+    }
+
+    private static void AssertSingletonAdapter<TConcrete, TContract>(IFlourish flourish)
+        where TConcrete : class
+        where TContract : class
+    {
+        Assert.Same(
+            flourish.GetRequiredService<TConcrete>(),
+            flourish.GetRequiredService<TContract>()
+        );
     }
 
     private sealed class HomePage : Page { }

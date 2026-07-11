@@ -200,6 +200,103 @@ public sealed class AppPreferenceServiceTests
         );
     }
 
+    [Fact]
+    public async Task UpdateAsync_AppliesTransactionAtomicallyAndReloadsConfiguration()
+    {
+        using var directory = new TemporaryDirectory();
+        WriteAppSettings(
+            directory.Path,
+            """
+            {
+              "Feature": {
+                "Existing": 1,
+                "Items": ["first"],
+                "RemoveMe": true
+              }
+            }
+            """
+        );
+        var sut = CreateService(directory.Path);
+
+        var result = await sut.UpdateAsync(editor =>
+        {
+            editor.Set("Feature:Enabled", true);
+            editor.Set<object?>("Feature:NullValue", null);
+            editor.Merge("Feature", new { Existing = 2, Added = "value" });
+            editor.Append("Feature:Items", "second");
+            editor.Remove("Feature:RemoveMe");
+        });
+
+        Assert.True(result.Changed);
+        Assert.True(result.ConfigurationReloaded);
+        Assert.Equal(sut.AppSettingsFilePath, result.FilePath);
+        Assert.Empty(
+            Directory.EnumerateFiles(directory.Path, ".appsettings.json.*.tmp")
+        );
+        using var document = JsonDocument.Parse(File.ReadAllText(result.FilePath));
+        var feature = document.RootElement.GetProperty("Feature");
+        Assert.True(feature.GetProperty("Enabled").GetBoolean());
+        Assert.Equal(JsonValueKind.Null, feature.GetProperty("NullValue").ValueKind);
+        Assert.Equal(2, feature.GetProperty("Existing").GetInt32());
+        Assert.Equal("value", feature.GetProperty("Added").GetString());
+        Assert.Equal(
+            new string?[] { "first", "second" },
+            feature
+                .GetProperty("Items")
+                .EnumerateArray()
+                .Select(item => item.GetString())
+                .ToArray()
+        );
+        Assert.False(feature.TryGetProperty("RemoveMe", out _));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenTransactionDoesNotChangeAnything_DoesNotCreateFile()
+    {
+        using var directory = new TemporaryDirectory();
+        var sut = CreateService(directory.Path);
+
+        var result = await sut.RemoveAsync("Missing:Value");
+
+        Assert.False(result.Changed);
+        Assert.False(result.ConfigurationReloaded);
+        Assert.False(File.Exists(result.FilePath));
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenTargetIsNotAnObject_PreservesOriginalFile()
+    {
+        using var directory = new TemporaryDirectory();
+        const string originalJson = "{ \"Feature\": 1 }";
+        WriteAppSettings(directory.Path, originalJson);
+        var sut = CreateService(directory.Path);
+
+        await Assert.ThrowsAsync<InvalidDataException>(async () =>
+            await sut.MergeAsync("Feature", new { Enabled = true })
+        );
+
+        Assert.Equal(originalJson, File.ReadAllText(sut.AppSettingsFilePath));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_EditorCannotBeUsedAfterTransactionCompletes()
+    {
+        using var directory = new TemporaryDirectory();
+        var sut = CreateService(directory.Path);
+        IAppSettingsEditor? capturedEditor = null;
+
+        await sut.UpdateAsync(editor =>
+        {
+            capturedEditor = editor;
+            editor.Set("Feature:Value", 1);
+        });
+
+        Assert.NotNull(capturedEditor);
+        Assert.Throws<ObjectDisposedException>(() =>
+            capturedEditor.Set("Feature:Value", 2)
+        );
+    }
+
     private static AppPreferenceService CreateService(string contentRootPath)
     {
         var configuration = new ConfigurationBuilder()

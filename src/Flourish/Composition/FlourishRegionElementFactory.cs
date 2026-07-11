@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Services;
 using Button = System.Windows.Controls.Button;
 using Orientation = System.Windows.Controls.Orientation;
@@ -25,7 +26,7 @@ internal static class FlourishRegionElementFactory
             ToolTip = displayName,
         };
         button.SetResourceReference(FrameworkElement.StyleProperty, "FlourishIconButtonStyle");
-        AttachClick(button, services, commandKey, action);
+        AttachClick(button, services, commandKey, action, CommandSource.TitleBar);
         return button;
     }
 
@@ -44,7 +45,7 @@ internal static class FlourishRegionElementFactory
             ToolTip = displayText,
         };
         button.SetResourceReference(FrameworkElement.StyleProperty, "FlourishToolbarButtonStyle");
-        AttachClick(button, services, commandKey, action);
+        AttachClick(button, services, commandKey, action, CommandSource.StatusBar);
         return button;
     }
 
@@ -52,7 +53,8 @@ internal static class FlourishRegionElementFactory
         Button button,
         IServiceProvider services,
         string? commandKey,
-        Action<IServiceProvider>? action
+        Action<IServiceProvider>? action,
+        CommandSource commandSource
     )
     {
         if (string.IsNullOrWhiteSpace(commandKey) && action is null)
@@ -61,13 +63,25 @@ internal static class FlourishRegionElementFactory
             return;
         }
 
-        button.Click += (_, _) =>
+        button.Click += async (_, _) =>
         {
             action?.Invoke(services);
             if (!string.IsNullOrWhiteSpace(commandKey))
             {
-                var parser = services.GetService(typeof(CommandParser)) as CommandParser;
-                parser?.Parse(commandKey);
+                if (
+                    services.GetService(typeof(ICommandDispatcher))
+                    is ICommandDispatcher dispatcher
+                )
+                {
+                    await dispatcher.ExecuteAsync(commandKey, source: commandSource);
+                }
+                else
+                {
+                    // Preserve custom service-provider scenarios that only register the historical
+                    // concrete parser while applications transition to ICommandDispatcher.
+                    var parser = services.GetService(typeof(CommandParser)) as CommandParser;
+                    parser?.Parse(commandKey);
+                }
             }
         };
     }

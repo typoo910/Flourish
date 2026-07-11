@@ -62,4 +62,32 @@ internal sealed class PageHistoryService
         backStack.Clear();
         forwardStack.Clear();
     }
+
+    public void Remove(string navigationKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(navigationKey);
+        RemoveFromStack(backStack, navigationKey);
+        RemoveFromStack(forwardStack, navigationKey);
+    }
+
+    private static void RemoveFromStack(
+        Stack<FlourishPageStackEntry> stack,
+        string navigationKey
+    )
+    {
+        if (stack.Count == 0)
+        {
+            return;
+        }
+
+        var retained = stack
+            .Where(entry => !StringComparer.Ordinal.Equals(entry.NavigationKey, navigationKey))
+            .Reverse()
+            .ToArray();
+        stack.Clear();
+        foreach (var entry in retained)
+        {
+            stack.Push(entry);
+        }
+    }
 }

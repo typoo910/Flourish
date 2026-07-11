@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using System.Windows.Threading;
 using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Configuration;
 
@@ -8,30 +9,45 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
 {
     private readonly INavigationPageProvider pageProvider;
     private readonly PageHistoryService pageHistoryService;
-    private readonly FlourishShellOptions options;
+    private readonly NavigationRouteRegistry routeRegistry;
     private INavigationContentHost? contentHost;
+    private Dispatcher? dispatcher;
     private object? currentParameter;
 
     public NavigationService(
         PageCacheService pageCacheService,
         PageHistoryService pageHistoryService,
-        FlourishShellOptions options
+        NavigationRouteRegistry routeRegistry
     )
-        : this((INavigationPageProvider)pageCacheService, pageHistoryService, options) { }
+        : this((INavigationPageProvider)pageCacheService, pageHistoryService, routeRegistry) { }
 
     internal NavigationService(
         INavigationPageProvider pageProvider,
         PageHistoryService pageHistoryService,
         FlourishShellOptions options
+    ) : this(
+        pageProvider,
+        pageHistoryService,
+        new NavigationRouteRegistry(options)
+    ) { }
+
+    internal NavigationService(
+        INavigationPageProvider pageProvider,
+        PageHistoryService pageHistoryService,
+        NavigationRouteRegistry routeRegistry
     )
     {
         this.pageProvider = pageProvider ?? throw new ArgumentNullException(nameof(pageProvider));
         this.pageHistoryService =
             pageHistoryService ?? throw new ArgumentNullException(nameof(pageHistoryService));
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
+        this.routeRegistry =
+            routeRegistry ?? throw new ArgumentNullException(nameof(routeRegistry));
+        routeRegistry.Changed += RouteRegistry_Changed;
     }
 
     public event EventHandler<FlourishNavigatedEventArgs>? Navigated;
+
+    public event EventHandler<FlourishNavigationStateChangedEventArgs>? StateChanged;
 
     public bool CanGoBack => pageHistoryService.CanGoBack;
 
@@ -41,8 +57,14 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
 
     public string? CurrentNavigationKey { get; private set; }
 
+    public object? CurrentParameter => currentParameter;
+
+    public IReadOnlyCollection<string> Routes => routeRegistry.Current.Routes.Keys.ToArray();
+
     public void Initialize(Frame contentFrame)
     {
+        ArgumentNullException.ThrowIfNull(contentFrame);
+        dispatcher = contentFrame.Dispatcher;
         Initialize(new FrameNavigationContentHost(contentFrame));
     }
 
@@ -54,6 +76,45 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
     public bool Navigate(string navigationKey, object? parameter = null, bool addToBackStack = true)
     {
         return NavigateCore(navigationKey, parameter, addToBackStack);
+    }
+
+    public bool CanNavigate(string navigationKey)
+    {
+        return routeRegistry.Contains(navigationKey);
+    }
+
+    public bool Navigate<TPage>(object? parameter = null, bool addToBackStack = true)
+        where TPage : Page
+    {
+        if (!routeRegistry.TryGet(typeof(TPage), out var route))
+        {
+            throw new InvalidOperationException(
+                $"Page type '{typeof(TPage).FullName}' is not registered for navigation."
+            );
+        }
+
+        return Navigate(route.NavigationKey, parameter, addToBackStack);
+    }
+
+    public async Task<bool> NavigateAsync(
+        string navigationKey,
+        object? parameter = null,
+        bool addToBackStack = true,
+        CancellationToken cancellationToken = default
+    )
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (dispatcher is null || dispatcher.CheckAccess())
+        {
+            return Navigate(navigationKey, parameter, addToBackStack);
+        }
+
+        var operation = dispatcher.InvokeAsync(
+            () => Navigate(navigationKey, parameter, addToBackStack),
+            DispatcherPriority.Normal,
+            cancellationToken
+        );
+        return await operation.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public bool GoBack()
@@ -105,6 +166,19 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
     public void ClearBackStack()
     {
         pageHistoryService.ClearBack();
+        RaiseStateChanged();
+    }
+
+    public void ClearForwardStack()
+    {
+        pageHistoryService.ClearForward();
+        RaiseStateChanged();
+    }
+
+    public void ClearHistory()
+    {
+        pageHistoryService.Clear();
+        RaiseStateChanged();
     }
 
     private bool NavigateCore(
@@ -126,12 +200,15 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
                 );
             }
 
-            if (!options.PageTypesByNavigationKey.TryGetValue(navigationKey, out var sourcePageType))
+            if (!routeRegistry.TryGet(navigationKey, out var route))
             {
                 throw new InvalidOperationException(
                     $"Navigation key '{navigationKey}' is not registered. Check its spelling and casing. Keys are generated from Page class names by removing the trailing, case-sensitive 'Page' suffix (for example, SettingsPage becomes 'Settings')."
                 );
             }
+
+
+            var sourcePageType = route.PageType;
 
             if (CurrentNavigationKey == navigationKey && Equals(currentParameter, parameter))
             {
@@ -162,6 +239,7 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
                 this,
                 new FlourishNavigatedEventArgs(navigationKey, sourcePageType, page, parameter)
             );
+            RaiseStateChanged();
             return true;
         }
         catch
@@ -180,5 +258,35 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
         return CurrentNavigationKey is null
             ? null
             : new FlourishPageStackEntry(CurrentNavigationKey, currentParameter);
+    }
+
+    private void RouteRegistry_Changed(
+        object? sender,
+        FlourishNavigationRoutesChangedEventArgs e
+    )
+    {
+        if (
+            e.ChangeKind == FlourishRuntimeChangeKind.Removed
+            && e.PreviousRoute is { } removed
+        )
+        {
+            pageHistoryService.Remove(removed.NavigationKey);
+            RaiseStateChanged();
+        }
+    }
+
+    private void RaiseStateChanged()
+    {
+        StateChanged?.Invoke(
+            this,
+            new FlourishNavigationStateChangedEventArgs(
+                new FlourishNavigationState(
+                    CurrentNavigationKey,
+                    CurrentSourcePageType,
+                    CanGoBack,
+                    CanGoForward
+                )
+            )
+        );
     }
 }

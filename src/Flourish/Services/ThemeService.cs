@@ -10,7 +10,7 @@ namespace ArkheideSystem.Flourish.Services;
 internal sealed class ThemeService(
     FlourishShellOptions shellOptions,
     AppPreferenceService preferenceService
-)
+) : IThemeService
 {
     private const int WmSettingChange = 0x001A;
     private const int WmThemeChanged = 0x031A;
@@ -20,14 +20,37 @@ internal sealed class ThemeService(
         @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
+    private readonly object gate = new();
     private readonly Dictionary<Window, HwndSource> hooksByWindow = [];
+    private readonly HashSet<Window> attachedWindows = [];
+    private readonly HashSet<Window> pendingHookWindows = [];
+    private FlourishTheme currentTheme = FlourishTheme.Light;
+    private FlourishTheme effectiveTheme = FlourishTheme.Light;
     private bool isInitialized;
 
     public event EventHandler<FlourishThemeChangedEventArgs>? ThemeChanged;
 
-    public FlourishTheme CurrentTheme { get; private set; } = FlourishTheme.Light;
+    public FlourishTheme CurrentTheme
+    {
+        get
+        {
+            lock (gate)
+            {
+                return currentTheme;
+            }
+        }
+    }
 
-    public FlourishTheme EffectiveTheme { get; private set; } = FlourishTheme.Light;
+    public FlourishTheme EffectiveTheme
+    {
+        get
+        {
+            lock (gate)
+            {
+                return effectiveTheme;
+            }
+        }
+    }
 
     public bool IsDark => EffectiveTheme == FlourishTheme.Dark;
 
@@ -35,43 +58,58 @@ internal sealed class ThemeService(
     {
         ArgumentNullException.ThrowIfNull(application);
 
-        if (isInitialized)
+        FlourishTheme initialTheme;
+        lock (gate)
         {
-            return;
+            if (isInitialized)
+            {
+                return;
+            }
+
+            initialTheme = shellOptions.IsThemeEnabled
+                ? preferenceService.ReadTheme() ?? shellOptions.DefaultTheme
+                : FlourishTheme.Light;
+            currentTheme = initialTheme;
+            effectiveTheme = ResolveTheme(initialTheme);
+            isInitialized = true;
         }
 
-        CurrentTheme = shellOptions.IsThemeEnabled
-            ? preferenceService.ReadTheme() ?? shellOptions.DefaultTheme
-            : FlourishTheme.Light;
-        EffectiveTheme = ResolveTheme(CurrentTheme);
         ApplyApplicationResources(application, EffectiveTheme);
-        isInitialized = true;
     }
 
     public void Attach(Window window)
     {
+        ArgumentNullException.ThrowIfNull(window);
+        lock (gate)
+        {
+            attachedWindows.Add(window);
+        }
+
         if (!shellOptions.IsThemeEnabled)
         {
             return;
         }
 
-        if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
-        {
-            AttachHook(window);
-            return;
-        }
-
-        window.SourceInitialized += Window_SourceInitialized;
-
-        void Window_SourceInitialized(object? sender, EventArgs e)
-        {
-            window.SourceInitialized -= Window_SourceInitialized;
-            AttachHook(window);
-        }
+        RunOnWindowDispatcher(window, () => EnsureHook(window));
     }
 
     public void Detach(Window window)
     {
+        lock (gate)
+        {
+            attachedWindows.Remove(window);
+        }
+
+        RunOnWindowDispatcher(window, () => DetachCore(window));
+    }
+
+    private void DetachCore(Window window)
+    {
+        if (pendingHookWindows.Remove(window))
+        {
+            window.SourceInitialized -= Window_SourceInitialized;
+        }
+
         if (!hooksByWindow.Remove(window, out var source))
         {
             return;
@@ -96,15 +134,56 @@ internal sealed class ThemeService(
     public void SetTheme(FlourishTheme theme)
     {
         ValidateTheme(theme, nameof(theme));
-        if (!shellOptions.IsThemeEnabled)
+        bool requestedThemeChanged;
+        Window[] windows;
+        lock (gate)
+        {
+            requestedThemeChanged = currentTheme != theme;
+            preferenceService.SaveTheme(theme);
+            shellOptions.IsThemeEnabled = true;
+            currentTheme = theme;
+            windows = attachedWindows.ToArray();
+        }
+
+        foreach (var window in windows)
+        {
+            RunOnWindowDispatcher(window, () => EnsureHook(window));
+        }
+
+        ApplyTheme(notify: true, forceNotify: requestedThemeChanged);
+    }
+
+    private void EnsureHook(Window window)
+    {
+        lock (gate)
+        {
+            if (!attachedWindows.Contains(window))
+            {
+                return;
+            }
+        }
+
+        if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
+        {
+            AttachHook(window);
+            return;
+        }
+
+        if (pendingHookWindows.Add(window))
+        {
+            window.SourceInitialized += Window_SourceInitialized;
+        }
+    }
+
+    private void Window_SourceInitialized(object? sender, EventArgs e)
+    {
+        if (sender is not Window window || !pendingHookWindows.Remove(window))
         {
             return;
         }
 
-        var requestedThemeChanged = CurrentTheme != theme;
-        CurrentTheme = theme;
-        preferenceService.SaveTheme(theme);
-        ApplyTheme(notify: true, forceNotify: requestedThemeChanged);
+        window.SourceInitialized -= Window_SourceInitialized;
+        AttachHook(window);
     }
 
     private void AttachHook(Window window)
@@ -140,23 +219,40 @@ internal sealed class ThemeService(
     private void ApplyTheme(bool notify, bool forceNotify = false)
     {
         var application = Application.Current;
-        if (application is null)
+        void ApplyCore()
         {
+            FlourishTheme requested;
+            FlourishTheme effective;
+            bool changed;
+            lock (gate)
+            {
+                requested = currentTheme;
+                effective = ResolveTheme(requested);
+                changed = effective != effectiveTheme;
+                effectiveTheme = effective;
+            }
+
+            if (application is not null)
+            {
+                ApplyApplicationResources(application, effective);
+            }
+
+            if (notify && (changed || forceNotify))
+            {
+                ThemeChanged?.Invoke(
+                    this,
+                    new FlourishThemeChangedEventArgs(requested, effective)
+                );
+            }
+        }
+
+        if (application is null || application.Dispatcher.CheckAccess())
+        {
+            ApplyCore();
             return;
         }
 
-        var effectiveTheme = ResolveTheme(CurrentTheme);
-        var changed = effectiveTheme != EffectiveTheme;
-        EffectiveTheme = effectiveTheme;
-        ApplyApplicationResources(application, effectiveTheme);
-
-        if (notify && (changed || forceNotify))
-        {
-            ThemeChanged?.Invoke(
-                this,
-                new FlourishThemeChangedEventArgs(CurrentTheme, EffectiveTheme)
-            );
-        }
+        application.Dispatcher.Invoke(ApplyCore);
     }
 
     private FlourishTheme ResolveTheme(FlourishTheme theme)
@@ -228,5 +324,16 @@ internal sealed class ThemeService(
         {
             throw new ArgumentOutOfRangeException(parameterName, theme, "Unknown theme.");
         }
+    }
+
+    private static void RunOnWindowDispatcher(Window window, Action action)
+    {
+        if (window.Dispatcher.CheckAccess())
+        {
+            action();
+            return;
+        }
+
+        window.Dispatcher.Invoke(action);
     }
 }

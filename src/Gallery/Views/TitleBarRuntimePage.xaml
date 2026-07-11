@@ -1,0 +1,115 @@
+<Page
+  x:Class="ArkheideSystem.Gallery.Views.TitleBarRuntimePage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Background="Transparent"
+>
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="32,28,32,40">
+      <TextBlock Style="{StaticResource GalleryPageTitleStyle}" Text="Title bar &amp; search" />
+      <TextBlock
+        Style="{StaticResource GalleryPageSubtitleStyle}"
+        Text="Update shell identity, toggle individual title-bar elements, and bind asynchronous search logic after the window has already started."
+      />
+
+      <Border Margin="0,24,0,0" Style="{StaticResource GalleryCardStyle}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource GallerySectionTitleStyle}" Text="Identity" />
+          <TextBlock Margin="0,5,0,16" Foreground="{DynamicResource MutedTextBrush}" Text="Title and subtitle changes are reflected by the existing shell instance." />
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="0,0,8,0">
+              <TextBlock Style="{StaticResource GalleryFieldLabelStyle}" Text="Title" />
+              <TextBox x:Name="TitleBox" Style="{StaticResource GalleryTextBoxStyle}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="8,0">
+              <TextBlock Style="{StaticResource GalleryFieldLabelStyle}" Text="Subtitle" />
+              <TextBox x:Name="SubtitleBox" Style="{StaticResource GalleryTextBoxStyle}" />
+            </StackPanel>
+            <Button Grid.Column="2" Margin="8,20,0,0" Click="ApplyIdentity_Click" Content="Apply identity" Style="{StaticResource GalleryActionButtonStyle}" />
+          </Grid>
+          <Grid Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="0,0,8,0">
+              <TextBlock Style="{StaticResource GalleryFieldLabelStyle}" Text="Logo path (optional)" />
+              <TextBox x:Name="LogoPathBox" Style="{StaticResource GalleryTextBoxStyle}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="8,0">
+              <TextBlock Style="{StaticResource GalleryFieldLabelStyle}" Text="Logo fallback text" />
+              <TextBox x:Name="LogoFallbackBox" Style="{StaticResource GalleryTextBoxStyle}" />
+            </StackPanel>
+            <Button Grid.Column="2" Margin="8,20,0,0" Click="ApplyLogo_Click" Content="Apply logo" Style="{StaticResource GalleryActionButtonStyle}" />
+          </Grid>
+          <TextBlock x:Name="IdentityStatusText" Margin="0,12,0,0" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <Border Margin="0,16,0,0" Style="{StaticResource GalleryCardStyle}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource GallerySectionTitleStyle}" Text="Element visibility" />
+          <TextBlock Margin="0,5,0,16" Foreground="{DynamicResource MutedTextBrush}" Text="Each title-bar element can be shown or hidden independently; breadcrumb behavior has an additional display policy." TextWrapping="Wrap" />
+          <WrapPanel>
+            <ComboBox x:Name="TitleBarElementBox" Width="220" Height="32" SelectionChanged="TitleBarElementBox_SelectionChanged" VerticalContentAlignment="Center" />
+            <CheckBox x:Name="TitleBarElementVisibleBox" Margin="18,0,0,0" VerticalAlignment="Center" Content="Visible" />
+            <Button Margin="18,0,0,0" Click="ApplyElementVisibility_Click" Content="Apply visibility" Style="{StaticResource GalleryActionButtonStyle}" />
+          </WrapPanel>
+          <WrapPanel Margin="0,14,0,0">
+            <ComboBox x:Name="BreadcrumbModeBox" Width="220" Height="32" VerticalContentAlignment="Center" />
+            <Button Margin="18,0,0,0" Click="ApplyBreadcrumbMode_Click" Content="Apply breadcrumb mode" Style="{StaticResource GalleryActionButtonStyle}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Margin="0,16,0,0" Style="{StaticResource GalleryCardStyle}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource GallerySectionTitleStyle}" Text="Runtime search binding" />
+          <TextBlock Margin="0,5,0,16" Foreground="{DynamicResource MutedTextBrush}" Text="This page owns a disposable asynchronous query subscription. Type here or in the real title-bar search box to exercise it." TextWrapping="Wrap" />
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchTextBox" Style="{StaticResource GalleryTextBoxStyle}" Text="runtime API" />
+            <Button Grid.Column="1" Margin="10,0,0,0" Click="SetSearchText_Click" Content="Set query" Style="{StaticResource GalleryActionButtonStyle}" />
+            <Button Grid.Column="2" Margin="8,0,0,0" Click="FocusSearch_Click" Content="Focus search" Style="{StaticResource GalleryActionButtonStyle}" />
+            <Button Grid.Column="3" Margin="8,0,0,0" Click="ClearSearch_Click" Content="Clear" Style="{StaticResource GalleryActionButtonStyle}" />
+          </Grid>
+          <Grid Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchPlaceholderBox" Style="{StaticResource GalleryTextBoxStyle}" />
+            <Button Grid.Column="1" Margin="10,0,0,0" Click="ApplySearchPlaceholder_Click" Content="Set placeholder" Style="{StaticResource GalleryActionButtonStyle}" />
+            <Button x:Name="ToggleSearchVisibilityButton" Grid.Column="2" Margin="8,0,0,0" Click="ToggleSearchVisibility_Click" Style="{StaticResource GalleryActionButtonStyle}" />
+          </Grid>
+          <TextBlock x:Name="SearchStatusText" Margin="0,12,0,0" Foreground="{DynamicResource AccentBrush}" Text="Waiting for a query." TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <Border Margin="0,16,0,0" Style="{StaticResource GalleryCardStyle}">
+        <StackPanel>
+          <TextBlock Style="{StaticResource GallerySectionTitleStyle}" Text="High-level shell features" />
+          <TextBlock Margin="0,5,0,16" Foreground="{DynamicResource MutedTextBrush}" Text="Feature switches coordinate whole shell surfaces, while the controls above manage their detailed state." TextWrapping="Wrap" />
+          <WrapPanel>
+            <ComboBox x:Name="ShellFeatureBox" Width="220" Height="32" SelectionChanged="ShellFeatureBox_SelectionChanged" VerticalContentAlignment="Center" />
+            <CheckBox x:Name="ShellFeatureEnabledBox" Margin="18,0,0,0" VerticalAlignment="Center" Content="Enabled" />
+            <Button Margin="18,0,0,0" Click="ApplyShellFeature_Click" Content="Apply feature" Style="{StaticResource GalleryActionButtonStyle}" />
+          </WrapPanel>
+          <TextBlock x:Name="ShellFeatureStatusText" Margin="0,12,0,0" Foreground="{DynamicResource MutedTextBrush}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

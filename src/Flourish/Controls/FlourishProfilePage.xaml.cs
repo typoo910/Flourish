@@ -52,9 +52,11 @@ internal partial class FlourishProfilePage : Page
         if (!isSubscribed)
         {
             profileService.ProfileChanged += ProfileService_ProfileChanged;
+            localizationService.Changed += LocalizationService_Changed;
             isSubscribed = true;
         }
 
+        ApplyLocale();
         UpdateState();
     }
 
@@ -66,6 +68,7 @@ internal partial class FlourishProfilePage : Page
         }
 
         profileService.ProfileChanged -= ProfileService_ProfileChanged;
+        localizationService.Changed -= LocalizationService_Changed;
         isSubscribed = false;
     }
 
@@ -77,6 +80,25 @@ internal partial class FlourishProfilePage : Page
             return;
         }
 
+        UpdateState();
+    }
+
+    private void LocalizationService_Changed(
+        object? sender,
+        FlourishLocalizationChangedEventArgs e
+    )
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ApplyLocale();
+                UpdateState();
+            });
+            return;
+        }
+
+        ApplyLocale();
         UpdateState();
     }
 

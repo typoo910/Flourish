@@ -1,8 +1,13 @@
 namespace ArkheideSystem.Flourish.Abstract;
 
 /// <summary>
-/// Parses command keys raised by Flourish UI surfaces such as toolbar items.
+/// Provides a synchronous startup-time compatibility handler for command keys raised by Flourish UI surfaces.
 /// </summary>
+/// <remarks>
+/// Use <see cref="ICommandRegistry" /> to add and remove handlers at runtime and
+/// <see cref="ICommandDispatcher" /> to execute commands asynchronously. Implementations of this
+/// interface registered during service configuration continue to run as ordered fallbacks.
+/// </remarks>
 /// <example>
 /// <code><![CDATA[
 /// services.AddSingleton<ICommandParser, AppCommandParser>();

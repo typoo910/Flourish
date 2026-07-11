@@ -146,7 +146,7 @@ internal sealed class DefaultFlourishBuilder(string[] args) : IFlourishBuilder
 
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
-        var builder = Host.CreateDefaultBuilder(args);
+        var builder = Host.CreateDefaultBuilder(args).UseContentRoot(AppContext.BaseDirectory);
         builder.ConfigureAppConfiguration((_, configuration) =>
             AddEntryAssemblyUserSecrets(configuration)
         );

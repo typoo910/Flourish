@@ -1,0 +1,19 @@
+<Page
+  x:Class="ArkheideSystem.Gallery.Views.RuntimeRoutePage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Background="Transparent"
+>
+  <Grid Margin="32">
+    <Border MaxWidth="680" Padding="28" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource GalleryCardStyle}">
+      <StackPanel>
+        <TextBlock Style="{StaticResource GalleryPageTitleStyle}" Text="A route created at runtime" />
+        <TextBlock Margin="0,10,0,0" Foreground="{DynamicResource MutedTextBrush}" Text="This page was not present in ConfigureNavigation. Its route and menu entry were registered while Gallery was already running." TextWrapping="Wrap" />
+        <TextBlock Margin="0,22,0,0" Style="{StaticResource GalleryFieldLabelStyle}" Text="PAGE INSTANCE" />
+        <TextBlock x:Name="InstanceText" FontFamily="Consolas" FontSize="16" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" />
+        <TextBlock Margin="0,18,0,0" Style="{StaticResource GalleryFieldLabelStyle}" Text="NAVIGATION PARAMETER" />
+        <TextBlock x:Name="ParameterText" FontFamily="Consolas" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Page>

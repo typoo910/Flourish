@@ -13,6 +13,9 @@ namespace ArkheideSystem.Flourish.Abstract;
 /// </example>
 public interface INavigationService
 {
+    /// <summary>Occurs after the current route or available navigation history changes.</summary>
+    event EventHandler<FlourishNavigationStateChangedEventArgs>? StateChanged;
+
     /// <summary>
     /// Occurs after Flourish navigates to a registered page.
     /// </summary>
@@ -72,6 +75,17 @@ public interface INavigationService
     /// </example>
     string? CurrentNavigationKey { get; }
 
+    /// <summary>Gets the parameter supplied by the most recent successful navigation.</summary>
+    object? CurrentParameter { get; }
+
+    /// <summary>Gets the case-sensitive keys of all currently registered runtime routes.</summary>
+    IReadOnlyCollection<string> Routes { get; }
+
+    /// <summary>Gets whether a route is currently registered.</summary>
+    /// <param name="navigationKey">The case-sensitive route key.</param>
+    /// <returns><see langword="true" /> when the route is registered.</returns>
+    bool CanNavigate(string navigationKey);
+
     /// <summary>
     /// Navigates to a registered page by navigation key.
     /// </summary>
@@ -86,6 +100,29 @@ public interface INavigationService
     /// ]]></code>
     /// </example>
     bool Navigate(string navigationKey, object? parameter = null, bool addToBackStack = true);
+
+    /// <summary>Navigates to the route registered for a page type.</summary>
+    /// <typeparam name="TPage">The registered WPF page type.</typeparam>
+    /// <param name="parameter">An optional parameter passed to the destination page.</param>
+    /// <param name="addToBackStack">Whether to add the current route to history.</param>
+    /// <returns><see langword="true" /> when navigation succeeds.</returns>
+    bool Navigate<TPage>(object? parameter = null, bool addToBackStack = true)
+        where TPage : System.Windows.Controls.Page;
+
+    /// <summary>
+    /// Navigates to a route and marshals the operation to the initialized Frame dispatcher.
+    /// </summary>
+    /// <param name="navigationKey">The case-sensitive route key.</param>
+    /// <param name="parameter">An optional parameter passed to the destination page.</param>
+    /// <param name="addToBackStack">Whether to add the current route to history.</param>
+    /// <param name="cancellationToken">A token that cancels waiting for dispatcher execution.</param>
+    /// <returns>A task containing whether navigation succeeded.</returns>
+    Task<bool> NavigateAsync(
+        string navigationKey,
+        object? parameter = null,
+        bool addToBackStack = true,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// Navigates to the previous page in the back stack.
@@ -118,4 +155,10 @@ public interface INavigationService
     /// ]]></code>
     /// </example>
     void ClearBackStack();
+
+    /// <summary>Clears the navigation forward stack.</summary>
+    void ClearForwardStack();
+
+    /// <summary>Clears both navigation history stacks.</summary>
+    void ClearHistory();
 }

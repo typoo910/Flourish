@@ -495,12 +495,37 @@ internal sealed class FlourishCompositionRoot(
             localizationService
                 ?? throw new InvalidOperationException("Flourish localization is not initialized.")
         );
+        services.AddSingleton<IFlourishLocalization>(provider =>
+            provider.GetRequiredService<FlourishLocalizationService>()
+        );
         services.AddSingleton(shellOptions);
         services.AddSingleton(shellOptions.Profile);
         services.AddSingleton(dataOptions);
+        services.AddSingleton<FlourishConfigurationService>();
+        services.AddSingleton<IFlourishConfiguration>(provider =>
+            provider.GetRequiredService<FlourishConfigurationService>()
+        );
         services.AddSingleton<FlourishShellWindow>();
+        services.AddSingleton<NavigationPanelService>();
+        services.AddSingleton<INavigationPanelService>(provider =>
+            provider.GetRequiredService<NavigationPanelService>()
+        );
+        services.AddSingleton<NavigationMenuService>();
+        services.AddSingleton<INavigationMenuService>(provider =>
+            provider.GetRequiredService<NavigationMenuService>()
+        );
         services.AddSingleton<FlourishToolbarService>();
+        services.AddSingleton<IToolbarService>(provider =>
+            provider.GetRequiredService<FlourishToolbarService>()
+        );
         services.AddSingleton<FlourishStatusService>();
+        services.AddSingleton<IStatusBarService>(provider =>
+            provider.GetRequiredService<FlourishStatusService>()
+        );
+        services.AddSingleton<ShellRegionService>();
+        services.AddSingleton<IShellRegionService>(provider =>
+            provider.GetRequiredService<ShellRegionService>()
+        );
         services.AddSingleton<FlourishBackgroundTaskService>();
         services.AddSingleton<IBackgroundTaskService>(provider =>
             provider.GetRequiredService<FlourishBackgroundTaskService>()
@@ -509,19 +534,86 @@ internal sealed class FlourishCompositionRoot(
             provider.GetRequiredService<FlourishBackgroundTaskService>()
         );
         services.AddSingleton<IMessageService, MessageService>();
+        services.AddSingleton<NotificationService>();
+        services.AddSingleton<INotificationService>(provider =>
+            provider.GetRequiredService<NotificationService>()
+        );
         services.AddSingleton<TrayIconService>();
+        services.AddSingleton<ITrayService>(provider =>
+            provider.GetRequiredService<TrayIconService>()
+        );
         services.AddSingleton<FontService>();
+        services.AddSingleton<IFontService>(provider =>
+            provider.GetRequiredService<FontService>()
+        );
         services.AddSingleton<CommandParser>();
+        services.AddSingleton<ICommandRegistry>(provider =>
+            provider.GetRequiredService<CommandParser>()
+        );
+        services.AddSingleton<ICommandDispatcher>(provider =>
+            provider.GetRequiredService<CommandParser>()
+        );
+        services.AddSingleton<ShortcutService>();
+        services.AddSingleton<IShortcutService>(provider =>
+            provider.GetRequiredService<ShortcutService>()
+        );
         services.AddSingleton<MaterialEffectService>();
+        services.AddSingleton<IMaterialEffectService>(provider =>
+            provider.GetRequiredService<MaterialEffectService>()
+        );
         services.AddSingleton<AppPreferenceService>();
+        services.AddSingleton<IAppSettingsStore>(provider =>
+            provider.GetRequiredService<AppPreferenceService>()
+        );
         services.AddSingleton<ProfileSecretStore>();
         services.TryAddSingleton<IProfileAuthService, SimpleProfileAuthService>();
         services.TryAddSingleton<IProfileService, ProfileService>();
         services.AddSingleton<ThemeService>();
+        services.AddSingleton<IThemeService>(provider =>
+            provider.GetRequiredService<ThemeService>()
+        );
         services.AddSingleton<FlourishMotionService>();
+        services.AddSingleton<IMotionService>(provider =>
+            provider.GetRequiredService<FlourishMotionService>()
+        );
+        services.AddSingleton<FlourishToolTipService>();
+        services.AddSingleton<IToolTipService>(provider =>
+            provider.GetRequiredService<FlourishToolTipService>()
+        );
+        services.AddSingleton<TitleBarService>();
+        services.AddSingleton<ITitleBarService>(provider =>
+            provider.GetRequiredService<TitleBarService>()
+        );
+        services.AddSingleton<TitleBarSearchService>();
+        services.AddSingleton<ITitleBarSearchService>(provider =>
+            provider.GetRequiredService<TitleBarSearchService>()
+        );
+        services.AddSingleton<WindowService>();
+        services.AddSingleton<IWindowService>(provider =>
+            provider.GetRequiredService<WindowService>()
+        );
+        services.AddSingleton<WindowCloseService>();
+        services.AddSingleton<IWindowCloseService>(provider =>
+            provider.GetRequiredService<WindowCloseService>()
+        );
+        services.AddSingleton<ProfileFlyoutService>();
+        services.AddSingleton<IProfileFlyoutService>(provider =>
+            provider.GetRequiredService<ProfileFlyoutService>()
+        );
+        services.AddSingleton<ShellFeatureService>();
+        services.AddSingleton<IShellFeatureService>(provider =>
+            provider.GetRequiredService<ShellFeatureService>()
+        );
         services.AddSingleton<WindowFrameFixService>();
+        services.AddSingleton<NavigationRouteRegistry>();
+        services.AddSingleton<INavigationRouteRegistry>(provider =>
+            provider.GetRequiredService<NavigationRouteRegistry>()
+        );
         services.AddSingleton<PageHistoryService>();
         services.AddSingleton<PageCacheService>();
+        services.AddSingleton<IPageCacheService>(provider =>
+            provider.GetRequiredService<PageCacheService>()
+        );
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(provider =>
             provider.GetRequiredService<NavigationService>()
