@@ -253,7 +253,7 @@
               <Frame
                 x:Name="RootFrame"
                 Focusable="False"
-                JournalOwnership="OwnsJournal"
+                JournalOwnership="UsesParentJournal"
                 NavigationUIVisibility="Hidden"
               />
               <Grid x:Name="ContentOverlayRegionHost" Panel.ZIndex="10" Visibility="Collapsed" />
@@ -437,7 +437,7 @@
               ClipToBounds="True"
               Focusable="False"
               FocusVisualStyle="{x:Null}"
-              JournalOwnership="OwnsJournal"
+              JournalOwnership="UsesParentJournal"
               NavigationUIVisibility="Hidden"
               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
               ScrollViewer.VerticalScrollBarVisibility="Disabled"

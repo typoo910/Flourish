@@ -88,4 +88,87 @@ public sealed class PageHistoryServiceTests
         Assert.Empty(sut.BackStack);
         Assert.Empty(sut.ForwardStack);
     }
+
+    [Fact]
+    public void Push_BeyondCapacity_EvictsTheOldestBackEntry()
+    {
+        var sut = new PageHistoryService(maximumEntries: 2);
+        var first = new FlourishPageStackEntry("first", 1);
+        var second = new FlourishPageStackEntry("second", 2);
+        var third = new FlourishPageStackEntry("third", 3);
+
+        sut.Push(first);
+        sut.Push(second);
+        sut.Push(third);
+
+        Assert.Equal(2, sut.BackStack.Count);
+        Assert.True(sut.TryPopBack(out var newest));
+        Assert.Equal(third, newest);
+        Assert.True(sut.TryPopBack(out var next));
+        Assert.Equal(second, next);
+        Assert.False(sut.TryPopBack(out _));
+    }
+
+    [Fact]
+    public void PushForward_BeyondCapacity_EvictsTheOldestForwardEntry()
+    {
+        var sut = new PageHistoryService(maximumEntries: 2);
+        var first = new FlourishPageStackEntry("first", 1);
+        var second = new FlourishPageStackEntry("second", 2);
+        var third = new FlourishPageStackEntry("third", 3);
+
+        sut.PushForward(first);
+        sut.PushForward(second);
+        sut.PushForward(third);
+
+        Assert.Equal(2, sut.ForwardStack.Count);
+        Assert.True(sut.TryPopForward(out var newest));
+        Assert.Equal(third, newest);
+        Assert.True(sut.TryPopForward(out var next));
+        Assert.Equal(second, next);
+        Assert.False(sut.TryPopForward(out _));
+    }
+
+    [Fact]
+    public void DefaultCapacity_BoundsProductionHistory()
+    {
+        var sut = new PageHistoryService();
+
+        for (var index = 0; index <= PageHistoryService.DefaultMaximumEntries; index++)
+        {
+            sut.Push(new FlourishPageStackEntry($"page-{index}", index));
+        }
+
+        Assert.Equal(PageHistoryService.DefaultMaximumEntries, sut.BackStack.Count);
+        Assert.DoesNotContain(sut.BackStack, entry => entry.NavigationKey == "page-0");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Constructor_WithNonPositiveCapacity_Throws(int maximumEntries)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new PageHistoryService(maximumEntries)
+        );
+    }
+
+    [Fact]
+    public void Remove_PreservesTheOrderOfRemainingEntries()
+    {
+        var sut = new PageHistoryService();
+        var oldest = new FlourishPageStackEntry("oldest", null);
+        var removed = new FlourishPageStackEntry("removed", null);
+        var newest = new FlourishPageStackEntry("newest", null);
+        sut.Push(oldest);
+        sut.Push(removed);
+        sut.Push(newest);
+
+        sut.Remove(removed.NavigationKey);
+
+        Assert.True(sut.TryPopBack(out var first));
+        Assert.Equal(newest, first);
+        Assert.True(sut.TryPopBack(out var second));
+        Assert.Equal(oldest, second);
+    }
 }

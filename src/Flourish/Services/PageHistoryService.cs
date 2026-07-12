@@ -2,8 +2,28 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class PageHistoryService
 {
-    private readonly Stack<FlourishPageStackEntry> backStack = new();
-    private readonly Stack<FlourishPageStackEntry> forwardStack = new();
+    internal const int DefaultMaximumEntries = 100;
+
+    private readonly LinkedList<FlourishPageStackEntry> backStack = new();
+    private readonly LinkedList<FlourishPageStackEntry> forwardStack = new();
+    private readonly int maximumEntries;
+
+    public PageHistoryService()
+        : this(DefaultMaximumEntries) { }
+
+    internal PageHistoryService(int maximumEntries)
+    {
+        if (maximumEntries <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(maximumEntries),
+                maximumEntries,
+                "The navigation history capacity must be greater than zero."
+            );
+        }
+
+        this.maximumEntries = maximumEntries;
+    }
 
     public bool CanGoBack => backStack.Count > 0;
 
@@ -15,12 +35,12 @@ internal sealed class PageHistoryService
 
     public void Push(FlourishPageStackEntry entry)
     {
-        backStack.Push(entry);
+        Push(backStack, entry);
     }
 
     public void PushForward(FlourishPageStackEntry entry)
     {
-        forwardStack.Push(entry);
+        Push(forwardStack, entry);
     }
 
     public bool TryPopBack(out FlourishPageStackEntry entry)
@@ -31,7 +51,8 @@ internal sealed class PageHistoryService
             return false;
         }
 
-        entry = backStack.Pop();
+        entry = backStack.First!.Value;
+        backStack.RemoveFirst();
         return true;
     }
 
@@ -43,7 +64,8 @@ internal sealed class PageHistoryService
             return false;
         }
 
-        entry = forwardStack.Pop();
+        entry = forwardStack.First!.Value;
+        forwardStack.RemoveFirst();
         return true;
     }
 
@@ -66,28 +88,38 @@ internal sealed class PageHistoryService
     public void Remove(string navigationKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(navigationKey);
-        RemoveFromStack(backStack, navigationKey);
-        RemoveFromStack(forwardStack, navigationKey);
+        RemoveFromHistory(backStack, navigationKey);
+        RemoveFromHistory(forwardStack, navigationKey);
     }
 
-    private static void RemoveFromStack(
-        Stack<FlourishPageStackEntry> stack,
+    private void Push(
+        LinkedList<FlourishPageStackEntry> history,
+        FlourishPageStackEntry entry
+    )
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        history.AddFirst(entry);
+        if (history.Count > maximumEntries)
+        {
+            history.RemoveLast();
+        }
+    }
+
+    private static void RemoveFromHistory(
+        LinkedList<FlourishPageStackEntry> history,
         string navigationKey
     )
     {
-        if (stack.Count == 0)
+        var node = history.First;
+        while (node is not null)
         {
-            return;
-        }
+            var next = node.Next;
+            if (StringComparer.Ordinal.Equals(node.Value.NavigationKey, navigationKey))
+            {
+                history.Remove(node);
+            }
 
-        var retained = stack
-            .Where(entry => !StringComparer.Ordinal.Equals(entry.NavigationKey, navigationKey))
-            .Reverse()
-            .ToArray();
-        stack.Clear();
-        foreach (var entry in retained)
-        {
-            stack.Push(entry);
+            node = next;
         }
     }
 }
