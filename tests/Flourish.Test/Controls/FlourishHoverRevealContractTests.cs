@@ -152,6 +152,33 @@ public sealed class FlourishHoverRevealContractTests
     }
 
     [Fact]
+    public void ParticipatingStyles_ConsumeTheGlobalMotionPolicyThroughDynamicResources()
+    {
+        const string expectedPolicy =
+            "{DynamicResource FlourishHoverRevealEnabled}";
+        var violations = new List<string>();
+
+        foreach (var template in FindParticipatingTemplates())
+        {
+            var setter = template.Style
+                .Elements()
+                .SingleOrDefault(element =>
+                    element.Name.LocalName == "Setter"
+                    && (string?)element.Attribute("Property")
+                        == "controls:HoverReveal.IsMotionEnabled"
+                );
+            if ((string?)setter?.Attribute("Value") != expectedPolicy)
+            {
+                violations.Add(
+                    $"{template.Identifier}: motion policy is not bound to {expectedPolicy}"
+                );
+            }
+        }
+
+        AssertNoViolations(violations);
+    }
+
+    [Fact]
     public void ButtonPressedState_UsesASeparateDarkerFillWithoutAnOutline()
     {
         var file = Path.Combine(FlourishRoot, "Controls", "Button.xaml");

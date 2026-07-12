@@ -136,6 +136,10 @@
     <Setter Property="ToolTipService.BetweenShowDelay" Value="0" />
     <Setter Property="ToolTipService.ShowDuration" Value="10000" />
     <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+    <Setter
+      Property="controls:HoverReveal.IsMotionEnabled"
+      Value="{DynamicResource FlourishHoverRevealEnabled}"
+    />
     <Setter Property="controls:HoverReveal.IsParticipant" Value="True" />
     <Setter Property="controls:HoverReveal.TemplateHandlesInteraction" Value="True" />
     <Setter Property="Template" Value="{StaticResource FlourishButtonTemplate}" />

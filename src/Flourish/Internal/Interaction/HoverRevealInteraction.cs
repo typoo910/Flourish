@@ -180,20 +180,20 @@ internal static class HoverRevealInteraction
 
     private static RevealPolicy GetRevealPolicy(FrameworkElement element)
     {
+        if (!HoverReveal.GetIsEnabled(element))
+        {
+            return DoesTemplateHandleInteraction(element)
+                ? RevealPolicy.TemplateStaticFallback
+                : RevealPolicy.BehaviorStaticFallback;
+        }
+
         var source = DependencyPropertyHelper.GetValueSource(
             element,
             HoverReveal.IsEnabledProperty
         );
         if (source.BaseValueSource != BaseValueSource.Default)
         {
-            if (HoverReveal.GetIsEnabled(element))
-            {
-                return RevealPolicy.Animated;
-            }
-
-            return DoesTemplateHandleInteraction(element)
-                ? RevealPolicy.TemplateStaticFallback
-                : RevealPolicy.BehaviorStaticFallback;
+            return RevealPolicy.Animated;
         }
 
         return element.TryFindResource("FlourishHoverRevealEnabled") is false

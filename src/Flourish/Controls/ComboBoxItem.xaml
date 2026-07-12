@@ -15,6 +15,10 @@
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
     <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter
+      Property="controls:HoverReveal.IsMotionEnabled"
+      Value="{DynamicResource FlourishHoverRevealEnabled}"
+    />
     <Setter Property="controls:HoverReveal.IsParticipant" Value="True" />
     <Setter Property="controls:HoverReveal.TemplateHandlesInteraction" Value="True" />
     <Setter Property="Template">

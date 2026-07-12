@@ -3,11 +3,23 @@ using ArkheideSystem.Flourish.Internal.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class ShellFeatureService(FlourishShellOptions options)
-    : IShellFeatureService
+internal sealed class ShellFeatureService : IShellFeatureService
 {
     private readonly object gate = new();
+    private readonly FlourishShellOptions options;
+    private readonly FlourishMotionService motionService;
     private long version;
+
+    public ShellFeatureService(
+        FlourishShellOptions options,
+        FlourishMotionService motionService
+    )
+    {
+        this.options = options ?? throw new ArgumentNullException(nameof(options));
+        this.motionService =
+            motionService ?? throw new ArgumentNullException(nameof(motionService));
+        motionService.Changed += MotionService_Changed;
+    }
 
     public event EventHandler<FlourishShellFeatureChangedEventArgs>? Changed;
 
@@ -27,6 +39,12 @@ internal sealed class ShellFeatureService(FlourishShellOptions options)
         if (!Enum.IsDefined(feature))
         {
             throw new ArgumentOutOfRangeException(nameof(feature), feature, "Unknown shell feature.");
+        }
+
+        if (feature == ShellFeature.Motion)
+        {
+            motionService.SetEnabled(enabled);
+            return;
         }
 
         FlourishShellFeatureState state;
@@ -54,9 +72,6 @@ internal sealed class ShellFeatureService(FlourishShellOptions options)
                 case ShellFeature.ToolTips:
                     options.IsTipsEnabled = enabled;
                     break;
-                case ShellFeature.Motion:
-                    options.Motion.IsEnabled = enabled;
-                    break;
                 case ShellFeature.Profile:
                     options.IsProfileEnabled = enabled;
                     break;
@@ -69,7 +84,30 @@ internal sealed class ShellFeatureService(FlourishShellOptions options)
         Changed?.Invoke(this, new FlourishShellFeatureChangedEventArgs(feature, state));
     }
 
-    private FlourishShellFeatureState CreateSnapshot()
+    private void MotionService_Changed(
+        object? sender,
+        FlourishMotionChangedEventArgs e
+    )
+    {
+        if (e.Previous.IsEnabled == e.Current.IsEnabled)
+        {
+            return;
+        }
+
+        FlourishShellFeatureState state;
+        lock (gate)
+        {
+            version++;
+            state = CreateSnapshot(e.Current.IsEnabled);
+        }
+
+        Changed?.Invoke(
+            this,
+            new FlourishShellFeatureChangedEventArgs(ShellFeature.Motion, state)
+        );
+    }
+
+    private FlourishShellFeatureState CreateSnapshot(bool? motionEnabled = null)
     {
         return new FlourishShellFeatureState(
             options.IsTitlebarEnabled,
@@ -77,7 +115,7 @@ internal sealed class ShellFeatureService(FlourishShellOptions options)
             options.IsDynamicToolbarEnabled,
             options.IsStatusBarEnabled,
             options.IsTipsEnabled,
-            options.Motion.IsEnabled,
+            motionEnabled ?? motionService.Current.IsEnabled,
             options.IsProfileEnabled,
             version
         );

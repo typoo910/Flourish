@@ -153,7 +153,8 @@ public sealed class RuntimeShellStateServiceTests
     public void ShellFeatureService_MapsEveryFeatureAndSuppressesNoOpEvents()
     {
         var options = new FlourishShellOptions();
-        IShellFeatureService sut = new ShellFeatureService(options);
+        var motion = new FlourishMotionService(options);
+        IShellFeatureService sut = new ShellFeatureService(options, motion);
         var changes = new List<FlourishShellFeatureChangedEventArgs>();
         sut.Changed += (_, args) => changes.Add(args);
 
@@ -182,7 +183,8 @@ public sealed class RuntimeShellStateServiceTests
             IsMaterialEffectEnabled = true,
             MaterialEffect = MaterialEffect.Mica,
         };
-        IShellFeatureService sut = new ShellFeatureService(options);
+        var motion = new FlourishMotionService(options);
+        IShellFeatureService sut = new ShellFeatureService(options, motion);
         var changes = new List<FlourishShellFeatureChangedEventArgs>();
         sut.Changed += (_, args) => changes.Add(args);
 
@@ -209,6 +211,37 @@ public sealed class RuntimeShellStateServiceTests
             },
             changes.Select(change =>
                 (change.Feature, change.State.IsEnabled(change.Feature), change.State.Version)
+            )
+        );
+    }
+
+    [Fact]
+    public void ShellFeatureService_AndMotionServicePublishOneSynchronizedEventPerChange()
+    {
+        var options = new FlourishShellOptions();
+        var motion = new FlourishMotionService(options);
+        IShellFeatureService sut = new ShellFeatureService(options, motion);
+        var motionChanges = new List<FlourishMotionChangedEventArgs>();
+        var featureChanges = new List<FlourishShellFeatureChangedEventArgs>();
+        motion.Changed += (_, args) => motionChanges.Add(args);
+        sut.Changed += (_, args) => featureChanges.Add(args);
+
+        sut.SetEnabled(ShellFeature.Motion, true);
+        sut.SetEnabled(ShellFeature.Motion, true);
+        motion.SetEnabled(false);
+        motion.SetEnabled(false);
+
+        Assert.False(motion.Current.IsEnabled);
+        Assert.False(sut.Current.IsMotionEnabled);
+        Assert.Equal(2, motionChanges.Count);
+        Assert.Equal(
+            new[]
+            {
+                (ShellFeature.Motion, true, 1L),
+                (ShellFeature.Motion, false, 2L),
+            },
+            featureChanges.Select(change =>
+                (change.Feature, change.State.IsMotionEnabled, change.State.Version)
             )
         );
     }

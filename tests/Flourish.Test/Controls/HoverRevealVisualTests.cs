@@ -224,6 +224,59 @@ public sealed class HoverRevealVisualTests
     }
 
     [Fact]
+    public void RuntimeMotionResource_UpdatesParticipantsWithoutAWindowPolicyValue()
+    {
+        RunInSta(() =>
+        {
+            var button = new FlourishButton { Content = "Runtime policy" };
+            var unrelatedElement = new Border();
+            var panel = new StackPanel
+            {
+                Children = { button, unrelatedElement },
+            };
+            var window = CreateWindow(LoadResourceDictionary(), panel);
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                Assert.Same(
+                    DependencyProperty.UnsetValue,
+                    window.ReadLocalValue(HoverReveal.IsEnabledProperty)
+                );
+                Assert.True(HoverReveal.GetIsMotionEnabled(button));
+                Assert.True(HoverReveal.GetIsEnabled(button));
+
+                window.Resources["FlourishHoverRevealEnabled"] = false;
+                FlushDispatcher();
+
+                Assert.False(HoverReveal.GetIsMotionEnabled(button));
+                Assert.False(HoverReveal.GetIsEnabled(button));
+                Assert.True(HoverReveal.GetIsMotionEnabled(unrelatedElement));
+                Assert.True(HoverReveal.GetIsEnabled(unrelatedElement));
+
+                RaiseMouseEvent(button, Mouse.MouseEnterEvent);
+                Assert.Null(HoverRevealAnimator.TryGetTemplateParts(button));
+
+                window.Resources["FlourishHoverRevealEnabled"] = true;
+                FlushDispatcher();
+                RaiseMouseEvent(button, Mouse.MouseEnterEvent);
+
+                Assert.True(HoverReveal.GetIsMotionEnabled(button));
+                Assert.True(HoverReveal.GetIsEnabled(button));
+                Assert.True(
+                    HoverRevealAnimator.ResolveTemplateParts(button).HasAnimationClocks
+                );
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
     public void ResourceOnlyMotionDisable_PreservesTheCompatibilityFallback()
     {
         RunInSta(() =>

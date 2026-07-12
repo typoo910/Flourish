@@ -37,6 +37,8 @@ public sealed class FlourishPublicControlsTests
             {
                 nameof(HoverReveal.GetIsEnabled),
                 nameof(HoverReveal.SetIsEnabled),
+                nameof(HoverReveal.GetIsMotionEnabled),
+                nameof(HoverReveal.SetIsMotionEnabled),
                 nameof(HoverReveal.GetIsParticipant),
                 nameof(HoverReveal.SetIsParticipant),
                 nameof(HoverReveal.GetTemplateHandlesInteraction),
@@ -219,6 +221,7 @@ public sealed class FlourishPublicControlsTests
             var duration = TimeSpan.FromMilliseconds(215);
 
             Assert.True(HoverReveal.GetIsEnabled(element));
+            Assert.True(HoverReveal.GetIsMotionEnabled(element));
             Assert.False(HoverReveal.GetIsParticipant(element));
             Assert.False(HoverReveal.GetTemplateHandlesInteraction(element));
             Assert.Equal(
@@ -227,14 +230,40 @@ public sealed class FlourishPublicControlsTests
             );
 
             HoverReveal.SetIsEnabled(element, false);
+            HoverReveal.SetIsMotionEnabled(element, false);
             HoverReveal.SetIsParticipant(element, true);
             HoverReveal.SetTemplateHandlesInteraction(element, true);
             HoverReveal.SetAnimationDuration(element, duration);
 
             Assert.False(HoverReveal.GetIsEnabled(element));
+            Assert.False(HoverReveal.GetIsMotionEnabled(element));
             Assert.True(HoverReveal.GetIsParticipant(element));
             Assert.True(HoverReveal.GetTemplateHandlesInteraction(element));
             Assert.Equal(duration, HoverReveal.GetAnimationDuration(element));
+        });
+    }
+
+    [Fact]
+    public void HoverReveal_MotionPolicyCoercesTheEffectiveStateWithoutInheriting()
+    {
+        RunInSta(() =>
+        {
+            var parent = new Grid();
+            var child = new Border();
+            parent.Children.Add(child);
+
+            HoverReveal.SetIsMotionEnabled(parent, false);
+
+            Assert.False(HoverReveal.GetIsEnabled(parent));
+            Assert.True(HoverReveal.GetIsMotionEnabled(child));
+
+            HoverReveal.SetIsMotionEnabled(parent, true);
+            Assert.True(HoverReveal.GetIsEnabled(parent));
+
+            HoverReveal.SetIsEnabled(parent, false);
+            Assert.False(HoverReveal.GetIsEnabled(parent));
+            HoverReveal.SetIsMotionEnabled(parent, true);
+            Assert.False(HoverReveal.GetIsEnabled(parent));
         });
     }
 

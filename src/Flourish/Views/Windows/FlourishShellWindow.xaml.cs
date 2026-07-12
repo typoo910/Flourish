@@ -229,7 +229,6 @@ internal partial class FlourishShellWindow : Window
 
         Titlebar.ApplyLocale(localizationService);
         fontService.Apply(this);
-        motionService.Attach(this);
         toolTipService.Attach(this);
         CacheResources();
         ApplyOptions();
@@ -310,7 +309,6 @@ internal partial class FlourishShellWindow : Window
             ? Visibility.Visible
             : Visibility.Collapsed;
         UpdateTitlebarBreadcrumbNavigation();
-        ApplyMotionResources();
         ApplyToolTipResources();
 
         NormalizeNavigationPaneWidths();
@@ -417,20 +415,6 @@ internal partial class FlourishShellWindow : Window
             CloseStatusFlyout(restoreFocus: false);
             Dispatcher.BeginInvoke(new Action(UpdateProfileCardPosition));
         }
-    }
-
-    private void ApplyMotionResources()
-    {
-        var isHoverRevealEnabled =
-            options.Motion.IsEnabled
-            && options.Motion.IsHoverRevealEnabled
-            && (
-                !options.Motion.RespectSystemReducedMotion
-                || SystemParameters.ClientAreaAnimation
-            );
-        Resources["FlourishHoverRevealEnabled"] = isHoverRevealEnabled;
-        HoverReveal.SetIsEnabled(this, isHoverRevealEnabled);
-        HoverReveal.SetAnimationDuration(this, options.Motion.HoverRevealAnimationDuration);
     }
 
     private void ApplyToolTipResources()
@@ -2498,9 +2482,6 @@ internal partial class FlourishShellWindow : Window
                     break;
                 case ShellFeature.ToolTips:
                     ApplyToolTipResources();
-                    break;
-                case ShellFeature.Motion:
-                    ApplyMotionResources();
                     break;
                 case ShellFeature.Profile:
                     ConfigureProfileSurface();

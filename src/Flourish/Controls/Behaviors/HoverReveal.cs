@@ -24,9 +24,26 @@ public static class HoverReveal
         new FrameworkPropertyMetadata(
             true,
             FrameworkPropertyMetadataOptions.Inherits,
-            OnIsEnabledChanged
+            OnIsEnabledChanged,
+            CoerceIsEnabled
         )
     );
+
+    /// <summary>
+    /// Identifies the non-inherited motion-policy value consumed by participating templates.
+    /// </summary>
+    /// <remarks>
+    /// Flourish control styles bind this property to the application-level motion resource.
+    /// Keeping the value on participants avoids invalidating unrelated visual descendants
+    /// when the global runtime policy changes.
+    /// </remarks>
+    public static readonly DependencyProperty IsMotionEnabledProperty =
+        DependencyProperty.RegisterAttached(
+            "IsMotionEnabled",
+            typeof(bool),
+            typeof(HoverReveal),
+            new FrameworkPropertyMetadata(true, OnIsMotionEnabledChanged)
+        );
 
     /// <summary>
     /// Identifies the attached property that opts a control template into hover reveal.
@@ -105,6 +122,22 @@ public static class HoverReveal
     }
 
     /// <summary>
+    /// Gets the non-inherited runtime motion policy for a participating element.
+    /// </summary>
+    public static bool GetIsMotionEnabled(DependencyObject element)
+    {
+        return (bool)element.GetValue(IsMotionEnabledProperty);
+    }
+
+    /// <summary>
+    /// Sets the non-inherited runtime motion policy for a participating element.
+    /// </summary>
+    public static void SetIsMotionEnabled(DependencyObject element, bool value)
+    {
+        element.SetValue(IsMotionEnabledProperty, value);
+    }
+
+    /// <summary>
     /// Gets whether a control template participates in hover reveal.
     /// </summary>
     public static bool GetIsParticipant(DependencyObject element)
@@ -172,6 +205,19 @@ public static class HoverReveal
         {
             HoverRevealInteraction.Refresh(frameworkElement);
         }
+    }
+
+    private static object CoerceIsEnabled(DependencyObject element, object baseValue)
+    {
+        return (bool)baseValue && GetIsMotionEnabled(element);
+    }
+
+    private static void OnIsMotionEnabledChanged(
+        DependencyObject element,
+        DependencyPropertyChangedEventArgs e
+    )
+    {
+        element.CoerceValue(IsEnabledProperty);
     }
 
     private static void OnIsParticipantChanged(

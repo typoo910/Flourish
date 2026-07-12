@@ -1,5 +1,6 @@
 using System.Windows;
 using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Services;
 using ArkheideSystem.Flourish.Themes;
 using ArkheideSystem.Flourish.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +81,7 @@ internal sealed class FlourishRuntime(IHost host) : IFlourish
     private FlourishShellWindow PrepareShell(Application application)
     {
         EnsureApplicationResources(application);
+        host.Services.GetRequiredService<FlourishMotionService>().Attach(application);
 
         var mainWindow = host.Services.GetRequiredService<FlourishShellWindow>();
         application.MainWindow = mainWindow;

@@ -2,17 +2,37 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Internal.Configuration;
 using Application = System.Windows.Application;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class FlourishMotionService(FlourishShellOptions options) : IMotionService
+internal sealed class FlourishMotionService : IMotionService
 {
     private const double PageEntranceOffset = 14;
+    private const string HoverRevealEnabledResourceKey = "FlourishHoverRevealEnabled";
+    private const string HoverRevealDurationResourceKey = "FlourishHoverRevealDuration";
     private readonly object gate = new();
-    private Window? owner;
+    private readonly FlourishShellOptions options;
+    private readonly Func<bool> isSystemAnimationEnabled;
+    private Dispatcher? applicationDispatcher;
+    private ResourceDictionary? applicationResources;
+
+    public FlourishMotionService(FlourishShellOptions options)
+        : this(options, static () => SystemParameters.ClientAreaAnimation) { }
+
+    internal FlourishMotionService(
+        FlourishShellOptions options,
+        Func<bool> isSystemAnimationEnabled
+    )
+    {
+        this.options = options ?? throw new ArgumentNullException(nameof(options));
+        this.isSystemAnimationEnabled =
+            isSystemAnimationEnabled
+            ?? throw new ArgumentNullException(nameof(isSystemAnimationEnabled));
+    }
 
     public FlourishMotionSettings Current
     {
@@ -98,11 +118,38 @@ internal sealed class FlourishMotionService(FlourishShellOptions options) : IMot
         UpdateOptions(() => options.Motion.RespectSystemReducedMotion = enabled);
     }
 
-    internal void Attach(Window window)
+    internal void Attach(Application application)
     {
-        ArgumentNullException.ThrowIfNull(window);
-        owner = window;
-        ApplyResources(window, Current);
+        ArgumentNullException.ThrowIfNull(application);
+        Attach(application.Dispatcher, application.Resources);
+    }
+
+    internal void Attach(Dispatcher dispatcher, ResourceDictionary resources)
+    {
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        ArgumentNullException.ThrowIfNull(resources);
+
+        void AttachCore()
+        {
+            FlourishMotionSettings settings;
+            lock (gate)
+            {
+                applicationDispatcher = dispatcher;
+                applicationResources = resources;
+                settings = CaptureSettings();
+            }
+
+            ApplyResources(resources, settings);
+        }
+
+        if (dispatcher.CheckAccess())
+        {
+            AttachCore();
+        }
+        else
+        {
+            dispatcher.Invoke(AttachCore);
+        }
     }
 
     public void AnimateNavigationPane(
@@ -237,6 +284,8 @@ internal sealed class FlourishMotionService(FlourishShellOptions options) : IMot
     {
         FlourishMotionSettings previous;
         FlourishMotionSettings current;
+        Dispatcher? dispatcher;
+        ResourceDictionary? resources;
         lock (gate)
         {
             previous = CaptureSettings();
@@ -246,23 +295,25 @@ internal sealed class FlourishMotionService(FlourishShellOptions options) : IMot
             {
                 return;
             }
+
+            dispatcher = applicationDispatcher;
+            resources = applicationResources;
         }
 
-        var attachedOwner = owner;
-        if (attachedOwner is not null)
+        if (dispatcher is not null && resources is not null)
         {
-            if (attachedOwner.Dispatcher.CheckAccess())
+            if (dispatcher.CheckAccess())
             {
                 var effective = Current;
-                ApplyResources(attachedOwner, effective);
+                ApplyResources(resources, effective);
                 RaiseChanged(previous, effective);
             }
             else
             {
-                attachedOwner.Dispatcher.Invoke(() =>
+                dispatcher.Invoke(() =>
                 {
                     var effective = Current;
-                    ApplyResources(attachedOwner, effective);
+                    ApplyResources(resources, effective);
                     RaiseChanged(previous, effective);
                 });
             }
@@ -302,37 +353,39 @@ internal sealed class FlourishMotionService(FlourishShellOptions options) : IMot
         );
     }
 
-    private static bool CanAnimateSettings(FlourishMotionSettings settings)
+    private bool CanAnimateSettings(FlourishMotionSettings settings)
     {
         return settings.IsEnabled
-            && (!settings.RespectSystemReducedMotion || SystemParameters.ClientAreaAnimation);
+            && (!settings.RespectSystemReducedMotion || isSystemAnimationEnabled());
     }
 
-    private static void ApplyResources(Window window, FlourishMotionSettings settings)
+    private void ApplyResources(
+        ResourceDictionary resources,
+        FlourishMotionSettings settings
+    )
     {
         var isHoverRevealEnabled =
             CanAnimateSettings(settings) && settings.IsHoverRevealEnabled;
-        window.Resources["FlourishHoverRevealEnabled"] = isHoverRevealEnabled;
-        window.Resources["FlourishHoverRevealDuration"] =
-            settings.HoverRevealAnimationDuration;
-        ArkheideSystem.Flourish.Controls.HoverReveal.SetIsEnabled(
-            window,
-            isHoverRevealEnabled
-        );
-        ArkheideSystem.Flourish.Controls.HoverReveal.SetAnimationDuration(
-            window,
+        SetResource(
+            resources,
+            HoverRevealDurationResourceKey,
             settings.HoverRevealAnimationDuration
         );
+        SetResource(resources, HoverRevealEnabledResourceKey, isHoverRevealEnabled);
+    }
 
-        var application = Application.Current;
-        if (application is null)
+    private static void SetResource(
+        ResourceDictionary resources,
+        string key,
+        object value
+    )
+    {
+        if (resources.Contains(key) && Equals(resources[key], value))
         {
             return;
         }
 
-        application.Resources["FlourishHoverRevealEnabled"] = isHoverRevealEnabled;
-        application.Resources["FlourishHoverRevealDuration"] =
-            settings.HoverRevealAnimationDuration;
+        resources[key] = value;
     }
 
     private static void ValidateDuration(TimeSpan duration, string parameterName)
