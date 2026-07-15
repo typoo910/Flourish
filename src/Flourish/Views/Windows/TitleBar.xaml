@@ -33,7 +33,7 @@
     >
       <controls:IconButton
         x:Name="BackButton"
-        Appearance="Subtle"
+        Variant="Text"
         Width="{DynamicResource FlourishShellCommandButtonWidth}"
         Height="{DynamicResource FlourishShellCommandButtonHeight}"
         MinWidth="0"
@@ -55,7 +55,7 @@
 
       <controls:IconButton
         x:Name="ForwardButton"
-        Appearance="Subtle"
+        Variant="Text"
         Width="{DynamicResource FlourishShellCommandButtonWidth}"
         Height="{DynamicResource FlourishShellCommandButtonHeight}"
         MinWidth="0"
@@ -79,7 +79,7 @@
     <controls:IconButton
       x:Name="NavigationToggleButton"
       Grid.Column="2"
-      Appearance="Subtle"
+      Variant="Text"
       Width="{DynamicResource FlourishShellCommandButtonWidth}"
       Height="{DynamicResource FlourishShellCommandButtonHeight}"
       MinWidth="0"
@@ -185,7 +185,7 @@
     <controls:IconButton
       x:Name="ThemeToggleButton"
       Grid.Column="7"
-      Appearance="Subtle"
+      Variant="Text"
       Width="{DynamicResource FlourishShellCommandButtonWidth}"
       Height="{DynamicResource FlourishShellCommandButtonHeight}"
       MinWidth="0"
@@ -218,7 +218,7 @@
     >
       <controls:IconButton
         x:Name="ProfileButton"
-        Appearance="Subtle"
+        Variant="Text"
         Width="34"
         Height="32"
         MinWidth="0"
@@ -263,7 +263,7 @@
     <controls:WindowCaptionButton
       x:Name="MinimizeButton"
       Grid.Column="10"
-      Appearance="Subtle"
+      Variant="Text"
       Click="MinimizeButton_Click"
       Icon="&#xE921;"
     >
@@ -272,7 +272,7 @@
     <controls:WindowCaptionButton
       x:Name="MaximizeButton"
       Grid.Column="11"
-      Appearance="Subtle"
+      Variant="Text"
       Click="MaximizeButton_Click"
     >
       <controls:WindowCaptionButton.Icon>
@@ -289,7 +289,7 @@
     <controls:WindowCaptionButton
       x:Name="CloseButton"
       Grid.Column="12"
-      Appearance="Danger"
+      Variant="Danger"
       Click="CloseButton_Click"
       Icon="&#xE8BB;"
     >

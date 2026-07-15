@@ -25,7 +25,7 @@ internal static class FlourishRegionElementFactory
             Padding = new Thickness(),
             Margin = new Thickness(2, 4, 2, 4),
             Icon = CreateIconOrText(iconGlyph, displayName, "FlourishFontSizeTitlebarIcon"),
-            Appearance = ButtonAppearance.Subtle,
+            Variant = ButtonVariant.Text,
             ToolTip = new FlourishToolTip { Content = displayName },
         };
         AttachClick(button, services, commandKey, action, CommandSource.TitleBar);
@@ -49,7 +49,7 @@ internal static class FlourishRegionElementFactory
             Padding = new Thickness(7, 0, 7, 0),
             Icon = string.IsNullOrWhiteSpace(iconGlyph) ? null : iconGlyph,
             Content = displayText,
-            Appearance = ButtonAppearance.Subtle,
+            Variant = ButtonVariant.Text,
             ToolTip = new FlourishToolTip { Content = displayText },
         };
         AttachClick(button, services, commandKey, action, CommandSource.StatusBar);

@@ -1,6 +1,6 @@
 ---
 title: Button
-description: Use Flourish Button, IconButton, CardButton, and WindowCaptionButton to communicate action semantics.
+description: Use Flourish Button, IconButton, CardButton, and WindowCaptionButton to communicate action hierarchy and intent.
 ---
 
 # Button
@@ -16,32 +16,47 @@ The Flourish button family consists of one general-purpose text button and three
 
 ## Button
 
-`Button.Appearance` communicates semantic emphasis, not button size or layout. Its default is `Standard`.
+`Button.Variant` selects the button's Material Design 3 presentation and visual emphasis, not its size or layout. Its default is `Outlined`.
 
-| `ButtonAppearance` | When to use it |
+| `ButtonVariant` | When to use it |
 | --- | --- |
-| `Standard` | A default action or an ordinary option alongside other actions. |
-| `Primary` | The single most important action in a group. |
-| `Subtle` | A supporting or toolbar-like action that needs less visual emphasis. |
+| `Elevated` | An important action that needs separation from a patterned, image-based, or similarly busy background. Use elevation sparingly. |
+| `Filled` | The highest-emphasis, primary action in a screen or action group. |
+| `Tonal` | A prominent supporting action that needs more emphasis than an outline without competing with a filled primary action. |
+| `Outlined` | A medium-emphasis secondary action with a visible boundary. This is the default. |
+| `Text` | The lowest-emphasis action, such as a compact, inline, toolbar, or tertiary action. |
 | `Danger` | A destructive or difficult-to-reverse action such as delete or reset. |
 
 ```xml
-<StackPanel Orientation="Horizontal">
+<WrapPanel>
   <flourish:Button
-    Appearance="Primary"
+    Variant="Filled"
     Command="{Binding SaveCommand}"
     Content="Save" />
   <flourish:Button
+    Variant="Tonal"
+    Command="{Binding SaveDraftCommand}"
+    Content="Save draft" />
+  <flourish:Button
+    Variant="Outlined"
     Command="{Binding CancelCommand}"
     Content="Cancel" />
   <flourish:Button
-    Appearance="Danger"
+    Variant="Text"
+    Command="{Binding LearnMoreCommand}"
+    Content="Learn more" />
+  <flourish:Button
+    Variant="Elevated"
+    Command="{Binding OpenPreviewCommand}"
+    Content="Open preview" />
+  <flourish:Button
+    Variant="Danger"
     Command="{Binding DeleteCommand}"
     Content="Delete" />
-</StackPanel>
+</WrapPanel>
 ```
 
-An action group should normally have only one `Primary` button. Let the containing layout control external placement. Do not use `Appearance` to select structural dimensions.
+An action group should normally have only one `Filled` button. Use `Danger` for destructive intent; it is a Flourish semantic extension to the five Material Design 3 emphasis variants. Let the containing layout control external placement, and do not use `Variant` to select structural dimensions.
 
 ## IconButton
 
@@ -49,14 +64,14 @@ An action group should normally have only one `Primary` button. Let the containi
 
 ```xml
 <flourish:IconButton
-  Appearance="Subtle"
+  Variant="Text"
   AutomationProperties.Name="Refresh"
   Command="{Binding RefreshCommand}"
   Icon="&#xE72C;"
   ToolTip="Refresh" />
 
 <flourish:IconButton
-  Appearance="Primary"
+  Variant="Filled"
   Command="{Binding AddCommand}"
   Content="Add item"
   Icon="&#xE710;" />
@@ -86,13 +101,13 @@ When `Content` is `null`, `IconButton` uses compact `30 × 30` geometry without 
 
 ## WindowCaptionButton
 
-`WindowCaptionButton` is reserved for window captions. It inherits `Icon`, `Appearance`, and the standard WPF button contract from `IconButton`, but uses dedicated caption geometry with a default size of `46 × 40`.
+`WindowCaptionButton` is reserved for window captions. It inherits `Icon`, `Variant`, and the standard WPF button contract from `IconButton`, but uses dedicated caption geometry with a default size of `46 × 40`.
 
-Set a close action to `Appearance="Danger"` and use `Subtle` for the other caption actions. The control supplies presentation and button interaction only; connect the actual window operation through `Command` or `Click`.
+Set a close action to `Variant="Danger"` and use `Text` for the other caption actions. The control supplies presentation and button interaction only; connect the actual window operation through `Command` or `Click`.
 
 ```xml
 <flourish:WindowCaptionButton
-  Appearance="Danger"
+  Variant="Danger"
   AutomationProperties.Name="Close"
   Command="{Binding CloseWindowCommand}"
   Icon="&#xE8BB;"
@@ -117,4 +132,4 @@ The button family participates in the public `HoverReveal` attached behavior. Pr
 
 - [Chunk](chunk.md) explains how to organize buttons and card content within page sections.
 - [Motion](../articles/configure-motion.md) configures hover reveal and reduced motion.
-- The [Button API](xref:ArkheideSystem.Flourish.Controls.Button), [IconButton API](xref:ArkheideSystem.Flourish.Controls.IconButton), [CardButton API](xref:ArkheideSystem.Flourish.Controls.CardButton), and [WindowCaptionButton API](xref:ArkheideSystem.Flourish.Controls.WindowCaptionButton) list all members.
+- The [ButtonVariant API](xref:ArkheideSystem.Flourish.Controls.ButtonVariant), [Button API](xref:ArkheideSystem.Flourish.Controls.Button), [IconButton API](xref:ArkheideSystem.Flourish.Controls.IconButton), [CardButton API](xref:ArkheideSystem.Flourish.Controls.CardButton), and [WindowCaptionButton API](xref:ArkheideSystem.Flourish.Controls.WindowCaptionButton) list all members.

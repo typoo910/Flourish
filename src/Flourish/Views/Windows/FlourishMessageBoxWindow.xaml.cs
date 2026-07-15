@@ -125,9 +125,9 @@ internal partial class FlourishMessageBoxWindow : Window
         {
             var button = new Button
             {
-                Appearance = buttonDefinition.IsPrimary
-                    ? ButtonAppearance.Primary
-                    : ButtonAppearance.Standard,
+                Variant = buttonDefinition.IsPrimary
+                    ? ButtonVariant.Filled
+                    : ButtonVariant.Outlined,
                 MinWidth = 72,
                 Height = 30,
                 Padding = new Thickness(14, 0, 14, 0),

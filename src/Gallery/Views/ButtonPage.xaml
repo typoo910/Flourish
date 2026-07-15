@@ -5,25 +5,30 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   Background="Transparent"
 >
-  <flourish:FlourishScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+  <flourish:FlourishScrollViewer
+    HorizontalScrollBarVisibility="Disabled"
+    VerticalScrollBarVisibility="Auto"
+  >
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
       <flourish:Chunk
-        ChunkDescription="Buttons use Appearance for action semantics. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
+        ChunkDescription="Buttons use six Material Design 3 variants to express visual hierarchy and destructive intent. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
         ChunkTitle="Button"
       />
 
       <flourish:Chunk
-        ChunkDescription="Button is the standard content action. Its Appearance property changes semantic emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
-        ChunkTitle="Button and Appearance"
+        ChunkDescription="Button is the standard content action. Variant changes its Material Design 3 emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
+        ChunkTitle="Button and Variant"
       >
         <flourish:FlourishCard>
           <StackPanel>
-            <flourish:FlourishTextBlock Role="FieldLabel" Text="APPEARANCE" />
+            <flourish:FlourishTextBlock Role="FieldLabel" Text="VARIANT" />
             <WrapPanel Margin="0,8,0,0">
-              <flourish:Button Margin="0,0,8,8" Appearance="Standard" Content="Standard" />
-              <flourish:Button Margin="0,0,8,8" Appearance="Primary" Content="Primary" />
-              <flourish:Button Margin="0,0,8,8" Appearance="Subtle" Content="Subtle" />
-              <flourish:Button Margin="0,0,8,8" Appearance="Danger" Content="Danger" />
+              <flourish:Button Margin="0,0,8,8" Variant="Elevated" Content="Elevated" />
+              <flourish:Button Margin="0,0,8,8" Variant="Filled" Content="Filled" />
+              <flourish:Button Margin="0,0,8,8" Variant="Tonal" Content="Tonal" />
+              <flourish:Button Margin="0,0,8,8" Variant="Outlined" Content="Outlined" />
+              <flourish:Button Margin="0,0,8,8" Variant="Text" Content="Text" />
+              <flourish:Button Margin="0,0,8,8" Variant="Danger" Content="Danger" />
             </WrapPanel>
             <Grid Margin="0,4,0,0">
               <Grid.ColumnDefinitions>
@@ -31,19 +36,19 @@
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
               <StackPanel Margin="0,0,12,0">
-                <flourish:FlourishTextBlock Role="CardTitle" Text="Standard and Primary" />
+                <flourish:FlourishTextBlock Role="CardTitle" Text="Filled, Tonal, and Elevated" />
                 <flourish:FlourishTextBlock
                   Margin="0,4,0,0"
                   Role="Description"
-                  Text="Use Standard for normal actions and Primary for the main action in a related group."
+                  Text="Use Filled for the highest-emphasis action, Tonal for a softer filled action, and Elevated when separation from the surface matters."
                 />
               </StackPanel>
               <StackPanel Grid.Column="1" Margin="12,0,0,0">
-                <flourish:FlourishTextBlock Role="CardTitle" Text="Subtle and Danger" />
+                <flourish:FlourishTextBlock Role="CardTitle" Text="Outlined, Text, and Danger" />
                 <flourish:FlourishTextBlock
                   Margin="0,4,0,0"
                   Role="Description"
-                  Text="Use Subtle for low-emphasis commands and Danger for destructive actions."
+                  Text="Outlined is the default for ordinary actions, Text carries the lowest emphasis, and Danger is reserved for destructive actions."
                 />
               </StackPanel>
             </Grid>
@@ -58,10 +63,30 @@
         <flourish:FlourishCard>
           <StackPanel>
             <WrapPanel>
-              <flourish:IconButton Margin="0,0,8,8" Appearance="Subtle" Icon="&#xE72C;" ToolTip="Refresh" />
-              <flourish:IconButton Margin="0,0,8,8" Appearance="Subtle" Icon="&#xE8D4;" ToolTip="Search" />
-              <flourish:IconButton Margin="0,0,8,8" Appearance="Primary" Content="Add item" Icon="&#xE710;" />
-              <flourish:IconButton Margin="0,0,0,8" Appearance="Danger" Content="Remove" Icon="&#xE74D;" />
+              <flourish:IconButton
+                Margin="0,0,8,8"
+                Variant="Text"
+                Icon="&#xE72C;"
+                ToolTip="Refresh"
+              />
+              <flourish:IconButton
+                Margin="0,0,8,8"
+                Variant="Text"
+                Icon="&#xE8D4;"
+                ToolTip="Search"
+              />
+              <flourish:IconButton
+                Margin="0,0,8,8"
+                Variant="Filled"
+                Content="Add item"
+                Icon="&#xE710;"
+              />
+              <flourish:IconButton
+                Margin="0,0,0,8"
+                Variant="Danger"
+                Content="Remove"
+                Icon="&#xE74D;"
+              />
             </WrapPanel>
             <flourish:FlourishTextBlock
               Margin="0,4,0,0"
@@ -106,29 +131,33 @@
               BorderThickness="1"
             >
               <StackPanel Orientation="Horizontal">
-                <flourish:WindowCaptionButton Appearance="Subtle" Icon="&#xE921;" ToolTip="Minimize" />
-                <flourish:WindowCaptionButton Appearance="Subtle" Icon="&#xE922;" ToolTip="Maximize" />
-                <flourish:WindowCaptionButton Appearance="Danger" Icon="&#xE8BB;" ToolTip="Close" />
+                <flourish:WindowCaptionButton Variant="Text" Icon="&#xE921;" ToolTip="Minimize" />
+                <flourish:WindowCaptionButton Variant="Text" Icon="&#xE922;" ToolTip="Maximize" />
+                <flourish:WindowCaptionButton Variant="Danger" Icon="&#xE8BB;" ToolTip="Close" />
               </StackPanel>
             </Border>
             <flourish:FlourishTextBlock
               Margin="0,8,0,0"
               Role="Description"
-              Text="Use Danger only for a close command. Other caption commands normally use Subtle."
+              Text="Use Danger only for the close command so it receives the platform-appropriate red hover treatment. Other caption commands use Text."
             />
           </StackPanel>
         </flourish:FlourishCard>
       </flourish:Chunk>
 
       <flourish:Chunk
-        ChunkDescription="The Button family participates in HoverReveal. The default template provides animated hover feedback, while the attached properties can adjust it for a local interaction requirement."
+        ChunkDescription="The Button family participates in HoverReveal. Danger supplies its semantic feedback automatically, while the attached properties can adjust a local color or disable the effect."
         ChunkTitle="Hover feedback"
       >
         <flourish:FlourishCard>
           <WrapPanel>
             <flourish:Button Margin="0,0,8,0" Content="Default hover reveal" />
-            <flourish:Button flourish:HoverReveal.IsEnabled="False" Content="Static hover feedback" />
-            <flourish:Button Margin="8,0,0,0" Appearance="Danger" Content="Danger hover reveal" />
+            <flourish:Button
+              flourish:HoverReveal.IsEnabled="False"
+              Content="Static hover feedback"
+            />
+            <flourish:Button Margin="8,0,0,0" Content="Danger hover reveal" Variant="Danger" />
+            <flourish:Button Margin="8,0,0,0" Content="Accent hover reveal" Variant="Tonal" />
           </WrapPanel>
         </flourish:FlourishCard>
       </flourish:Chunk>

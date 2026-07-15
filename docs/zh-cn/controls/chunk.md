@@ -59,7 +59,7 @@ description: 使用 Chunk 与 ChunkHero 建立 Flourish 页面的章节、页首
   <flourish:ChunkHero.ChunkHeroBody>
     <StackPanel Orientation="Horizontal">
       <flourish:Button
-        Appearance="Primary"
+        Variant="Filled"
         Command="{Binding CreateProjectCommand}"
         Content="创建项目" />
       <flourish:Button

@@ -59,7 +59,7 @@
       </MultiTrigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="Appearance" Value="Danger" />
+          <Condition Property="Variant" Value="Danger" />
           <Condition Property="IsMouseOver" Value="True" />
         </MultiTrigger.Conditions>
         <Setter Property="Foreground" Value="{DynamicResource FlourishWindowCaptionCloseForegroundBrush}" />
@@ -70,7 +70,7 @@
       </Trigger>
       <MultiTrigger>
         <MultiTrigger.Conditions>
-          <Condition Property="Appearance" Value="Danger" />
+          <Condition Property="Variant" Value="Danger" />
           <Condition Property="IsPressed" Value="True" />
         </MultiTrigger.Conditions>
         <Setter TargetName="PressedChrome" Property="Background" Value="{DynamicResource FlourishWindowCaptionCloseHoverBrush}" />
@@ -107,7 +107,13 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Template" Value="{StaticResource WindowCaptionButtonTemplate}" />
       </Trigger>
-      <Trigger Property="Appearance" Value="Danger">
+      <Trigger Property="Variant" Value="Text">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
+      </Trigger>
+      <Trigger Property="Variant" Value="Danger">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />

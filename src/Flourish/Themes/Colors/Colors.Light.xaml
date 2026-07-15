@@ -20,6 +20,10 @@
   <SolidColorBrush x:Key="FlourishControlSelectedForegroundBrush" Color="#0C3B5E" />
   <SolidColorBrush x:Key="FlourishHoverRevealBrush" Color="#592886DE" />
   <SolidColorBrush x:Key="FlourishPressedRevealBrush" Color="#660F6CBD" />
+  <SolidColorBrush x:Key="FlourishTonalButtonBackgroundBrush" Color="#E9DFF5" />
+  <SolidColorBrush x:Key="FlourishTonalButtonForegroundBrush" Color="#3D2455" />
+  <SolidColorBrush x:Key="FlourishTonalButtonHoverBrush" Color="#DED0ED" />
+  <SolidColorBrush x:Key="FlourishTonalButtonPressedBrush" Color="#D1BDE5" />
   <SolidColorBrush x:Key="FlourishControlSelectedHoverBrush" Color="#592886DE" />
   <SolidColorBrush x:Key="FlourishControlDisabledBrush" Color="#F0F0F0" />
   <SolidColorBrush x:Key="FlourishControlStrokeBrush" Color="#DCE1E7" />

@@ -59,7 +59,7 @@ Keep the default `ChunkMargin` and `ChunkSpacing` in most pages so neighboring s
   <flourish:ChunkHero.ChunkHeroBody>
     <StackPanel Orientation="Horizontal">
       <flourish:Button
-        Appearance="Primary"
+        Variant="Filled"
         Command="{Binding CreateProjectCommand}"
         Content="Create project" />
       <flourish:Button

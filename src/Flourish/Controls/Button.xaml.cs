@@ -4,37 +4,43 @@ using WpfButton = System.Windows.Controls.Button;
 namespace ArkheideSystem.Flourish.Controls;
 
 /// <summary>
-/// Describes the semantic appearance of a <see cref="Button" />.
+/// Describes the visual variant of a <see cref="Button" />.
 /// </summary>
-public enum ButtonAppearance
+public enum ButtonVariant
 {
-    /// <summary>A neutral action button.</summary>
-    Standard,
+    /// <summary>A raised button on a neutral surface.</summary>
+    Elevated,
 
-    /// <summary>A primary action button.</summary>
-    Primary,
+    /// <summary>A high-emphasis button filled with the primary color.</summary>
+    Filled,
 
-    /// <summary>A low-emphasis action that blends into its surrounding surface.</summary>
-    Subtle,
+    /// <summary>A medium-emphasis button filled with a secondary tonal color.</summary>
+    Tonal,
+
+    /// <summary>A button with a transparent background and visible outline.</summary>
+    Outlined,
+
+    /// <summary>A low-emphasis button without a fill or outline.</summary>
+    Text,
 
     /// <summary>A destructive action with warning feedback.</summary>
     Danger,
 }
 
 /// <summary>
-/// A themed content button with a semantic appearance contract.
+/// A themed content button with a visual variant contract.
 /// </summary>
 public class Button : WpfButton
 {
     /// <summary>
-    /// Identifies the <see cref="Appearance" /> dependency property.
+    /// Identifies the <see cref="Variant" /> dependency property.
     /// </summary>
-    public static readonly DependencyProperty AppearanceProperty = DependencyProperty.Register(
-        nameof(Appearance),
-        typeof(ButtonAppearance),
+    public static readonly DependencyProperty VariantProperty = DependencyProperty.Register(
+        nameof(Variant),
+        typeof(ButtonVariant),
         typeof(Button),
-        new FrameworkPropertyMetadata(ButtonAppearance.Standard),
-        IsAppearanceValid
+        new FrameworkPropertyMetadata(ButtonVariant.Outlined),
+        IsVariantValid
     );
 
     static Button()
@@ -46,12 +52,12 @@ public class Button : WpfButton
     }
 
     /// <summary>
-    /// Gets or sets the semantic visual appearance of the button.
+    /// Gets or sets the visual variant of the button.
     /// </summary>
-    public ButtonAppearance Appearance
+    public ButtonVariant Variant
     {
-        get => (ButtonAppearance)GetValue(AppearanceProperty);
-        set => SetValue(AppearanceProperty, value);
+        get => (ButtonVariant)GetValue(VariantProperty);
+        set => SetValue(VariantProperty, value);
     }
 
     /// <inheritdoc />
@@ -61,8 +67,8 @@ public class Button : WpfButton
         HoverReveal.NotifyTemplateApplied(this);
     }
 
-    private static bool IsAppearanceValid(object value)
+    private static bool IsVariantValid(object value)
     {
-        return value is ButtonAppearance appearance && Enum.IsDefined(appearance);
+        return value is ButtonVariant variant && Enum.IsDefined(variant);
     }
 }

@@ -67,7 +67,7 @@
         <controls:WindowCaptionButton
           x:Name="CloseButton"
           Grid.Column="1"
-          Appearance="Danger"
+          Variant="Danger"
           Click="CloseButton_Click"
           Icon="&#xE8BB;"
         >

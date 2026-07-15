@@ -55,7 +55,7 @@
     <Grid Grid.Row="2" Margin="0,14,0,0">
       <flourish:Button
         x:Name="LoginButton"
-        Appearance="Primary"
+        Variant="Filled"
         HorizontalAlignment="Center"
         Click="LoginButton_Click"
       />
@@ -177,13 +177,13 @@
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
           <flourish:Button
             x:Name="CancelLoginButton"
-            Appearance="Standard"
+            Variant="Outlined"
             Margin="0,0,7,0"
             Click="CancelLoginButton_Click"
           />
           <flourish:Button
             x:Name="SubmitLoginButton"
-            Appearance="Primary"
+            Variant="Filled"
             Click="SubmitLoginButton_Click"
           />
         </StackPanel>
@@ -198,7 +198,7 @@
         />
         <flourish:Button
           x:Name="LogoutButton"
-          Appearance="Standard"
+          Variant="Outlined"
           Margin="0,14,0,0"
           HorizontalAlignment="Center"
           Click="LogoutButton_Click"

@@ -615,16 +615,16 @@ public sealed class HoverRevealVisualTests
             var resources = LoadResourceDictionary();
             FlourishButton[] buttons =
             [
-                new() { Content = "Standard" },
+                new() { Content = "Outlined" },
                 new()
                 {
-                    Content = "Primary",
-                    Appearance = ButtonAppearance.Primary,
+                    Content = "Filled",
+                    Variant = ButtonVariant.Filled,
                 },
                 new WindowCaptionButton
                 {
                     Icon = "Caption",
-                    Appearance = ButtonAppearance.Subtle,
+                    Variant = ButtonVariant.Text,
                 },
             ];
             var panel = new StackPanel();

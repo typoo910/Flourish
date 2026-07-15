@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using ArkheideSystem.Flourish.Controls;
 using FlourishButton = ArkheideSystem.Flourish.Controls.Button;
 using WpfButton = System.Windows.Controls.Button;
@@ -520,45 +521,115 @@ public sealed class FlourishControlStylesTests
     }
 
     [Fact]
-    public void ButtonDangerAppearance_UsesRedHoverRevealAndAllowsLocalOverride()
+    public void ButtonVariants_ApplyMd3SurfacesAndElevatedShadow()
     {
         RunInSta(() =>
         {
-            var standard = new FlourishButton { Content = "Standard" };
-            var danger = new FlourishButton
+            var elevated = new FlourishButton
             {
-                Appearance = ButtonAppearance.Danger,
-                Content = "Danger",
+                Content = "Elevated",
+                Variant = ButtonVariant.Elevated,
             };
-            var local = new FlourishButton
+            var filled = new FlourishButton
             {
-                Appearance = ButtonAppearance.Danger,
-                Content = "Local",
+                Content = "Filled",
+                Variant = ButtonVariant.Filled,
             };
-            var localBrush = new SolidColorBrush(Colors.MediumVioletRed);
-            HoverReveal.SetOverrideColor(local, localBrush);
+            var tonal = new FlourishButton
+            {
+                Content = "Tonal",
+                Variant = ButtonVariant.Tonal,
+            };
+            var outlined = new FlourishButton
+            {
+                Content = "Outlined",
+                Variant = ButtonVariant.Outlined,
+            };
+            var textButton = new FlourishButton
+            {
+                Content = "Text",
+                Variant = ButtonVariant.Text,
+            };
             var window = CreateWindow(
-                new StackPanel { Children = { standard, danger, local } }
+                new StackPanel
+                {
+                    Children = { elevated, filled, tonal, outlined, textButton },
+                }
             );
 
             try
             {
                 window.Show();
                 window.UpdateLayout();
-                standard.ApplyTemplate();
+
+                Assert.IsType<DropShadowEffect>(elevated.Effect);
+                Assert.False(elevated.ClipToBounds);
+                Assert.Equal(0, elevated.BorderThickness.Left);
+                Assert.Same(
+                    filled.TryFindResource("FlourishPrimaryBackgroundBrush"),
+                    filled.Background
+                );
+                Assert.Equal(0, filled.BorderThickness.Left);
+                Assert.Same(
+                    tonal.TryFindResource("FlourishTonalButtonBackgroundBrush"),
+                    tonal.Background
+                );
+                Assert.Same(
+                    tonal.TryFindResource("FlourishTonalButtonForegroundBrush"),
+                    tonal.Foreground
+                );
+                Assert.Equal(Colors.Transparent, ((SolidColorBrush)outlined.Background).Color);
+                Assert.Equal(1, outlined.BorderThickness.Left);
+                Assert.Equal(Colors.Transparent, ((SolidColorBrush)textButton.Background).Color);
+                Assert.Equal(0, textButton.BorderThickness.Left);
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void ButtonDangerVariant_UsesRedHoverRevealAndAllowsLocalOverride()
+    {
+        RunInSta(() =>
+        {
+            var outlined = new FlourishButton { Content = "Outlined" };
+            var danger = new FlourishButton
+            {
+                Variant = ButtonVariant.Danger,
+                Content = "Danger",
+            };
+            var local = new FlourishButton
+            {
+                Variant = ButtonVariant.Danger,
+                Content = "Local",
+            };
+            var localBrush = new SolidColorBrush(Colors.MediumVioletRed);
+            HoverReveal.SetOverrideColor(local, localBrush);
+            var window = CreateWindow(
+                new StackPanel { Children = { outlined, danger, local } }
+            );
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                outlined.ApplyTemplate();
                 danger.ApplyTemplate();
                 local.ApplyTemplate();
 
-                var standardBrush = Assert.IsType<SolidColorBrush>(
-                    standard.TryFindResource("FlourishHoverRevealBrush")
+                var outlinedBrush = Assert.IsType<SolidColorBrush>(
+                    outlined.TryFindResource("FlourishHoverRevealBrush")
                 );
                 var dangerBrush = Assert.IsType<SolidColorBrush>(
                     danger.TryFindResource("FlourishDangerHoverRevealBrush")
                 );
 
                 Assert.Equal(
-                    standardBrush.Color,
-                    Assert.IsType<SolidColorBrush>(HoverReveal.GetOverrideColor(standard))
+                    outlinedBrush.Color,
+                    Assert.IsType<SolidColorBrush>(HoverReveal.GetOverrideColor(outlined))
                         .Color
                 );
                 Assert.Equal(

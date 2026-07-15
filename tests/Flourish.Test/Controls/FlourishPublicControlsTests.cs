@@ -22,7 +22,7 @@ public sealed class FlourishPublicControlsTests
         Type[] publicContractTypes =
         [
             typeof(FlourishThemeResources),
-            typeof(ButtonAppearance),
+            typeof(ButtonVariant),
             typeof(ChunkHeroMode),
             typeof(FlourishCardAppearance),
             typeof(FlourishGridSplitterVariant),
@@ -255,7 +255,7 @@ public sealed class FlourishPublicControlsTests
             var search = new FlourishSearchBox();
             var text = new FlourishTextBlock();
 
-            Assert.Equal(ButtonAppearance.Standard, button.Appearance);
+            Assert.Equal(ButtonVariant.Outlined, button.Variant);
             Assert.Null(iconButton.Icon);
             Assert.IsAssignableFrom<FlourishButton>(iconButton);
             Assert.IsAssignableFrom<IconButton>(windowCaptionButton);
@@ -284,16 +284,17 @@ public sealed class FlourishPublicControlsTests
     }
 
     [Fact]
-    public void ButtonFamily_ExposesFourAppearancesWithoutVariantOrPrefixedTypes()
+    public void ButtonFamily_ExposesSixVariantsWithoutAppearanceOrPrefixedTypes()
     {
         Assert.Equal(
-            new[] { "Standard", "Primary", "Subtle", "Danger" },
-            Enum.GetNames<ButtonAppearance>()
+            new[] { "Elevated", "Filled", "Tonal", "Outlined", "Text", "Danger" },
+            Enum.GetNames<ButtonVariant>()
         );
-        Assert.Null(typeof(FlourishButton).GetProperty("Variant"));
+        Assert.NotNull(typeof(FlourishButton).GetProperty(nameof(FlourishButton.Variant)));
+        Assert.Null(typeof(FlourishButton).GetProperty("Appearance"));
 
         var assembly = typeof(FlourishButton).Assembly;
-        Assert.Null(assembly.GetType("ArkheideSystem.Flourish.Controls.ButtonVariant"));
+        Assert.Null(assembly.GetType("ArkheideSystem.Flourish.Controls.ButtonAppearance"));
         Assert.Null(assembly.GetType("ArkheideSystem.Flourish.Controls.FlourishButton"));
         Assert.Null(assembly.GetType("ArkheideSystem.Flourish.Controls.FlourishIconButton"));
         Assert.Null(assembly.GetType("ArkheideSystem.Flourish.Controls.FlourishCardButton"));
@@ -308,23 +309,36 @@ public sealed class FlourishPublicControlsTests
         RunInSta(() =>
         {
             var icon = new Border();
-            var iconButton = new IconButton { Icon = icon, Content = "Label" };
-            var captionButton = new WindowCaptionButton { Icon = "Caption" };
+            var iconButton = new IconButton
+            {
+                Icon = icon,
+                Content = "Label",
+                Variant = ButtonVariant.Text,
+            };
+            var captionButton = new WindowCaptionButton
+            {
+                Icon = "Caption",
+                Variant = ButtonVariant.Danger,
+            };
             var cardButton = new CardButton
             {
                 Icon = icon,
                 IconPosition = Dock.Right,
                 Title = "Title",
                 Content = "Description",
+                Variant = ButtonVariant.Tonal,
             };
 
             Assert.Same(icon, iconButton.Icon);
             Assert.Equal("Label", iconButton.Content);
+            Assert.Equal(ButtonVariant.Text, iconButton.Variant);
             Assert.Equal("Caption", captionButton.Icon);
+            Assert.Equal(ButtonVariant.Danger, captionButton.Variant);
             Assert.Same(icon, cardButton.Icon);
             Assert.Equal(Dock.Right, cardButton.IconPosition);
             Assert.Equal("Title", cardButton.Title);
             Assert.Equal("Description", cardButton.Content);
+            Assert.Equal(ButtonVariant.Tonal, cardButton.Variant);
         });
     }
 
@@ -457,9 +471,7 @@ public sealed class FlourishPublicControlsTests
         {
             var button = new FlourishButton();
 
-            Assert.Throws<ArgumentException>(() =>
-                button.Appearance = (ButtonAppearance)(-1)
-            );
+            Assert.Throws<ArgumentException>(() => button.Variant = (ButtonVariant)(-1));
             Assert.Throws<ArgumentException>(() =>
                 new ChunkHero().ChunkHeroMode = (ChunkHeroMode)(-1)
             );

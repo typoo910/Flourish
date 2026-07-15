@@ -4,6 +4,8 @@
   xmlns:flourish="http://schemas.arkheide.system/flourish"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   Background="Transparent"
+  SnapsToDevicePixels="True"
+  UseLayoutRounding="True"
 >
   <flourish:FlourishScrollViewer
     HorizontalScrollBarVisibility="Disabled"
@@ -18,9 +20,19 @@
       >
         <flourish:ChunkHero.ChunkHeroBody>
           <WrapPanel>
-            <flourish:Button Appearance="Primary" Click="SplitLeft_Click" Content="Split left" />
-            <flourish:Button Margin="8,0,0,0" Click="SplitRight_Click" Content="Split right" />
-            <flourish:Button Margin="8,0,0,0" Click="Overlay_Click" Content="Overlay" />
+            <flourish:Button Variant="Filled" Click="SplitLeft_Click" Content="Split left" />
+            <flourish:Button
+              Variant="Tonal"
+              Margin="8,0,0,0"
+              Click="SplitRight_Click"
+              Content="Split right"
+            />
+            <flourish:Button
+              Variant="Tonal"
+              Margin="8,0,0,0"
+              Click="Overlay_Click"
+              Content="Overlay"
+            />
           </WrapPanel>
         </flourish:ChunkHero.ChunkHeroBody>
         <flourish:ChunkHero.ChunkHeroPresenter>

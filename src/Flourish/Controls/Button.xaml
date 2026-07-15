@@ -82,14 +82,28 @@
           </Setter.Value>
         </Setter>
       </MultiTrigger>
-      <Trigger Property="Appearance" Value="Primary">
+      <Trigger Property="Variant" Value="Elevated">
+        <Setter
+          TargetName="PressedChrome"
+          Property="Background"
+          Value="{DynamicResource FlourishControlPressedBrush}"
+        />
+      </Trigger>
+      <Trigger Property="Variant" Value="Filled">
         <Setter
           TargetName="PressedChrome"
           Property="Background"
           Value="{DynamicResource FlourishPrimaryBackgroundPressedBrush}"
         />
       </Trigger>
-      <Trigger Property="Appearance" Value="Danger">
+      <Trigger Property="Variant" Value="Tonal">
+        <Setter
+          TargetName="PressedChrome"
+          Property="Background"
+          Value="{DynamicResource FlourishTonalButtonPressedBrush}"
+        />
+      </Trigger>
+      <Trigger Property="Variant" Value="Danger">
         <Setter
           TargetName="PressedChrome"
           Property="Background"
@@ -110,9 +124,25 @@
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForegroundDisabledBrush}" />
         <Setter Property="Background" Value="{DynamicResource FlourishControlDisabledBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource FlourishControlStrokeDisabledBrush}" />
+        <Setter Property="Effect" Value="{x:Null}" />
         <Setter TargetName="HoverChrome" Property="Visibility" Value="Collapsed" />
         <Setter TargetName="PressedChrome" Property="Visibility" Value="Collapsed" />
       </Trigger>
+      <MultiTrigger>
+        <MultiTrigger.Conditions>
+          <Condition Property="Variant" Value="Outlined" />
+          <Condition Property="IsEnabled" Value="False" />
+        </MultiTrigger.Conditions>
+        <Setter Property="Background" Value="Transparent" />
+      </MultiTrigger>
+      <MultiTrigger>
+        <MultiTrigger.Conditions>
+          <Condition Property="Variant" Value="Text" />
+          <Condition Property="IsEnabled" Value="False" />
+        </MultiTrigger.Conditions>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+      </MultiTrigger>
     </ControlTemplate.Triggers>
   </ControlTemplate>
 
@@ -122,10 +152,10 @@
     <Setter Property="Padding" Value="{DynamicResource FlourishControlPadding}" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="Background" Value="{DynamicResource FlourishControlBackgroundBrush}" />
+    <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="{DynamicResource FlourishControlStrokeBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FlourishControlBorderThickness}" />
-    <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FlourishPrimaryForegroundBrush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
     <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
     <Setter Property="Cursor" Value="Hand" />
@@ -141,17 +171,35 @@
     <Setter Property="controls:HoverReveal.TemplateHandlesInteraction" Value="True" />
     <Setter Property="Template" Value="{StaticResource ButtonTemplate}" />
     <Style.Triggers>
-      <Trigger Property="Appearance" Value="Primary">
-        <Setter Property="Background" Value="{DynamicResource FlourishPrimaryBackgroundBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource FlourishPrimaryBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource FlourishForegroundOnPrimaryBrush}" />
+      <Trigger Property="Variant" Value="Elevated">
+        <Setter Property="Background" Value="{DynamicResource FlourishControlBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource FlourishPrimaryForegroundBrush}" />
+        <Setter Property="Effect" Value="{DynamicResource FlourishElevation1Effect}" />
+        <Setter Property="controls:HoverReveal.OverrideColor" Value="{DynamicResource FlourishControlHoverBrush}" />
       </Trigger>
-      <Trigger Property="Appearance" Value="Subtle">
+      <Trigger Property="Variant" Value="Filled">
+        <Setter Property="Background" Value="{DynamicResource FlourishPrimaryBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource FlourishForegroundOnPrimaryBrush}" />
+        <Setter Property="controls:HoverReveal.OverrideColor" Value="{DynamicResource FlourishPrimaryBackgroundHoverBrush}" />
+      </Trigger>
+      <Trigger Property="Variant" Value="Tonal">
+        <Setter Property="Background" Value="{DynamicResource FlourishTonalButtonBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource FlourishTonalButtonForegroundBrush}" />
+        <Setter Property="controls:HoverReveal.OverrideColor" Value="{DynamicResource FlourishTonalButtonHoverBrush}" />
+      </Trigger>
+      <Trigger Property="Variant" Value="Text">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource FlourishPrimaryForegroundBrush}" />
       </Trigger>
-      <Trigger Property="Appearance" Value="Danger">
+      <Trigger Property="Variant" Value="Danger">
         <Setter Property="Background" Value="{DynamicResource FlourishDangerBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource FlourishDangerStrokeBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishDangerForegroundBrush}" />

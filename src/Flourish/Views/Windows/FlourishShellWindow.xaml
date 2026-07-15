@@ -329,7 +329,7 @@
           <control:IconButton
             x:Name="BackgroundTaskQueueButton"
             Grid.Column="1"
-            Appearance="Subtle"
+            Variant="Text"
             Width="26"
             Height="22"
             MinWidth="0"
@@ -390,7 +390,7 @@
           <control:IconButton
             x:Name="SystemStatusButton"
             Grid.Column="5"
-            Appearance="Subtle"
+            Variant="Text"
             Width="26"
             Height="22"
             MinWidth="0"

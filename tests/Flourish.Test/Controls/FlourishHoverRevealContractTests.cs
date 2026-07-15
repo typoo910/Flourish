@@ -236,7 +236,7 @@ public sealed class FlourishHoverRevealContractTests
     }
 
     [Fact]
-    public void ButtonAppearances_ShareRevealAndKeepCaptionDangerSpecialized()
+    public void ButtonVariants_ShareRevealAndKeepCaptionDangerSpecialized()
     {
         var document = LoadXaml(
             Path.Combine(FlourishRoot, "Controls", "Button.xaml")
@@ -249,7 +249,7 @@ public sealed class FlourishHoverRevealContractTests
                     == "ButtonTemplate"
             );
 
-        var dangerTrigger = FindTrigger(template, "Appearance", "Danger");
+        var dangerTrigger = FindTrigger(template, "Variant", "Danger");
         AssertSetter(
             dangerTrigger,
             "PressedChrome",
@@ -272,7 +272,7 @@ public sealed class FlourishHoverRevealContractTests
                 && (string?)element.Attribute("TargetType")
                     == "{x:Type controls:Button}"
             );
-        var dangerStyleTrigger = FindTrigger(implicitStyle, "Appearance", "Danger");
+        var dangerStyleTrigger = FindTrigger(implicitStyle, "Variant", "Danger");
         AssertSetter(
             dangerStyleTrigger,
             null,
@@ -306,7 +306,7 @@ public sealed class FlourishHoverRevealContractTests
             .Descendants()
             .Single(element =>
                 element.Name.LocalName == "MultiTrigger"
-                && HasCondition(element, "Appearance", "Danger")
+                && HasCondition(element, "Variant", "Danger")
                 && HasCondition(element, "IsMouseOver", "True")
             );
         AssertSetter(
@@ -324,7 +324,7 @@ public sealed class FlourishHoverRevealContractTests
                 && (string?)element.Attribute("TargetType")
                     == "{x:Type controls:WindowCaptionButton}"
             );
-        var captionDangerTrigger = FindTrigger(captionStyle, "Appearance", "Danger");
+        var captionDangerTrigger = FindTrigger(captionStyle, "Variant", "Danger");
         AssertSetter(
             captionDangerTrigger,
             null,
@@ -410,7 +410,7 @@ public sealed class FlourishHoverRevealContractTests
     }
 
     [Fact]
-    public void WindowCaptionButtons_ReserveDangerAppearanceForCloseCommands()
+    public void WindowCaptionButtons_ReserveDangerVariantForCloseCommands()
     {
         var titleBar = LoadXaml(
             Path.Combine(FlourishRoot, "Views", "Windows", "TitleBar.xaml")
@@ -424,10 +424,10 @@ public sealed class FlourishHoverRevealContractTests
             )
         );
 
-        AssertButtonAppearance(titleBar, "MinimizeButton", "Subtle");
-        AssertButtonAppearance(titleBar, "MaximizeButton", "Subtle");
-        AssertButtonAppearance(titleBar, "CloseButton", "Danger");
-        AssertButtonAppearance(messageBox, "CloseButton", "Danger");
+        AssertButtonVariant(titleBar, "MinimizeButton", "Text");
+        AssertButtonVariant(titleBar, "MaximizeButton", "Text");
+        AssertButtonVariant(titleBar, "CloseButton", "Danger");
+        AssertButtonVariant(messageBox, "CloseButton", "Danger");
         AssertCloseButtonHasIcon(titleBar);
         AssertCloseButtonHasIcon(messageBox);
     }
@@ -770,10 +770,10 @@ public sealed class FlourishHoverRevealContractTests
         Assert.False(string.IsNullOrWhiteSpace((string?)closeButton.Attribute("Icon")));
     }
 
-    private static void AssertButtonAppearance(
+    private static void AssertButtonVariant(
         XDocument document,
         string name,
-        string appearance
+        string variant
     )
     {
         var button = document
@@ -783,8 +783,8 @@ public sealed class FlourishHoverRevealContractTests
                 && (string?)element.Attribute(XName.Get("Name", XamlNamespace)) == name
             );
 
-        Assert.Equal(appearance, (string?)button.Attribute("Appearance"));
-        Assert.Null(button.Attribute("Variant"));
+        Assert.Equal(variant, (string?)button.Attribute("Variant"));
+        Assert.Null(button.Attribute("Appearance"));
     }
 
     private static void AssertAttribute(

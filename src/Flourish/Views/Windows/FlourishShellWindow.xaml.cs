@@ -1088,7 +1088,7 @@ internal partial class FlourishShellWindow : Window
             MinHeight = 0,
             Padding = new Thickness(),
             Icon = icon,
-            Appearance = ButtonAppearance.Subtle,
+            Variant = ButtonVariant.Text,
             Tag = task.Id,
             ToolTip = new FlourishToolTip { Content = toolTip },
         };
@@ -1988,7 +1988,7 @@ internal partial class FlourishShellWindow : Window
                 Content = useIconOnly ? null : item.DisplayName,
                 Margin = buttons.Count > 0 ? new Thickness(2, 0, 0, 0) : new Thickness(),
                 ToolTip = new FlourishToolTip { Content = item.DisplayName },
-                Appearance = ButtonAppearance.Subtle,
+                Variant = ButtonVariant.Text,
                 Tag = item.CommandKey,
                 Width = useIconOnly ? 30 : double.NaN,
                 Height = 28,
@@ -2202,7 +2202,7 @@ internal partial class FlourishShellWindow : Window
                     Padding = new Thickness(7, 0, 7, 0),
                     Content = "Run action",
                     Tag = info,
-                    Appearance = ButtonAppearance.Subtle,
+                    Variant = ButtonVariant.Text,
                 };
                 action.Click += NotificationAction_Click;
                 content.Children.Add(action);
@@ -2221,7 +2221,7 @@ internal partial class FlourishShellWindow : Window
                 Margin = new Thickness(8, 0, 0, 0),
                 Icon = CreateIconContent("\uE711"),
                 Tag = definition.Id,
-                Appearance = ButtonAppearance.Subtle,
+                Variant = ButtonVariant.Text,
                 ToolTip = new FlourishToolTip { Content = "Dismiss" },
             };
             dismiss.Click += NotificationDismiss_Click;
