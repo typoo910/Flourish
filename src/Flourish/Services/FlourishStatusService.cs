@@ -5,7 +5,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FlourishStatusService : IStatusBarService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly FlourishShellOptions options;
     private readonly Dictionary<string, CancellationTokenSource> expirations = new(
         StringComparer.Ordinal
@@ -68,11 +68,12 @@ internal sealed class FlourishStatusService : IStatusBarService
     public void SetEnabled(bool enabled)
     {
         Mutate(
-            () => SetIfChanged(
-                options.IsStatusBarEnabled,
-                enabled,
-                value => options.IsStatusBarEnabled = value
-            ),
+            () =>
+                SetIfChanged(
+                    options.IsStatusBarEnabled,
+                    enabled,
+                    value => options.IsStatusBarEnabled = value
+                ),
             FlourishRuntimeChangeKind.Updated,
             itemId: null
         );
@@ -81,11 +82,12 @@ internal sealed class FlourishStatusService : IStatusBarService
     public void SetLanStatusEnabled(bool enabled)
     {
         Mutate(
-            () => SetIfChanged(
-                options.IsLANConnectionStatusEnabled,
-                enabled,
-                value => options.IsLANConnectionStatusEnabled = value
-            ),
+            () =>
+                SetIfChanged(
+                    options.IsLANConnectionStatusEnabled,
+                    enabled,
+                    value => options.IsLANConnectionStatusEnabled = value
+                ),
             FlourishRuntimeChangeKind.Updated,
             itemId: null
         );
@@ -94,11 +96,12 @@ internal sealed class FlourishStatusService : IStatusBarService
     public void SetPowerStatusEnabled(bool enabled)
     {
         Mutate(
-            () => SetIfChanged(
-                options.IsPowerStatusEnabled,
-                enabled,
-                value => options.IsPowerStatusEnabled = value
-            ),
+            () =>
+                SetIfChanged(
+                    options.IsPowerStatusEnabled,
+                    enabled,
+                    value => options.IsPowerStatusEnabled = value
+                ),
             FlourishRuntimeChangeKind.Updated,
             itemId: null
         );
@@ -297,9 +300,7 @@ internal sealed class FlourishStatusService : IStatusBarService
             await Task.Delay(duration, cancellationToken).ConfigureAwait(false);
             RemoveCore(id, lease);
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
     private bool RemoveCore(string id, Guid? lease)
@@ -350,7 +351,9 @@ internal sealed class FlourishStatusService : IStatusBarService
                 ValidateItem(replacement);
                 if (!StringComparer.Ordinal.Equals(id, replacement.Id))
                 {
-                    throw new InvalidOperationException("A status item update cannot change its stable ID.");
+                    throw new InvalidOperationException(
+                        "A status item update cannot change its stable ID."
+                    );
                 }
 
                 if (options.StatusItems[index] == replacement)
@@ -366,11 +369,7 @@ internal sealed class FlourishStatusService : IStatusBarService
         );
     }
 
-    private void Mutate(
-        Func<bool> mutation,
-        FlourishRuntimeChangeKind changeKind,
-        string? itemId
-    )
+    private void Mutate(Func<bool> mutation, FlourishRuntimeChangeKind changeKind, string? itemId)
     {
         FlourishStatusBarSnapshot snapshot;
         lock (gate)
@@ -384,10 +383,7 @@ internal sealed class FlourishStatusService : IStatusBarService
             snapshot = CreateSnapshot();
         }
 
-        Changed?.Invoke(
-            this,
-            new FlourishStatusBarChangedEventArgs(snapshot, changeKind, itemId)
-        );
+        Changed?.Invoke(this, new FlourishStatusBarChangedEventArgs(snapshot, changeKind, itemId));
     }
 
     private FlourishStatusBarSnapshot CreateSnapshot()
@@ -487,11 +483,8 @@ internal sealed class FlourishStatusService : IStatusBarService
         }
     }
 
-    private sealed class StatusBarItemHandle(
-        FlourishStatusService owner,
-        string id,
-        Guid lease
-    ) : IStatusBarItemHandle
+    private sealed class StatusBarItemHandle(FlourishStatusService owner, string id, Guid lease)
+        : IStatusBarItemHandle
     {
         private FlourishStatusService? owner = owner;
 

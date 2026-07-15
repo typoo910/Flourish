@@ -3,18 +3,13 @@ using ArkheideSystem.Flourish.Internal.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class NavigationPanelService : INavigationPanelService
+internal sealed class NavigationPanelService(FlourishShellOptions options) : INavigationPanelService
 {
-    private readonly object gate = new();
-    private readonly FlourishShellOptions options;
-    private bool isOpen;
+    private readonly Lock gate = new();
+    private readonly FlourishShellOptions options =
+        options ?? throw new ArgumentNullException(nameof(options));
+    private bool isOpen = options.IsNavigationPanelInitiallyOpen;
     private long version;
-
-    public NavigationPanelService(FlourishShellOptions options)
-    {
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
-        isOpen = options.IsNavigationPanelInitiallyOpen;
-    }
 
     public event EventHandler<FlourishNavigationPanelChangedEventArgs>? Changed;
 
@@ -145,10 +140,7 @@ internal sealed class NavigationPanelService : INavigationPanelService
     )
     {
         ValidatePositiveFinite(openWidth, nameof(openWidth));
-        NavigationPanelDimensions.ValidateCollapsedWidth(
-            closedWidth,
-            nameof(closedWidth)
-        );
+        NavigationPanelDimensions.ValidateCollapsedWidth(closedWidth, nameof(closedWidth));
         ValidatePositiveFinite(maxWidth, nameof(maxWidth));
         ValidatePositiveFinite(minWidth, nameof(minWidth));
 
@@ -184,8 +176,11 @@ internal sealed class NavigationPanelService : INavigationPanelService
     {
         if (!double.IsFinite(value) || value <= 0)
         {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be positive and finite.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                value,
+                "Value must be positive and finite."
+            );
         }
     }
-
 }

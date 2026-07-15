@@ -9,7 +9,7 @@ internal sealed class ProfileFlyoutService(
     FlourishProfileOptions profileOptions
 ) : IProfileFlyoutService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private bool isVisible;
     private long version;
 
@@ -66,7 +66,8 @@ internal sealed class ProfileFlyoutService(
         });
     }
 
-    public void SetContentPage<TPage>() where TPage : Page => SetContentPage(typeof(TPage));
+    public void SetContentPage<TPage>()
+        where TPage : Page => SetContentPage(typeof(TPage));
 
     public void SetContentPage(Type pageType)
     {

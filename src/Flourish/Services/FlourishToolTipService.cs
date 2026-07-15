@@ -8,11 +8,9 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FlourishToolTipService(FlourishShellOptions options) : IToolTipService
 {
-    private const string InitialShowDelayResourceKey =
-        "FlourishToolTipInitialShowDelay";
-    private const string SpawnableMarginResourceKey =
-        "FlourishToolTipSpawnableMargin";
-    private readonly object gate = new();
+    private const string InitialShowDelayResourceKey = "FlourishToolTipInitialShowDelay";
+    private const string SpawnableMarginResourceKey = "FlourishToolTipSpawnableMargin";
+    private readonly Lock gate = new();
     private Dispatcher? applicationDispatcher;
     private ResourceDictionary? applicationResources;
     private ResourceDictionary? appliedResources;
@@ -158,10 +156,7 @@ internal sealed class FlourishToolTipService(FlourishShellOptions options) : ITo
         }
     }
 
-    private void PublishMutation(
-        ToolTipMutation? mutation,
-        ResourceDictionary? resources
-    )
+    private void PublishMutation(ToolTipMutation? mutation, ResourceDictionary? resources)
     {
         if (mutation is not { } value)
         {
@@ -272,11 +267,7 @@ internal sealed class FlourishToolTipService(FlourishShellOptions options) : ITo
         );
     }
 
-    private static void SetResourceIfChanged(
-        ResourceDictionary resources,
-        string key,
-        object value
-    )
+    private static void SetResourceIfChanged(ResourceDictionary resources, string key, object value)
     {
         var hasDirectKey = resources.Keys.Cast<object>().Contains(key);
         if (hasDirectKey && Equals(resources[key], value))

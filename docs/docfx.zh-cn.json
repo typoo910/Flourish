@@ -29,6 +29,8 @@
           "toc.yml",
           "articles/**/*.md",
           "articles/**/*.yml",
+          "controls/**/*.md",
+          "controls/**/*.yml",
           "api/**/*.yml"
         ],
         "dest": "."

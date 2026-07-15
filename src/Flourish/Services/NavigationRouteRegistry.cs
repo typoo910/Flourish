@@ -6,7 +6,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly IServiceProvider? serviceProvider;
     private readonly Dictionary<string, FlourishNavigationRoute> routes = new(
         StringComparer.Ordinal
@@ -17,7 +17,8 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
     public NavigationRouteRegistry(IServiceProvider serviceProvider, FlourishShellOptions options)
         : this(options)
     {
-        this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        this.serviceProvider =
+            serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
     internal NavigationRouteRegistry(FlourishShellOptions options)
@@ -177,11 +178,7 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
         }
     }
 
-    internal Page CreatePage(
-        Type pageType,
-        IPageFactory fallbackFactory,
-        out long routeVersion
-    )
+    internal Page CreatePage(Type pageType, IPageFactory fallbackFactory, out long routeVersion)
     {
         FlourishNavigationRoute? route;
         lock (gate)
@@ -192,10 +189,12 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
 
         if (route?.PageFactory is not null)
         {
-            return route.PageFactory(serviceProvider
-                ?? throw new InvalidOperationException(
-                    "The runtime route factory service provider is unavailable."
-                ));
+            return route.PageFactory(
+                serviceProvider
+                    ?? throw new InvalidOperationException(
+                        "The runtime route factory service provider is unavailable."
+                    )
+            );
         }
 
         return fallbackFactory.Create(pageType) as Page
@@ -212,7 +211,10 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
         {
             if (
                 lease is not null
-                && (!leases.TryGetValue(navigationKey, out var currentLease) || currentLease != lease)
+                && (
+                    !leases.TryGetValue(navigationKey, out var currentLease)
+                    || currentLease != lease
+                )
             )
             {
                 return false;
@@ -292,7 +294,11 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
     {
         if (!Enum.IsDefined(cacheMode))
         {
-            throw new ArgumentOutOfRangeException(nameof(cacheMode), cacheMode, "Unknown cache mode.");
+            throw new ArgumentOutOfRangeException(
+                nameof(cacheMode),
+                cacheMode,
+                "Unknown cache mode."
+            );
         }
     }
 
@@ -311,5 +317,4 @@ internal sealed class NavigationRouteRegistry : INavigationRouteRegistry
             Interlocked.Exchange(ref owner, null)?.RemoveCore(NavigationKey, lease);
         }
     }
-
 }

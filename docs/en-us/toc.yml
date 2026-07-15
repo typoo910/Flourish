@@ -3,3 +3,5 @@ items:
   href: articles/
 - name: API
   href: api/
+- name: Controls
+  href: controls/

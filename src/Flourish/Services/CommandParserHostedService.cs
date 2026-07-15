@@ -5,7 +5,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class CommandParserHostedService : IHostedService, IDisposable
 {
-    private readonly object lifecycleGate = new();
+    private readonly Lock lifecycleGate = new();
     private readonly ICommandRegistry commandRegistry;
     private readonly IReadOnlyList<ICommandParser> parsers;
     private List<ICommandRegistration>? activeRegistrations;
@@ -16,8 +16,8 @@ internal sealed class CommandParserHostedService : IHostedService, IDisposable
         IEnumerable<ICommandParser> parsers
     )
     {
-        this.commandRegistry = commandRegistry
-            ?? throw new ArgumentNullException(nameof(commandRegistry));
+        this.commandRegistry =
+            commandRegistry ?? throw new ArgumentNullException(nameof(commandRegistry));
         ArgumentNullException.ThrowIfNull(parsers);
         this.parsers = parsers.ToArray();
         if (this.parsers.Any(parser => parser is null))
@@ -34,10 +34,7 @@ internal sealed class CommandParserHostedService : IHostedService, IDisposable
         cancellationToken.ThrowIfCancellationRequested();
         lock (lifecycleGate)
         {
-            ObjectDisposedException.ThrowIf(
-                lifecycleState == LifecycleState.Disposed,
-                this
-            );
+            ObjectDisposedException.ThrowIf(lifecycleState == LifecycleState.Disposed, this);
             if (lifecycleState == LifecycleState.Started)
             {
                 return Task.CompletedTask;
@@ -45,9 +42,7 @@ internal sealed class CommandParserHostedService : IHostedService, IDisposable
 
             if (lifecycleState == LifecycleState.Starting)
             {
-                throw new InvalidOperationException(
-                    "Command registration is already starting."
-                );
+                throw new InvalidOperationException("Command registration is already starting.");
             }
 
             lifecycleState = LifecycleState.Starting;
@@ -156,9 +151,7 @@ internal sealed class CommandParserHostedService : IHostedService, IDisposable
         DisposeRegistrations(registrations);
     }
 
-    private static void DisposeRegistrations(
-        IReadOnlyList<ICommandRegistration>? registrations
-    )
+    private static void DisposeRegistrations(IReadOnlyList<ICommandRegistration>? registrations)
     {
         if (registrations is null)
         {
@@ -201,7 +194,7 @@ internal sealed class CommandParserHostedService : IHostedService, IDisposable
         List<ICommandRegistration> registrations
     ) : ICommandRegistrar
     {
-        private readonly object gate = new();
+        private readonly Lock gate = new();
         private bool isActive = true;
 
         public void Register(

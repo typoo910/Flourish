@@ -23,6 +23,7 @@ public sealed class FlourishPublicControlsTests
         [
             typeof(FlourishThemeResources),
             typeof(ButtonAppearance),
+            typeof(ChunkHeroMode),
             typeof(FlourishCardAppearance),
             typeof(FlourishGridSplitterVariant),
             typeof(FlourishListBoxAppearance),
@@ -245,6 +246,8 @@ public sealed class FlourishPublicControlsTests
             var iconButton = new IconButton();
             var windowCaptionButton = new WindowCaptionButton();
             var cardButton = new CardButton();
+            var chunk = new Chunk();
+            var chunkHero = new ChunkHero();
             var card = new FlourishCard();
             var gridSplitter = new FlourishGridSplitter();
             var listBox = new FlourishListBox();
@@ -260,6 +263,16 @@ public sealed class FlourishPublicControlsTests
             Assert.Equal(Dock.Top, cardButton.IconPosition);
             Assert.Equal(string.Empty, cardButton.Title);
             Assert.IsAssignableFrom<FlourishButton>(cardButton);
+            Assert.Equal(string.Empty, chunk.ChunkTitle);
+            Assert.Null(chunk.ChunkDescription);
+            Assert.Equal(new Thickness(0, 32, 0, 0), chunk.ChunkMargin);
+            Assert.Equal(new Thickness(0, 12, 0, 0), chunk.ChunkSpacing);
+            Assert.Null(chunk.ChunkBody);
+            Assert.Equal(string.Empty, chunkHero.ChunkHeroTitle);
+            Assert.Null(chunkHero.ChunkHeroDescription);
+            Assert.Null(chunkHero.ChunkHeroBody);
+            Assert.Equal(ChunkHeroMode.SplitLeft, chunkHero.ChunkHeroMode);
+            Assert.Null(chunkHero.ChunkHeroPresenter);
             Assert.Equal(FlourishCardAppearance.Standard, card.Appearance);
             Assert.Equal(FlourishGridSplitterVariant.Standard, gridSplitter.Variant);
             Assert.Equal(FlourishListBoxAppearance.Standard, listBox.Appearance);
@@ -316,6 +329,105 @@ public sealed class FlourishPublicControlsTests
     }
 
     [Fact]
+    public void ChunkFamily_DependencyPropertiesRoundTripAndChunkOwnsImplicitContent()
+    {
+        RunInSta(() =>
+        {
+            var chunkBody = new Border();
+            var heroBody = new StackPanel();
+            var presenter = new Border();
+            var chunk = new Chunk
+            {
+                ChunkTitle = "Section",
+                ChunkDescription = "Supporting copy",
+                ChunkMargin = new Thickness(1, 2, 3, 4),
+                ChunkSpacing = new Thickness(5, 6, 7, 8),
+                ChunkBody = chunkBody,
+            };
+            var hero = new ChunkHero
+            {
+                ChunkHeroTitle = "Hero",
+                ChunkHeroDescription = "Leading copy",
+                ChunkHeroBody = heroBody,
+                ChunkHeroMode = ChunkHeroMode.Overlay,
+                ChunkHeroPresenter = presenter,
+            };
+
+            Assert.Equal("Section", chunk.ChunkTitle);
+            Assert.Equal("Supporting copy", chunk.ChunkDescription);
+            Assert.Equal(new Thickness(1, 2, 3, 4), chunk.ChunkMargin);
+            Assert.Equal(new Thickness(5, 6, 7, 8), chunk.ChunkSpacing);
+            Assert.Same(chunkBody, chunk.ChunkBody);
+            Assert.Equal(
+                nameof(Chunk.ChunkBody),
+                typeof(Chunk).GetCustomAttribute<ContentPropertyAttribute>()?.Name
+            );
+            Assert.Equal("Hero", hero.ChunkHeroTitle);
+            Assert.Equal("Leading copy", hero.ChunkHeroDescription);
+            Assert.Same(heroBody, hero.ChunkHeroBody);
+            Assert.Equal(ChunkHeroMode.Overlay, hero.ChunkHeroMode);
+            Assert.Same(presenter, hero.ChunkHeroPresenter);
+            Assert.Equal(
+                nameof(ChunkHero.ChunkHeroBody),
+                typeof(ChunkHero).GetCustomAttribute<ContentPropertyAttribute>()?.Name
+            );
+        });
+    }
+
+    [Fact]
+    public void ChunkFamily_OwnsLogicalContentBeforeAndAfterReplacement()
+    {
+        RunInSta(() =>
+        {
+            var dataContext = new object();
+            var firstBody = new Border();
+            var replacementBody = new Border();
+            var chunk = new Chunk { DataContext = dataContext };
+            chunk.Resources["ChunkResource"] = "Available";
+
+            chunk.ChunkBody = firstBody;
+
+            Assert.Same(chunk, LogicalTreeHelper.GetParent(firstBody));
+            Assert.Same(dataContext, firstBody.DataContext);
+            Assert.Equal("Available", firstBody.FindResource("ChunkResource"));
+
+            chunk.ChunkBody = replacementBody;
+
+            Assert.Null(LogicalTreeHelper.GetParent(firstBody));
+            Assert.Same(chunk, LogicalTreeHelper.GetParent(replacementBody));
+
+            chunk.ClearValue(Chunk.ChunkBodyProperty);
+
+            Assert.Null(LogicalTreeHelper.GetParent(replacementBody));
+
+            var heroBody = new Border();
+            var heroPresenter = new Border();
+            var hero = new ChunkHero
+            {
+                DataContext = dataContext,
+                ChunkHeroBody = heroBody,
+                ChunkHeroPresenter = heroPresenter,
+            };
+
+            Assert.Same(hero, LogicalTreeHelper.GetParent(heroBody));
+            Assert.Same(hero, LogicalTreeHelper.GetParent(heroPresenter));
+            Assert.Same(dataContext, heroBody.DataContext);
+            Assert.Same(dataContext, heroPresenter.DataContext);
+            Assert.Equal(
+                new object[] { heroBody, heroPresenter },
+                LogicalTreeHelper.GetChildren(hero).Cast<object>()
+            );
+
+            hero.ChunkHeroBody = null;
+            hero.ChunkHeroPresenter = null;
+
+            Assert.Null(LogicalTreeHelper.GetParent(heroBody));
+            Assert.Null(LogicalTreeHelper.GetParent(heroPresenter));
+            Assert.Empty(LogicalTreeHelper.GetChildren(hero).Cast<object>());
+        });
+    }
+
+    [Fact]
     public void IconButton_SimpleToolTipContentUsesFlourishToolTip()
     {
         RunInSta(() =>
@@ -347,6 +459,9 @@ public sealed class FlourishPublicControlsTests
 
             Assert.Throws<ArgumentException>(() =>
                 button.Appearance = (ButtonAppearance)(-1)
+            );
+            Assert.Throws<ArgumentException>(() =>
+                new ChunkHero().ChunkHeroMode = (ChunkHeroMode)(-1)
             );
             Assert.Throws<ArgumentException>(() =>
                 new CardButton().IconPosition = (Dock)(-1)

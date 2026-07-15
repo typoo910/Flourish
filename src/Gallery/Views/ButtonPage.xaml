@@ -7,21 +7,16 @@
 >
   <flourish:FlourishScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-      <flourish:FlourishTextBlock Role="PageTitle" Text="Button" />
-      <flourish:FlourishTextBlock
-        Margin="{DynamicResource FlourishPageSubtitleMargin}"
-        Role="Subtitle"
-        Text="Buttons use Appearance for action semantics. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
+      <flourish:Chunk
+        ChunkDescription="Buttons use Appearance for action semantics. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
+        ChunkTitle="Button"
       />
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Button and Appearance" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Button is the standard content action. Its Appearance property changes semantic emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Button is the standard content action. Its Appearance property changes semantic emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
+        ChunkTitle="Button and Appearance"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <flourish:FlourishTextBlock Role="FieldLabel" Text="APPEARANCE" />
             <WrapPanel Margin="0,8,0,0">
@@ -54,16 +49,13 @@
             </Grid>
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="IconButton" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="IconButton derives from Button and adds Icon. Icon-only actions use compact 30 by 30 geometry by default, while icon-plus-label commands keep the ordinary Button geometry. Plain ToolTip content automatically uses FlourishToolTip."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="IconButton derives from Button and adds Icon. Icon-only actions use compact 30 by 30 geometry by default, while icon-plus-label commands keep the ordinary Button geometry. Plain ToolTip content automatically uses FlourishToolTip."
+        ChunkTitle="IconButton"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <WrapPanel>
               <flourish:IconButton Margin="0,0,8,8" Appearance="Subtle" Icon="&#xE72C;" ToolTip="Refresh" />
@@ -78,15 +70,12 @@
             />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="CardButton" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="CardButton represents a complete interactive card. Title is the heading, inherited Content is the supporting description, and IconPosition chooses where the icon appears."
-        />
+      <flourish:Chunk
+        ChunkDescription="CardButton represents a complete interactive card. Title is the heading, inherited Content is the supporting description, and IconPosition chooses where the icon appears."
+        ChunkTitle="CardButton"
+      >
         <UniformGrid Margin="0,0,0,0" Columns="2">
           <flourish:CardButton
             Margin="0,0,8,0"
@@ -102,16 +91,13 @@
             Title="View details"
           />
         </UniformGrid>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="WindowCaptionButton" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="WindowCaptionButton derives from IconButton and is reserved for minimize, maximize, restore, and close commands in a window title bar. It intentionally uses dedicated caption geometry."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="WindowCaptionButton derives from IconButton and is reserved for minimize, maximize, restore, and close commands in a window title bar. It intentionally uses dedicated caption geometry."
+        ChunkTitle="WindowCaptionButton"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <Border
               HorizontalAlignment="Left"
@@ -132,23 +118,20 @@
             />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Hover feedback" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="The Button family participates in HoverReveal. The default template provides animated hover feedback, while the attached properties can adjust it for a local interaction requirement."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="The Button family participates in HoverReveal. The default template provides animated hover feedback, while the attached properties can adjust it for a local interaction requirement."
+        ChunkTitle="Hover feedback"
+      >
+        <flourish:FlourishCard>
           <WrapPanel>
             <flourish:Button Margin="0,0,8,0" Content="Default hover reveal" />
             <flourish:Button flourish:HoverReveal.IsEnabled="False" Content="Static hover feedback" />
             <flourish:Button Margin="8,0,0,0" Appearance="Danger" Content="Danger hover reveal" />
           </WrapPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
     </StackPanel>
   </flourish:FlourishScrollViewer>
 </Page>

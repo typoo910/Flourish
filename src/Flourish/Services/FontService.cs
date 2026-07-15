@@ -11,10 +11,11 @@ using WpfControl = System.Windows.Controls.Control;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class FontService : IFontService
+internal sealed class FontService(FlourishShellOptions options) : IFontService
 {
-    private readonly object gate = new();
-    private readonly FlourishShellOptions options;
+    private readonly Lock gate = new();
+    private readonly FlourishShellOptions options =
+        options ?? throw new ArgumentNullException(nameof(options));
     private readonly ConditionalWeakTable<Page, PageFontResourceState> pageFontStates = new();
     private Dispatcher? applicationDispatcher;
     private ResourceDictionary? applicationResources;
@@ -39,11 +40,6 @@ internal sealed class FontService : IFontService
         "FlourishLineHeightDescription",
         "FlourishLineHeightSubtitle",
     ];
-
-    public FontService(FlourishShellOptions options)
-    {
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
-    }
 
     public string FontFamily
     {
@@ -160,12 +156,7 @@ internal sealed class FontService : IFontService
 
         return change == FontResourceChange.None
             ? null
-            : new FontMutation(
-                CaptureSnapshot(),
-                change,
-                FlourishFontChangeKind.GlobalText,
-                null
-            );
+            : new FontMutation(CaptureSnapshot(), change, FlourishFontChangeKind.GlobalText, null);
     }
 
     public void SetFontFamily(string fontFamily)
@@ -240,11 +231,7 @@ internal sealed class FontService : IFontService
         SetOverrideFont(typeof(TPage), fontFamily, fontSize);
     }
 
-    public void SetOverrideFont(
-        Type pageType,
-        string fontFamily,
-        double? fontSize = null
-    )
+    public void SetOverrideFont(Type pageType, string fontFamily, double? fontSize = null)
     {
         ValidatePageType(pageType, nameof(pageType));
         fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
@@ -257,10 +244,7 @@ internal sealed class FontService : IFontService
         ExecuteMutation(() => SetOverrideFontCore(pageType, pageOverride));
     }
 
-    private FontMutation? SetOverrideFontCore(
-        Type pageType,
-        FlourishPageFontOverride pageOverride
-    )
+    private FontMutation? SetOverrideFontCore(Type pageType, FlourishPageFontOverride pageOverride)
     {
         if (
             options.PageFontOverridesByPageType.TryGetValue(pageType, out var current)
@@ -279,7 +263,8 @@ internal sealed class FontService : IFontService
         );
     }
 
-    public bool ClearOverrideFont<TPage>() where TPage : Page
+    public bool ClearOverrideFont<TPage>()
+        where TPage : Page
     {
         return ClearOverrideFont(typeof(TPage));
     }
@@ -395,10 +380,7 @@ internal sealed class FontService : IFontService
         }
     }
 
-    private void PublishMutation(
-        FontMutation? mutation,
-        ResourceDictionary? resources
-    )
+    private void PublishMutation(FontMutation? mutation, ResourceDictionary? resources)
     {
         if (mutation is not { } value)
         {
@@ -435,11 +417,7 @@ internal sealed class FontService : IFontService
 
     private FontSnapshot CaptureSnapshot()
     {
-        return new FontSnapshot(
-            options.FontFamily,
-            options.IconFontFamily,
-            options.FontSize
-        );
+        return new FontSnapshot(options.FontFamily, options.IconFontFamily, options.FontSize);
     }
 
     private static void ApplyResources(
@@ -472,16 +450,9 @@ internal sealed class FontService : IFontService
         }
     }
 
-    private static void SetResourceIfChanged(
-        ResourceDictionary resources,
-        string key,
-        object value
-    )
+    private static void SetResourceIfChanged(ResourceDictionary resources, string key, object value)
     {
-        if (
-            TryGetDirectResource(resources, key, out var current)
-            && Equals(current, value)
-        )
+        if (TryGetDirectResource(resources, key, out var current) && Equals(current, value))
         {
             return;
         }
@@ -549,10 +520,7 @@ internal sealed class FontService : IFontService
         state.HasCapturedResources = false;
     }
 
-    private static void RestorePageFontSizeResources(
-        Page page,
-        PageFontResourceState state
-    )
+    private static void RestorePageFontSizeResources(Page page, PageFontResourceState state)
     {
         if (!state.HasCapturedResources)
         {
@@ -565,11 +533,7 @@ internal sealed class FontService : IFontService
         }
     }
 
-    private static void RestorePageResource(
-        Page page,
-        PageFontResourceState state,
-        string key
-    )
+    private static void RestorePageResource(Page page, PageFontResourceState state, string key)
     {
         if (state.MissingResourceKeys.Contains(key))
         {
@@ -580,18 +544,11 @@ internal sealed class FontService : IFontService
         page.Resources[key] = state.OriginalResources[key];
     }
 
-    private static void SetPageFontSizeResources(
-        ResourceDictionary resources,
-        double baseSize
-    )
+    private static void SetPageFontSizeResources(ResourceDictionary resources, double baseSize)
     {
         SetResourceIfChanged(resources, "FlourishFontSizeSmall", ClampFontSize(baseSize - 4));
         SetResourceIfChanged(resources, "FlourishFontSizeCaption", ClampFontSize(baseSize - 2));
-        SetResourceIfChanged(
-            resources,
-            "FlourishFontSizeDescription",
-            ClampFontSize(baseSize - 1)
-        );
+        SetResourceIfChanged(resources, "FlourishFontSizeDescription", ClampFontSize(baseSize - 1));
         SetResourceIfChanged(resources, "FlourishFontSizeBase", baseSize);
         SetResourceIfChanged(resources, "FlourishFontSizeSubtitle", ClampFontSize(baseSize + 2));
         SetResourceIfChanged(
@@ -599,11 +556,7 @@ internal sealed class FontService : IFontService
             "FlourishFontSizeSectionTitle",
             ClampFontSize(baseSize + 6)
         );
-        SetResourceIfChanged(
-            resources,
-            "FlourishFontSizePageTitle",
-            ClampFontSize(baseSize + 18)
-        );
+        SetResourceIfChanged(resources, "FlourishFontSizePageTitle", ClampFontSize(baseSize + 18));
         SetResourceIfChanged(resources, "FlourishFontSizeTitle", baseSize);
         SetResourceIfChanged(
             resources,
@@ -626,11 +579,7 @@ internal sealed class FontService : IFontService
             "FlourishLineHeightDescription",
             ClampFontSize(baseSize + 4)
         );
-        SetResourceIfChanged(
-            resources,
-            "FlourishLineHeightSubtitle",
-            ClampFontSize(baseSize + 10)
-        );
+        SetResourceIfChanged(resources, "FlourishLineHeightSubtitle", ClampFontSize(baseSize + 10));
     }
 
     private static string ValidateNotBlank(string value, string parameterName)

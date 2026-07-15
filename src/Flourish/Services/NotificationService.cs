@@ -7,7 +7,7 @@ internal sealed class NotificationService(ILogger<NotificationService> logger)
     : INotificationService,
         IDisposable
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly Dictionary<string, NotificationEntry> entries = new(StringComparer.Ordinal);
     private long version;
     private bool isDisposed;
@@ -33,7 +33,9 @@ internal sealed class NotificationService(ILogger<NotificationService> logger)
             ObjectDisposedException.ThrowIf(isDisposed, this);
             if (entries.ContainsKey(notification.Id))
             {
-                throw new InvalidOperationException($"Notification '{notification.Id}' is already active.");
+                throw new InvalidOperationException(
+                    $"Notification '{notification.Id}' is already active."
+                );
             }
 
             AddOrReplaceLocked(notification);
@@ -179,9 +181,7 @@ internal sealed class NotificationService(ILogger<NotificationService> logger)
                 NotifyChanged();
             }
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception error)
         {
             logger.LogError(error, "Failed to expire notification {NotificationId}.", id);
@@ -221,13 +221,11 @@ internal sealed class NotificationService(ILogger<NotificationService> logger)
     {
         return entries
             .Values.OrderBy(entry => entry.CreatedAt)
-            .Select(entry =>
-                new FlourishNotificationInfo(
-                    entry.Notification,
-                    entry.CreatedAt,
-                    entry.Version
-                )
-            )
+            .Select(entry => new FlourishNotificationInfo(
+                entry.Notification,
+                entry.CreatedAt,
+                entry.Version
+            ))
             .ToArray();
     }
 
@@ -251,12 +249,18 @@ internal sealed class NotificationService(ILogger<NotificationService> logger)
 
         if (!Enum.IsDefined(notification.Severity))
         {
-            throw new ArgumentOutOfRangeException(nameof(notification), "Unknown notification severity.");
+            throw new ArgumentOutOfRangeException(
+                nameof(notification),
+                "Unknown notification severity."
+            );
         }
 
         if (notification.Duration is { } duration && duration <= TimeSpan.Zero)
         {
-            throw new ArgumentOutOfRangeException(nameof(notification), "Notification duration must be positive.");
+            throw new ArgumentOutOfRangeException(
+                nameof(notification),
+                "Notification duration must be positive."
+            );
         }
     }
 

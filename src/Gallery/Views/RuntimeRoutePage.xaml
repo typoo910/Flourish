@@ -6,25 +6,23 @@
   Background="Transparent"
 >
   <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-    <flourish:FlourishTextBlock Role="PageTitle" Text="A route created at runtime" />
-    <flourish:FlourishTextBlock
-      Margin="{DynamicResource FlourishPageSubtitleMargin}"
-      Role="Subtitle"
-      Text="This page was registered while Gallery was already running."
-    />
-    <flourish:FlourishCard
-      MaxWidth="680"
-      Margin="{DynamicResource FlourishSectionCardMargin}"
-      HorizontalAlignment="Left"
-      Appearance="Elevated"
+    <flourish:Chunk
+      ChunkDescription="This page was registered while Gallery was already running."
+      ChunkTitle="A route created at runtime"
     >
-      <StackPanel>
-        <flourish:FlourishTextBlock Role="Paragraph" Text="This page was not present in ConfigureNavigation. Its route and menu entry were registered while Gallery was already running." />
-        <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,22,0,0" Text="PAGE INSTANCE" />
-        <flourish:FlourishTextBlock x:Name="InstanceText" FontFamily="Consolas" FontSize="16" Foreground="{DynamicResource FlourishPrimaryForegroundBrush}" TextWrapping="Wrap" />
-        <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,18,0,0" Text="NAVIGATION PARAMETER" />
-        <flourish:FlourishTextBlock x:Name="ParameterText" FontFamily="Consolas" Foreground="{DynamicResource FlourishNeutralForeground1Brush}" TextWrapping="Wrap" />
-      </StackPanel>
-    </flourish:FlourishCard>
+      <flourish:FlourishCard
+        MaxWidth="680"
+        HorizontalAlignment="Left"
+        Appearance="Elevated"
+      >
+        <StackPanel>
+          <flourish:FlourishTextBlock Role="Paragraph" Text="This page was not present in ConfigureNavigation. Its route and menu entry were registered while Gallery was already running." />
+          <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,22,0,0" Text="PAGE INSTANCE" />
+          <flourish:FlourishTextBlock x:Name="InstanceText" FontFamily="Consolas" FontSize="16" Foreground="{DynamicResource FlourishPrimaryForegroundBrush}" TextWrapping="Wrap" />
+          <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,18,0,0" Text="NAVIGATION PARAMETER" />
+          <flourish:FlourishTextBlock x:Name="ParameterText" FontFamily="Consolas" Foreground="{DynamicResource FlourishNeutralForeground1Brush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </flourish:FlourishCard>
+    </flourish:Chunk>
   </StackPanel>
 </Page>

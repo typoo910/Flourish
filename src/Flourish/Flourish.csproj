@@ -30,6 +30,12 @@
     <Compile Update="Controls\CardButton.xaml.cs">
       <DependentUpon>CardButton.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\Chunk.xaml.cs">
+      <DependentUpon>Chunk.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ChunkHero.xaml.cs">
+      <DependentUpon>ChunkHero.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Controls\Card.xaml.cs">
       <DependentUpon>Card.xaml</DependentUpon>
     </Compile>

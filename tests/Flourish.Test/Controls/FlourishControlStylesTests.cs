@@ -29,6 +29,8 @@ public sealed class FlourishControlStylesTests
             "/Flourish;component/Controls/IconButton.xaml",
             "/Flourish;component/Controls/WindowCaptionButton.xaml",
             "/Flourish;component/Controls/CardButton.xaml",
+            "/Flourish;component/Controls/Chunk.xaml",
+            "/Flourish;component/Controls/ChunkHero.xaml",
             "/Flourish;component/Controls/Card.xaml",
             "/Flourish;component/Controls/CheckBox.xaml",
             "/Flourish;component/Controls/ComboBox.xaml",
@@ -194,6 +196,19 @@ public sealed class FlourishControlStylesTests
             WpfControl[] templatedControls =
             [
                 button,
+                new Chunk
+                {
+                    ChunkTitle = "Section",
+                    ChunkDescription = "Description",
+                    ChunkBody = new Border(),
+                },
+                new ChunkHero
+                {
+                    ChunkHeroTitle = "Hero",
+                    ChunkHeroDescription = "Description",
+                    ChunkHeroBody = new FlourishButton { Content = "Action" },
+                    ChunkHeroPresenter = new Border(),
+                },
                 new FlourishCard { Content = "Card" },
                 new FlourishCheckBox { Content = "Check" },
                 comboBox,
@@ -264,6 +279,111 @@ public sealed class FlourishControlStylesTests
                 toolTip.IsOpen = false;
                 comboBox.IsDropDownOpen = false;
                 window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void ChunkHero_ModesArrangePresenterAndTextAndNullPresenterUsesFullWidth()
+    {
+        RunInSta(() =>
+        {
+            var expectations = new[]
+            {
+                new
+                {
+                    Mode = ChunkHeroMode.SplitLeft,
+                    PresenterColumn = 1,
+                    TextColumn = 0,
+                    ColumnSpan = 1,
+                    ScrimOpacity = 0d,
+                },
+                new
+                {
+                    Mode = ChunkHeroMode.SplitRight,
+                    PresenterColumn = 0,
+                    TextColumn = 1,
+                    ColumnSpan = 1,
+                    ScrimOpacity = 0d,
+                },
+                new
+                {
+                    Mode = ChunkHeroMode.Overlay,
+                    PresenterColumn = 0,
+                    TextColumn = 0,
+                    ColumnSpan = 2,
+                    ScrimOpacity = 1d,
+                },
+            };
+
+            foreach (var expectation in expectations)
+            {
+                var hero = new ChunkHero
+                {
+                    ChunkHeroTitle = expectation.Mode.ToString(),
+                    ChunkHeroBody = new Border(),
+                    ChunkHeroMode = expectation.Mode,
+                    ChunkHeroPresenter = new Border(),
+                };
+                var window = CreateWindow(hero);
+
+                try
+                {
+                    window.Show();
+                    window.UpdateLayout();
+                    hero.ApplyTemplate();
+
+                    var presenter = AssertTemplatePart<ContentPresenter>(
+                        hero,
+                        "PresenterHost"
+                    );
+                    var text = AssertTemplatePart<Border>(hero, "TextSurface");
+                    var scrim = AssertTemplatePart<Border>(hero, "OverlayScrim");
+                    var body = AssertTemplatePart<ContentPresenter>(hero, "BodyHost");
+
+                    Assert.Equal(expectation.PresenterColumn, Grid.GetColumn(presenter));
+                    Assert.Equal(expectation.TextColumn, Grid.GetColumn(text));
+                    Assert.Equal(expectation.ColumnSpan, Grid.GetColumnSpan(presenter));
+                    Assert.Equal(expectation.ColumnSpan, Grid.GetColumnSpan(text));
+                    Assert.Equal(expectation.ScrimOpacity, scrim.Opacity);
+                    Assert.Equal(HorizontalAlignment.Stretch, body.HorizontalAlignment);
+                    Assert.Equal(new Thickness(0, 32, 0, 0), hero.Margin);
+                }
+                finally
+                {
+                    window.Close();
+                }
+            }
+
+            var presenterlessHero = new ChunkHero
+            {
+                ChunkHeroTitle = "Presenterless",
+                ChunkHeroMode = ChunkHeroMode.SplitRight,
+            };
+            var presenterlessWindow = CreateWindow(presenterlessHero);
+
+            try
+            {
+                presenterlessWindow.Show();
+                presenterlessWindow.UpdateLayout();
+                presenterlessHero.ApplyTemplate();
+
+                var presenter = AssertTemplatePart<ContentPresenter>(
+                    presenterlessHero,
+                    "PresenterHost"
+                );
+                var text = AssertTemplatePart<Border>(
+                    presenterlessHero,
+                    "TextSurface"
+                );
+
+                Assert.Equal(Visibility.Collapsed, presenter.Visibility);
+                Assert.Equal(0, Grid.GetColumn(text));
+                Assert.Equal(2, Grid.GetColumnSpan(text));
+            }
+            finally
+            {
+                presenterlessWindow.Close();
             }
         });
     }

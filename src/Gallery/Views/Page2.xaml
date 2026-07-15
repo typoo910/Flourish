@@ -9,11 +9,11 @@
   mc:Ignorable="d"
 >
   <Grid>
-    <flourish:FlourishTextBlock
+    <flourish:Chunk
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
-      Role="PageTitle"
-      Text="Page2"
+      ChunkMargin="0"
+      ChunkTitle="Page2"
     />
   </Grid>
 </Page>

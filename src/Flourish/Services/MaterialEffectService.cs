@@ -20,7 +20,7 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
     private const int DwmsbtMainWindow = 2;
     private const int WmDwmCompositionChanged = 0x031E;
 
-    private readonly object stateGate = new();
+    private readonly Lock stateGate = new();
     private Window? owner;
     private HwndSource? hwndSource;
     private MediaBrush? originalBackground;
@@ -30,9 +30,7 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
     private bool isSourceInitializationPending;
 
     public MaterialEffect CurrentEffect { get; private set; } =
-        options is { IsMaterialEffectEnabled: true }
-            ? options.MaterialEffect
-            : MaterialEffect.None;
+        options is { IsMaterialEffectEnabled: true } ? options.MaterialEffect : MaterialEffect.None;
 
     public bool IsApplied { get; private set; }
 
@@ -99,21 +97,20 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
         var attachedOwner = owner;
         if (attachedOwner is not null)
         {
-            RunOnWindowDispatcher(attachedOwner, () =>
-            {
-                var hwnd = new WindowInteropHelper(attachedOwner).Handle;
-                ApplyDarkMode(hwnd, isDarkMode);
-            });
+            RunOnWindowDispatcher(
+                attachedOwner,
+                () =>
+                {
+                    var hwnd = new WindowInteropHelper(attachedOwner).Handle;
+                    ApplyDarkMode(hwnd, isDarkMode);
+                }
+            );
         }
 
         RaiseChanged();
     }
 
-    internal void Attach(
-        Window window,
-        MaterialEffect effect,
-        object? backgroundResourceKey = null
-    )
+    internal void Attach(Window window, MaterialEffect effect, object? backgroundResourceKey = null)
     {
         ArgumentNullException.ThrowIfNull(window);
         ValidateEffect(effect, nameof(effect));
@@ -302,8 +299,7 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
         }
 
         var frameMargins = DwmFrameMargins.ExtendAcrossClientArea;
-        var frameExtended =
-            DwmExtendFrameIntoClientArea(hwnd, ref frameMargins) == Succeeded;
+        var frameExtended = DwmExtendFrameIntoClientArea(hwnd, ref frameMargins) == Succeeded;
 
         var backdropType = DwmsbtMainWindow;
         var backdropApplied =
@@ -410,12 +406,7 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
         }
 
         var darkMode = isDarkMode ? 1 : 0;
-        DwmSetWindowAttribute(
-            hwnd,
-            DwmwaUseImmersiveDarkMode,
-            ref darkMode,
-            Marshal.SizeOf<int>()
-        );
+        DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref darkMode, Marshal.SizeOf<int>());
     }
 
     private static bool IsSystemBackdropSupported()
@@ -480,12 +471,7 @@ internal sealed class MaterialEffectService(FlourishShellOptions? options = null
 
         private readonly int bottomHeight;
 
-        private DwmFrameMargins(
-            int leftWidth,
-            int rightWidth,
-            int topHeight,
-            int bottomHeight
-        )
+        private DwmFrameMargins(int leftWidth, int rightWidth, int topHeight, int bottomHeight)
         {
             this.leftWidth = leftWidth;
             this.rightWidth = rightWidth;

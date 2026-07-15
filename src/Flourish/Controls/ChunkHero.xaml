@@ -1,0 +1,110 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:ArkheideSystem.Flourish.Controls"
+>
+  <ControlTemplate x:Key="ChunkHeroTemplate" TargetType="{x:Type controls:ChunkHero}">
+    <Border
+      x:Name="HeroSurface"
+      MinHeight="{DynamicResource FlourishChunkHeroMinHeight}"
+      Background="{TemplateBinding Background}"
+      BorderBrush="{TemplateBinding BorderBrush}"
+      BorderThickness="{TemplateBinding BorderThickness}"
+      ClipToBounds="True"
+      CornerRadius="{DynamicResource FlourishOverlayCornerRadius}"
+      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+    >
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ContentPresenter
+          x:Name="PresenterHost"
+          Grid.Column="1"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch"
+          Content="{TemplateBinding ChunkHeroPresenter}"
+          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+        />
+        <Border
+          x:Name="OverlayScrim"
+          Grid.ColumnSpan="2"
+          Panel.ZIndex="1"
+          Background="{DynamicResource FlourishChunkHeroOverlayScrimBrush}"
+          IsHitTestVisible="False"
+          Opacity="0"
+        />
+        <Border
+          x:Name="TextSurface"
+          Grid.Column="0"
+          Panel.ZIndex="2"
+          Padding="{TemplateBinding Padding}"
+        >
+          <StackPanel VerticalAlignment="Center">
+            <controls:FlourishTextBlock
+              x:Name="TitleHost"
+              Role="PageTitle"
+              Text="{TemplateBinding ChunkHeroTitle}"
+              TextWrapping="Wrap"
+            />
+            <controls:FlourishTextBlock
+              x:Name="DescriptionHost"
+              Margin="{DynamicResource FlourishChunkHeroDescriptionMargin}"
+              Role="Subtitle"
+              Text="{TemplateBinding ChunkHeroDescription}"
+            />
+            <ContentPresenter
+              x:Name="BodyHost"
+              Margin="{DynamicResource FlourishChunkHeroBodyMargin}"
+              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+              VerticalAlignment="Center"
+              Content="{TemplateBinding ChunkHeroBody}"
+              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+            />
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+    <ControlTemplate.Triggers>
+      <Trigger Property="ChunkHeroDescription" Value="{x:Null}">
+        <Setter TargetName="DescriptionHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+      <Trigger Property="ChunkHeroDescription" Value="">
+        <Setter TargetName="DescriptionHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+      <Trigger Property="ChunkHeroBody" Value="{x:Null}">
+        <Setter TargetName="BodyHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+      <Trigger Property="ChunkHeroMode" Value="SplitRight">
+        <Setter TargetName="PresenterHost" Property="Grid.Column" Value="0" />
+        <Setter TargetName="TextSurface" Property="Grid.Column" Value="1" />
+      </Trigger>
+      <Trigger Property="ChunkHeroMode" Value="Overlay">
+        <Setter TargetName="PresenterHost" Property="Grid.Column" Value="0" />
+        <Setter TargetName="PresenterHost" Property="Grid.ColumnSpan" Value="2" />
+        <Setter TargetName="OverlayScrim" Property="Opacity" Value="1" />
+        <Setter TargetName="TextSurface" Property="Grid.Column" Value="0" />
+        <Setter TargetName="TextSurface" Property="Grid.ColumnSpan" Value="2" />
+        <Setter TargetName="TitleHost" Property="Foreground" Value="{DynamicResource FlourishChunkHeroOverlayForegroundBrush}" />
+        <Setter TargetName="DescriptionHost" Property="Foreground" Value="{DynamicResource FlourishChunkHeroOverlayForegroundBrush}" />
+      </Trigger>
+      <Trigger Property="ChunkHeroPresenter" Value="{x:Null}">
+        <Setter TargetName="PresenterHost" Property="Visibility" Value="Collapsed" />
+        <Setter TargetName="TextSurface" Property="Grid.Column" Value="0" />
+        <Setter TargetName="TextSurface" Property="Grid.ColumnSpan" Value="2" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <Style TargetType="{x:Type controls:ChunkHero}">
+    <Setter Property="Margin" Value="{DynamicResource FlourishChunkHeroMargin}" />
+    <Setter Property="Padding" Value="{DynamicResource FlourishChunkHeroPadding}" />
+    <Setter Property="Background" Value="{DynamicResource FlourishHeroBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FlourishSurfaceStrokeBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FlourishSurfaceBorderThickness}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template" Value="{StaticResource ChunkHeroTemplate}" />
+  </Style>
+</ResourceDictionary>

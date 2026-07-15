@@ -7,7 +7,7 @@ internal sealed class TitleBarLogoLoadCoordinator(
     Func<string, CancellationToken, Task<ImageSource?>> loadAsync
 ) : IDisposable
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly Func<string, CancellationToken, Task<ImageSource?>> loadAsync =
         loadAsync ?? throw new ArgumentNullException(nameof(loadAsync));
     private string? currentPath;
@@ -73,12 +73,7 @@ internal sealed class TitleBarLogoLoadCoordinator(
                     IsNewRequest: true,
                     completion.Task
                 );
-                _ = LoadAndCompleteAsync(
-                    normalizedPath,
-                    generation,
-                    cancellation,
-                    completion
-                );
+                _ = LoadAndCompleteAsync(normalizedPath, generation, cancellation, completion);
             }
         }
 
@@ -140,10 +135,12 @@ internal sealed class TitleBarLogoLoadCoordinator(
             }
         }
         catch (Exception error)
-            when (error is ArgumentException
-                or NotSupportedException
-                or PathTooLongException
-                or UriFormatException)
+            when (error
+                    is ArgumentException
+                        or NotSupportedException
+                        or PathTooLongException
+                        or UriFormatException
+            )
         {
             // The image loader will treat the original value as an invalid path and cache
             // the fallback result. Normalization itself must never block a title-bar update.
@@ -227,12 +224,7 @@ internal sealed class TitleBarLogoLoadCoordinator(
         }
 
         completion.TrySetResult(
-            new TitleBarLogoLoadResult(
-                normalizedPath,
-                source,
-                requestGeneration,
-                isCurrent
-            )
+            new TitleBarLogoLoadResult(normalizedPath, source, requestGeneration, isCurrent)
         );
     }
 

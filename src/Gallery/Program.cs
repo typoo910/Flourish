@@ -33,6 +33,7 @@ internal static class Program
                     services.AddNavigable<BackgroundTasksPage>("Background", "\uE895");
                     services.AddNavigable<ControlLibraryPage>("Controls", "\uE8D2");
                     services.AddNavigable<ButtonPage>("Button", "\uE8FB");
+                    services.AddNavigable<ChunkPage>("Chunk", "\uE7C8");
                 }
             )
             .ConfigureShell(shell =>
@@ -97,6 +98,7 @@ internal static class Program
                         group =>
                         {
                             group.AddNavigableViewItem<ControlLibraryPage>(parentId: 1);
+                            group.AddNavigableViewItem<ChunkPage>(childId: 1);
                             group.AddNavigableViewItem<ButtonPage>(childId: 1);
                         }
                     )
@@ -106,11 +108,7 @@ internal static class Program
                         group =>
                         {
                             group.AddNavigableItem("Message", "\uE8F2", "demo.hello");
-                            group.AddNavigableItem(
-                                "Task",
-                                "\uE895",
-                                "demo.background"
-                            );
+                            group.AddNavigableItem("Task", "\uE895", "demo.background");
                         }
                     );
             })

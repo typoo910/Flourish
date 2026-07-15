@@ -6,9 +6,10 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
 {
-    private readonly object gate = new();
-    private readonly Dictionary<string, List<RegistrationEntry>> registrationsByKey =
-        new(StringComparer.Ordinal);
+    private readonly Lock gate = new();
+    private readonly Dictionary<string, List<RegistrationEntry>> registrationsByKey = new(
+        StringComparer.Ordinal
+    );
     private long nextSequence;
     private long version;
 
@@ -210,9 +211,7 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
             CommandResult result;
             try
             {
-                result = await entry
-                    .ExecuteAsync(context, cancellationToken)
-                    .ConfigureAwait(false);
+                result = await entry.ExecuteAsync(context, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -288,8 +287,7 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
     {
         return new ReadOnlyCollection<CommandRegistrationInfo>(
             registrationsByKey
-                .Values
-                .SelectMany(entries => entries)
+                .Values.SelectMany(entries => entries)
                 .Where(entry => entry.IsRegistered)
                 .OrderBy(entry => entry.Sequence)
                 .Select(entry => entry.CreateSnapshot())
@@ -352,9 +350,7 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
             }
             catch (Exception error)
             {
-                Debug.WriteLine(
-                    $"Flourish command can-execute event handler failed: {error}"
-                );
+                Debug.WriteLine($"Flourish command can-execute event handler failed: {error}");
             }
         }
     }
@@ -402,10 +398,8 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
         }
     }
 
-    private sealed class CommandRegistration(
-        CommandDispatcher owner,
-        RegistrationEntry entry
-    ) : ICommandRegistration
+    private sealed class CommandRegistration(CommandDispatcher owner, RegistrationEntry entry)
+        : ICommandRegistration
     {
         public Guid Id => entry.Id;
 

@@ -7,41 +7,29 @@
 >
   <flourish:FlourishScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-      <flourish:FlourishCard Appearance="Hero">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-          <StackPanel>
-            <flourish:FlourishTextBlock Role="PageTitle" Text="Flourish Gallery" />
+      <flourish:ChunkHero
+        ChunkHeroDescription="Every page calls Flourish APIs directly. Change configuration, appearance, navigation, shell surfaces, commands, window behavior, and background work without restarting the application."
+        ChunkHeroMode="SplitLeft"
+        ChunkHeroTitle="Flourish Gallery"
+      >
+        <flourish:ChunkHero.ChunkHeroPresenter>
+          <Border MinHeight="180" Background="{DynamicResource FlourishHeroBackgroundBrush}" CornerRadius="12">
             <flourish:FlourishTextBlock
-              Margin="{DynamicResource FlourishPageSubtitleMargin}"
-              Role="Subtitle"
-              MaxWidth="720"
-              Text="Every page calls Flourish APIs directly. Change configuration, appearance, navigation, shell surfaces, commands, window behavior, and background work without restarting the application."
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              FontFamily="{DynamicResource FlourishIconFontFamily}"
+              FontSize="48"
+              Foreground="{DynamicResource FlourishAccentForegroundBrush}"
+              Text="&#xE950;"
             />
-          </StackPanel>
-          <flourish:FlourishTextBlock
-            Grid.Column="1"
-            Margin="24,0,0,0"
-            VerticalAlignment="Center"
-            FontFamily="{DynamicResource FlourishIconFontFamily}"
-            FontSize="48"
-            Foreground="{DynamicResource FlourishAccentForegroundBrush}"
-            Text="&#xE950;"
-          />
-        </Grid>
-      </flourish:FlourishCard>
+          </Border>
+        </flourish:ChunkHero.ChunkHeroPresenter>
+      </flourish:ChunkHero>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Demos" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Explore the public APIs by capability. Interactive cards resize with the available page width."
-        />
-
+      <flourish:Chunk
+        ChunkDescription="Explore the public APIs by capability. Interactive cards resize with the available page width."
+        ChunkTitle="Demos"
+      >
         <UniformGrid
           x:Name="DemoGrid"
           Margin="0,6,-6,-6"
@@ -129,7 +117,7 @@
             Title="Background tasks"
           />
         </UniformGrid>
-      </StackPanel>
+      </flourish:Chunk>
     </StackPanel>
   </flourish:FlourishScrollViewer>
 </Page>

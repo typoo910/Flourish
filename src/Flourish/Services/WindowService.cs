@@ -6,7 +6,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class WindowService(FlourishShellOptions options) : IWindowService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private Window? owner;
 
     public event EventHandler<FlourishWindowStateChangedEventArgs>? StateChanged;
@@ -141,7 +141,11 @@ internal sealed class WindowService(FlourishShellOptions options) : IWindowServi
     {
         if (!Enum.IsDefined(resizeMode))
         {
-            throw new ArgumentOutOfRangeException(nameof(resizeMode), resizeMode, "Unknown resize mode.");
+            throw new ArgumentOutOfRangeException(
+                nameof(resizeMode),
+                resizeMode,
+                "Unknown resize mode."
+            );
         }
 
         UpdateOptions(() => options.WindowResizeMode = resizeMode);
@@ -242,10 +246,7 @@ internal sealed class WindowService(FlourishShellOptions options) : IWindowServi
 
         if (current is null)
         {
-            StateChanged?.Invoke(
-                this,
-                new FlourishWindowStateChangedEventArgs(unattachedState!)
-            );
+            StateChanged?.Invoke(this, new FlourishWindowStateChangedEventArgs(unattachedState!));
             return;
         }
 
@@ -325,7 +326,8 @@ internal sealed class WindowService(FlourishShellOptions options) : IWindowServi
                 options.WindowLeft = window.Left;
                 options.WindowTop = window.Top;
                 options.WindowWidth = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
-                options.WindowHeight = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
+                options.WindowHeight =
+                    window.ActualHeight > 0 ? window.ActualHeight : window.Height;
             }
         }
     }
@@ -403,7 +405,11 @@ internal sealed class WindowService(FlourishShellOptions options) : IWindowServi
         ValidateFinite(value, parameterName);
         if (value <= 0)
         {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than zero.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                value,
+                "Value must be greater than zero."
+            );
         }
     }
 
@@ -412,7 +418,11 @@ internal sealed class WindowService(FlourishShellOptions options) : IWindowServi
         ValidateFinite(value, parameterName);
         if (value < 0)
         {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value cannot be negative.");
+            throw new ArgumentOutOfRangeException(
+                parameterName,
+                value,
+                "Value cannot be negative."
+            );
         }
     }
 

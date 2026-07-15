@@ -6,7 +6,7 @@ namespace ArkheideSystem.Flourish.Services;
 internal sealed class NavigationMenuService : INavigationMenuService
 {
     private const int FixedGroupId = int.MaxValue;
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly FlourishShellOptions options;
     private readonly NavigationRouteRegistry routeRegistry;
     private List<GroupState> groups;
@@ -71,10 +71,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
             current = CreateSnapshot(groups, fixedItems, version);
         }
 
-        Changed?.Invoke(
-            this,
-            new FlourishNavigationMenuChangedEventArgs(previous, current)
-        );
+        Changed?.Invoke(this, new FlourishNavigationMenuChangedEventArgs(previous, current));
     }
 
     internal void RecordExpansion(string itemId, bool expanded)
@@ -91,10 +88,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
         }
     }
 
-    private void RouteRegistry_Changed(
-        object? sender,
-        FlourishNavigationRoutesChangedEventArgs e
-    )
+    private void RouteRegistry_Changed(object? sender, FlourishNavigationRoutesChangedEventArgs e)
     {
         SynchronizeRoutes(e.Current, publishChange: true);
     }
@@ -157,10 +151,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
 
         if (previous is not null && current is not null)
         {
-            Changed?.Invoke(
-                this,
-                new FlourishNavigationMenuChangedEventArgs(previous, current)
-            );
+            Changed?.Invoke(this, new FlourishNavigationMenuChangedEventArgs(previous, current));
         }
     }
 
@@ -207,10 +198,9 @@ internal sealed class NavigationMenuService : INavigationMenuService
         IReadOnlyDictionary<string, FlourishNavigationRoute> routes
     )
     {
-        var expected = new Dictionary<
-            string,
-            (string NavigationKey, Type PageType, bool IsFixed)
-        >(StringComparer.Ordinal);
+        var expected = new Dictionary<string, (string NavigationKey, Type PageType, bool IsFixed)>(
+            StringComparer.Ordinal
+        );
 
         foreach (var item in sourceGroups.SelectMany(group => group.Items))
         {
@@ -246,10 +236,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
             }
 
             var navigationKey = item.NavigationKey!;
-            expected.Add(
-                item.Id,
-                (navigationKey, routes[navigationKey].PageType, isFixed)
-            );
+            expected.Add(item.Id, (navigationKey, routes[navigationKey].PageType, isFixed));
         }
     }
 
@@ -335,9 +322,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
                 pageType = route.PageType;
             }
             var parentId = parentRelationshipIds.GetValueOrDefault(item.Id);
-            var childId = item.ParentId is null
-                ? 0
-                : parentRelationshipIds[item.ParentId];
+            var childId = item.ParentId is null ? 0 : parentRelationshipIds[item.ParentId];
             var internalItem = new FlourishNavigationItem(
                 navigationKey,
                 item.Label,
@@ -396,8 +381,8 @@ internal sealed class NavigationMenuService : INavigationMenuService
         foreach (var group in groups)
         {
             var numericId = int.Parse(group.Id.AsSpan("group:".Length));
-            var source = options.NavigationItems
-                .Where(item => item.GroupId == numericId && item.IsNavigationItem)
+            var source = options
+                .NavigationItems.Where(item => item.GroupId == numericId && item.IsNavigationItem)
                 .ToArray();
             group.Items.AddRange(ConvertSeedItems(source, usedItemIds));
         }
@@ -448,9 +433,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
                         ? FlourishNavigationMenuItemKind.Page
                         : FlourishNavigationMenuItemKind.Command,
                     item.IconGlyph,
-                    navigationKey: item.IsPageItem
-                        ? item.Key
-                        : null,
+                    navigationKey: item.IsPageItem ? item.Key : null,
                     commandKey: item.CommandKey,
                     parentId: parentId
                 )
@@ -488,13 +471,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
             ValidateItems(group.Items, group.Id, itemIds, navigationKeys, routes);
         }
 
-        ValidateItems(
-            newFixedItems,
-            "fixed navigation items",
-            itemIds,
-            navigationKeys,
-            routes
-        );
+        ValidateItems(newFixedItems, "fixed navigation items", itemIds, navigationKeys, routes);
     }
 
     private void ValidateItems(
@@ -716,11 +693,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
             groups[RequireGroupIndex(id)].Title = title;
         }
 
-        public void AddItem(
-            string groupId,
-            FlourishNavigationMenuItem item,
-            int? index = null
-        )
+        public void AddItem(string groupId, FlourishNavigationMenuItem item, int? index = null)
         {
             ArgumentNullException.ThrowIfNull(item);
             EnsureItemIdAvailable(item.Id);
@@ -767,20 +740,15 @@ internal sealed class NavigationMenuService : INavigationMenuService
             return true;
         }
 
-        public void MoveItem(
-            string id,
-            string? targetGroupId,
-            int newIndex,
-            bool isFixed = false
-        )
+        public void MoveItem(string id, string? targetGroupId, int newIndex, bool isFixed = false)
         {
             if (!TryFindItem(groups, fixedItems, id, out var location))
             {
                 throw new KeyNotFoundException($"Navigation item ID '{id}' was not found.");
             }
 
-            var moving = location.Items
-                .Where(item =>
+            var moving = location
+                .Items.Where(item =>
                     StringComparer.Ordinal.Equals(item.Id, id)
                     || StringComparer.Ordinal.Equals(item.ParentId, id)
                 )
@@ -806,7 +774,8 @@ internal sealed class NavigationMenuService : INavigationMenuService
                 throw new KeyNotFoundException($"Navigation item ID '{id}' was not found.");
             }
 
-            var replacement = update(location.Items[location.Index])
+            var replacement =
+                update(location.Items[location.Index])
                 ?? throw new InvalidOperationException("The navigation item update returned null.");
             if (!StringComparer.Ordinal.Equals(id, replacement.Id))
             {
@@ -876,9 +845,7 @@ internal sealed class NavigationMenuService : INavigationMenuService
             var index = FindGroupIndex(id);
             return index >= 0
                 ? index
-                : throw new KeyNotFoundException(
-                    $"Navigation group ID '{id}' was not found."
-                );
+                : throw new KeyNotFoundException($"Navigation group ID '{id}' was not found.");
         }
 
         private static void Insert<T>(List<T> items, T item, int? index)

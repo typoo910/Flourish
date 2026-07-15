@@ -11,12 +11,16 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
     private const string DefaultLocale = "EN";
     private const string EmbeddedResourcePrefix = "ArkheideSystem.Flourish.Assets.lang_";
 
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> builtInLocales;
-    private readonly Dictionary<string, Dictionary<string, string>> customLocales =
-        new(StringComparer.OrdinalIgnoreCase);
+    private readonly IReadOnlyDictionary<
+        string,
+        IReadOnlyDictionary<string, string>
+    > builtInLocales;
+    private readonly Dictionary<string, Dictionary<string, string>> customLocales = new(
+        StringComparer.OrdinalIgnoreCase
+    );
     private readonly List<LocaleRegistrationState> registrations = [];
     private readonly FlourishDataOptions options;
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private string locale;
 
     public FlourishLocalizationService(FlourishDataOptions options)
@@ -146,9 +150,7 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
             );
             if (state is null)
             {
-                throw new InvalidOperationException(
-                    "The locale-file registration is not active."
-                );
+                throw new InvalidOperationException("The locale-file registration is not active.");
             }
 
             state.Values = values;
@@ -211,10 +213,7 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
         var fullPath = Path.GetFullPath(path);
         if (!File.Exists(fullPath))
         {
-            throw new FileNotFoundException(
-                $"Locale file '{fullPath}' does not exist.",
-                fullPath
-            );
+            throw new FileNotFoundException($"Locale file '{fullPath}' does not exist.", fullPath);
         }
 
         var locale = GetLocaleFromFileName(fullPath);
@@ -235,11 +234,7 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
         Dictionary<string, string>? mergedValues = null;
         foreach (
             var registration in registrations.Where(candidate =>
-                string.Equals(
-                    candidate.Handle.Locale,
-                    locale,
-                    StringComparison.OrdinalIgnoreCase
-                )
+                string.Equals(candidate.Handle.Locale, locale, StringComparison.OrdinalIgnoreCase)
             )
         )
         {
@@ -317,17 +312,11 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException)
         {
-            throw new InvalidDataException(
-                $"Locale file '{path}' could not be read.",
-                error
-            );
+            throw new InvalidDataException($"Locale file '{path}' could not be read.", error);
         }
     }
 
-    private static IReadOnlyDictionary<string, string> ParseLocale(
-        Stream stream,
-        string sourceName
-    )
+    private static IReadOnlyDictionary<string, string> ParseLocale(Stream stream, string sourceName)
     {
         try
         {
@@ -387,9 +376,7 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
 
     private static string NormalizeLocale(string? locale)
     {
-        return string.IsNullOrWhiteSpace(locale)
-            ? DefaultLocale
-            : locale.Trim().ToUpperInvariant();
+        return string.IsNullOrWhiteSpace(locale) ? DefaultLocale : locale.Trim().ToUpperInvariant();
     }
 
     private static string NormalizeRuntimeLocale(string locale)
@@ -418,8 +405,7 @@ internal sealed class FlourishLocalizationService : IFlourishLocalization
     )
         where TDictionary : IReadOnlyDictionary<string, string>
     {
-        return locales.TryGetValue(locale, out var values)
-            && values.TryGetValue(key, out var value)
+        return locales.TryGetValue(locale, out var values) && values.TryGetValue(key, out var value)
             ? value
             : null;
     }

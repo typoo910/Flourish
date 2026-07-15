@@ -6,8 +6,9 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class FlourishToolbarService(FlourishShellOptions options) : IToolbarService
 {
-    private readonly object gate = new();
-    private readonly FlourishShellOptions options = options ?? throw new ArgumentNullException(nameof(options));
+    private readonly Lock gate = new();
+    private readonly FlourishShellOptions options =
+        options ?? throw new ArgumentNullException(nameof(options));
     private long version;
 
     public event EventHandler<FlourishToolbarChangedEventArgs>? Changed;
@@ -58,11 +59,7 @@ internal sealed class FlourishToolbarService(FlourishShellOptions options) : ITo
         );
     }
 
-    public void Replace(
-        Type pageType,
-        IEnumerable<FlourishToolbarItem> items,
-        bool iconOnly = true
-    )
+    public void Replace(Type pageType, IEnumerable<FlourishToolbarItem> items, bool iconOnly = true)
     {
         ValidatePageType(pageType);
         var replacement = ValidateItems(items);
@@ -79,10 +76,8 @@ internal sealed class FlourishToolbarService(FlourishShellOptions options) : ITo
         );
     }
 
-    public void Replace<TPage>(
-        IEnumerable<FlourishToolbarItem> items,
-        bool iconOnly = true
-    ) where TPage : Page
+    public void Replace<TPage>(IEnumerable<FlourishToolbarItem> items, bool iconOnly = true)
+        where TPage : Page
     {
         Replace(typeof(TPage), items, iconOnly);
     }
@@ -299,7 +294,9 @@ internal sealed class FlourishToolbarService(FlourishShellOptions options) : ITo
                 ValidateItem(replacement);
                 if (!StringComparer.Ordinal.Equals(id, replacement.Id))
                 {
-                    throw new InvalidOperationException("A toolbar update cannot change the stable item ID.");
+                    throw new InvalidOperationException(
+                        "A toolbar update cannot change the stable item ID."
+                    );
                 }
 
                 if (items[index] == replacement)
@@ -368,9 +365,7 @@ internal sealed class FlourishToolbarService(FlourishShellOptions options) : ITo
             return [.. options.ToolbarItems];
         }
 
-        return options.DynamicToolbarItems.TryGetValue(pageType, out var items)
-            ? [.. items]
-            : [];
+        return options.DynamicToolbarItems.TryGetValue(pageType, out var items) ? [.. items] : [];
     }
 
     private void StoreItems(Type? pageType, IReadOnlyList<FlourishToolbarItem> items)
@@ -460,7 +455,11 @@ internal sealed class FlourishToolbarService(FlourishShellOptions options) : ITo
         return -1;
     }
 
-    private static void Insert(List<FlourishToolbarItem> items, FlourishToolbarItem item, int? index)
+    private static void Insert(
+        List<FlourishToolbarItem> items,
+        FlourishToolbarItem item,
+        int? index
+    )
     {
         if (index is null)
         {

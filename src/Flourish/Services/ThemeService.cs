@@ -25,7 +25,7 @@ internal sealed class ThemeService(
         @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly Dictionary<Window, HwndSource> hooksByWindow = [];
     private readonly HashSet<Window> attachedWindows = [];
     private readonly HashSet<Window> pendingHookWindows = [];
@@ -237,11 +237,7 @@ internal sealed class ThemeService(
         return IntPtr.Zero;
     }
 
-    private void ApplyTheme(
-        bool notify,
-        bool forceNotify = false,
-        Action? onApplied = null
-    )
+    private void ApplyTheme(bool notify, bool forceNotify = false, Action? onApplied = null)
     {
         var application = Application.Current;
         void ApplyCore()
@@ -270,10 +266,7 @@ internal sealed class ThemeService(
 
             if (notify && (changed || forceNotify))
             {
-                ThemeChanged?.Invoke(
-                    this,
-                    new FlourishThemeChangedEventArgs(requested, effective)
-                );
+                ThemeChanged?.Invoke(this, new FlourishThemeChangedEventArgs(requested, effective));
             }
         }
 
@@ -292,9 +285,7 @@ internal sealed class ThemeService(
         {
             FlourishTheme.Dark => FlourishTheme.Dark,
             FlourishTheme.Light => FlourishTheme.Light,
-            FlourishTheme.System => IsSystemDarkTheme()
-                ? FlourishTheme.Dark
-                : FlourishTheme.Light,
+            FlourishTheme.System => IsSystemDarkTheme() ? FlourishTheme.Dark : FlourishTheme.Light,
             _ => FlourishTheme.Light,
         };
     }
@@ -308,11 +299,13 @@ internal sealed class ThemeService(
     internal static void ApplyThemePalette(ResourceDictionary resources, FlourishTheme theme)
     {
         ArgumentNullException.ThrowIfNull(resources);
-        var themeRoot = FlourishThemeResources.FindThemeRoot(resources)
+        var themeRoot =
+            FlourishThemeResources.FindThemeRoot(resources)
             ?? throw new InvalidOperationException(
                 $"The resource graph does not contain {FlourishThemeResources.GenericThemeSource}."
             );
-        var paletteHost = FindPaletteHost(themeRoot)
+        var paletteHost =
+            FindPaletteHost(themeRoot)
             ?? throw new InvalidOperationException(
                 $"The Flourish theme graph does not contain a canonical Flourish palette."
             );
@@ -351,8 +344,7 @@ internal sealed class ThemeService(
             resources["FlourishSurfaceCornerRadius"] = cornerRadius;
             resources["FlourishOverlayCornerRadius"] = cornerRadius;
             resources["FlourishDialogCornerRadius"] = cornerRadius;
-            resources["FlourishDialogFooterCornerRadius"] =
-                new CornerRadius(0, 0, radius, radius);
+            resources["FlourishDialogFooterCornerRadius"] = new CornerRadius(0, 0, radius, radius);
         }
     }
 
@@ -363,12 +355,8 @@ internal sealed class ThemeService(
     )
     {
         var isDark = effectiveTheme == FlourishTheme.Dark;
-        var neutralBackground = isDark
-            ? Color.FromRgb(0x14, 0x14, 0x14)
-            : Colors.White;
-        var controlBackground = isDark
-            ? Color.FromRgb(0x29, 0x29, 0x29)
-            : Colors.White;
+        var neutralBackground = isDark ? Color.FromRgb(0x14, 0x14, 0x14) : Colors.White;
+        var controlBackground = isDark ? Color.FromRgb(0x29, 0x29, 0x29) : Colors.White;
         var neutralForeground = isDark
             ? Color.FromRgb(0xF8, 0xF8, 0xFA)
             : Color.FromRgb(0x1B, 0x1B, 0x1F);
@@ -378,42 +366,22 @@ internal sealed class ThemeService(
         var cardBackgroundOnNeutral = Composite(cardLayer, neutralBackground);
         var cardBackgroundOnControl = Composite(cardLayer, controlBackground);
         var foregroundTarget = isDark ? Colors.White : Colors.Black;
-        var primaryForeground = EnsureContrast(
-            colors.Primary,
-            neutralBackground,
-            foregroundTarget
-        );
+        var primaryForeground = EnsureContrast(colors.Primary, neutralBackground, foregroundTarget);
         var secondaryForeground = EnsureContrast(
             colors.Secondary,
             neutralBackground,
             foregroundTarget
         );
-        var accentForeground = EnsureContrast(
-            colors.Accent,
-            neutralBackground,
-            foregroundTarget
-        );
-        var primaryHover = Blend(
-            colors.Primary,
-            isDark ? Colors.White : Colors.Black,
-            0.12
-        );
+        var accentForeground = EnsureContrast(colors.Accent, neutralBackground, foregroundTarget);
+        var primaryHover = Blend(colors.Primary, isDark ? Colors.White : Colors.Black, 0.12);
         var primaryPressed = Blend(colors.Primary, Colors.Black, 0.24);
         var primarySurface = CreateSurface(colors.Primary);
         var foregroundOnPrimary = GetContrastingForeground(colors.Primary);
-        var secondaryHover = Blend(
-            colors.Secondary,
-            isDark ? Colors.White : Colors.Black,
-            0.12
-        );
+        var secondaryHover = Blend(colors.Secondary, isDark ? Colors.White : Colors.Black, 0.12);
         var secondaryPressed = Blend(colors.Secondary, Colors.Black, 0.24);
         var secondarySurface = CreateSurface(colors.Secondary);
         var foregroundOnSecondary = GetContrastingForeground(colors.Secondary);
-        var accentHover = Blend(
-            colors.Accent,
-            isDark ? Colors.White : Colors.Black,
-            0.12
-        );
+        var accentHover = Blend(colors.Accent, isDark ? Colors.White : Colors.Black, 0.12);
         var accentPressed = Blend(colors.Accent, Colors.Black, 0.24);
         var accentSurface = CreateSurface(colors.Accent);
         var foregroundOnAccent = GetContrastingForeground(colors.Accent);
@@ -507,10 +475,7 @@ internal sealed class ThemeService(
         resources[key] = brush;
     }
 
-    private static void SetHeroBackground(
-        ResourceDictionary resources,
-        FlourishThemeColors colors
-    )
+    private static void SetHeroBackground(ResourceDictionary resources, FlourishThemeColors colors)
     {
         var brush = new LinearGradientBrush
         {
@@ -565,8 +530,7 @@ internal sealed class ThemeService(
             foreach (var (foreground, background) in surfaces)
             {
                 if (
-                    GetContrastRatio(foreground, Composite(candidate, background))
-                    < minimumContrast
+                    GetContrastRatio(foreground, Composite(candidate, background)) < minimumContrast
                 )
                 {
                     isReadable = false;
@@ -583,11 +547,7 @@ internal sealed class ThemeService(
         return Color.FromArgb(0, color.R, color.G, color.B);
     }
 
-    private static Color EnsureContrast(
-        Color foreground,
-        Color background,
-        Color target
-    )
+    private static Color EnsureContrast(Color foreground, Color background, Color target)
     {
         const double minimumContrast = 4.5;
         if (GetContrastRatio(foreground, background) >= minimumContrast)
@@ -615,8 +575,8 @@ internal sealed class ThemeService(
     {
         const double minimumContrast = 4.5;
         if (
-            backgrounds.All(
-                background => GetContrastRatio(foreground, background) >= minimumContrast
+            backgrounds.All(background =>
+                GetContrastRatio(foreground, background) >= minimumContrast
             )
         )
         {
@@ -627,8 +587,8 @@ internal sealed class ThemeService(
         {
             var candidate = Blend(foreground, target, step / 20d);
             if (
-                backgrounds.All(
-                    background => GetContrastRatio(candidate, background) >= minimumContrast
+                backgrounds.All(background =>
+                    GetContrastRatio(candidate, background) >= minimumContrast
                 )
             )
             {
@@ -671,9 +631,7 @@ internal sealed class ThemeService(
     private static double Linearize(byte channel)
     {
         var value = channel / 255d;
-        return value <= 0.04045
-            ? value / 12.92
-            : Math.Pow((value + 0.055) / 1.055, 2.4);
+        return value <= 0.04045 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4);
     }
 
     private static ResourceDictionary? FindPaletteHost(ResourceDictionary dictionary)
@@ -706,8 +664,7 @@ internal sealed class ThemeService(
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(PersonalizeRegistryPath);
-            return key?.GetValue(AppsUseLightThemeValue) is int useLightTheme
-                && useLightTheme == 0;
+            return key?.GetValue(AppsUseLightThemeValue) is int useLightTheme && useLightTheme == 0;
         }
         catch (ObjectDisposedException)
         {

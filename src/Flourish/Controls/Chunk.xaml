@@ -1,0 +1,54 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:ArkheideSystem.Flourish.Controls"
+>
+  <ControlTemplate x:Key="ChunkTemplate" TargetType="{x:Type controls:Chunk}">
+    <Grid
+      Margin="{TemplateBinding ChunkMargin}"
+      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+    >
+      <StackPanel>
+        <controls:FlourishTextBlock
+          x:Name="TitleHost"
+          Role="SectionTitle"
+          Text="{TemplateBinding ChunkTitle}"
+          TextWrapping="Wrap"
+        />
+        <controls:FlourishTextBlock
+          x:Name="DescriptionHost"
+          Margin="{TemplateBinding ChunkSpacing}"
+          Role="Description"
+          Text="{TemplateBinding ChunkDescription}"
+        />
+        <ContentPresenter
+          x:Name="BodyHost"
+          Margin="{TemplateBinding ChunkSpacing}"
+          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+          Content="{TemplateBinding ChunkBody}"
+          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+        />
+      </StackPanel>
+    </Grid>
+    <ControlTemplate.Triggers>
+      <Trigger Property="ChunkDescription" Value="{x:Null}">
+        <Setter TargetName="DescriptionHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+      <Trigger Property="ChunkDescription" Value="">
+        <Setter TargetName="DescriptionHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+      <Trigger Property="ChunkBody" Value="{x:Null}">
+        <Setter TargetName="BodyHost" Property="Visibility" Value="Collapsed" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <Style TargetType="{x:Type controls:Chunk}">
+    <Setter Property="ChunkMargin" Value="{DynamicResource FlourishChunkMargin}" />
+    <Setter Property="ChunkSpacing" Value="{DynamicResource FlourishChunkSpacing}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template" Value="{StaticResource ChunkTemplate}" />
+  </Style>
+</ResourceDictionary>

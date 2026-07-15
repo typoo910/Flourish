@@ -7,7 +7,7 @@ namespace ArkheideSystem.Flourish.Services;
 internal sealed class FlourishConfigurationService : IFlourishConfiguration, IDisposable
 {
     private readonly IConfiguration configuration;
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly IDisposable reloadSubscription;
     private FlourishConfigurationSnapshot current;
     private long version;
@@ -15,7 +15,8 @@ internal sealed class FlourishConfigurationService : IFlourishConfiguration, IDi
 
     public FlourishConfigurationService(IConfiguration configuration)
     {
-        this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        this.configuration =
+            configuration ?? throw new ArgumentNullException(nameof(configuration));
         current = CaptureSnapshot();
         reloadSubscription = ChangeToken.OnChange(
             configuration.GetReloadToken,
@@ -100,9 +101,7 @@ internal sealed class FlourishConfigurationService : IFlourishConfiguration, IDi
         var changedKeys = previous
             .Values.Keys.Concat(next.Values.Keys)
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Where(key =>
-                !string.Equals(previous[key], next[key], StringComparison.Ordinal)
-            )
+            .Where(key => !string.Equals(previous[key], next[key], StringComparison.Ordinal))
             .OrderBy(key => key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
         Changed?.Invoke(

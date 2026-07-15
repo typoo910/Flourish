@@ -7,7 +7,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IShortcutService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly ICommandDispatcher commandDispatcher =
         commandDispatcher ?? throw new ArgumentNullException(nameof(commandDispatcher));
     private readonly List<ShortcutEntry> entries = [];
@@ -54,10 +54,7 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
                 )
                 .ToArray();
 
-            if (
-                conflicts.Length > 0
-                && options.ConflictPolicy == ShortcutConflictPolicy.Reject
-            )
+            if (conflicts.Length > 0 && options.ConflictPolicy == ShortcutConflictPolicy.Reject)
             {
                 throw new InvalidOperationException(
                     $"Shortcut '{FormatGesture(storedGesture)}' is already registered in the {options.Scope} scope."
@@ -65,10 +62,7 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
             }
 
             var changeKind = ShortcutRegistryChangeKind.Registered;
-            if (
-                conflicts.Length > 0
-                && options.ConflictPolicy == ShortcutConflictPolicy.Replace
-            )
+            if (conflicts.Length > 0 && options.ConflictPolicy == ShortcutConflictPolicy.Replace)
             {
                 foreach (var conflict in conflicts)
                 {
@@ -252,33 +246,20 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
         }
     }
 
-    private static bool IsEligible(
-        ShortcutEntry entry,
-        ShortcutResolutionContext? context
-    )
+    private static bool IsEligible(ShortcutEntry entry, ShortcutResolutionContext? context)
     {
         return entry.Scope switch
         {
             ShortcutScope.Application => true,
-            ShortcutScope.Window =>
-                context?.WindowKey is not null
+            ShortcutScope.Window => context?.WindowKey is not null
                 && (
                     entry.ScopeKey is null
-                    || string.Equals(
-                        entry.ScopeKey,
-                        context.WindowKey,
-                        StringComparison.Ordinal
-                    )
+                    || string.Equals(entry.ScopeKey, context.WindowKey, StringComparison.Ordinal)
                 ),
-            ShortcutScope.Page =>
-                context?.PageKey is not null
+            ShortcutScope.Page => context?.PageKey is not null
                 && (
                     entry.ScopeKey is null
-                    || string.Equals(
-                        entry.ScopeKey,
-                        context.PageKey,
-                        StringComparison.Ordinal
-                    )
+                    || string.Equals(entry.ScopeKey, context.PageKey, StringComparison.Ordinal)
                 ),
             _ => false,
         };
@@ -307,17 +288,10 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
         return entry.Scope switch
         {
             ShortcutScope.Window
-                when string.Equals(
-                    entry.ScopeKey,
-                    context?.WindowKey,
-                    StringComparison.Ordinal
-                ) => 1,
+                when string.Equals(entry.ScopeKey, context?.WindowKey, StringComparison.Ordinal) =>
+                1,
             ShortcutScope.Page
-                when string.Equals(
-                    entry.ScopeKey,
-                    context?.PageKey,
-                    StringComparison.Ordinal
-                ) => 1,
+                when string.Equals(entry.ScopeKey, context?.PageKey, StringComparison.Ordinal) => 1,
             _ => 0,
         };
     }
@@ -332,11 +306,7 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
         return left.Key == right.Key && left.Modifiers == right.Modifiers;
     }
 
-    private static bool GestureEquals(
-        KeyGesture gesture,
-        Key key,
-        ModifierKeys modifiers
-    )
+    private static bool GestureEquals(KeyGesture gesture, Key key, ModifierKeys modifiers)
     {
         return gesture.Key == key && gesture.Modifiers == modifiers;
     }
@@ -344,9 +314,7 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
     private static string FormatGesture(KeyGesture gesture)
     {
         return string.IsNullOrWhiteSpace(gesture.DisplayString)
-            ? gesture.GetDisplayStringForCulture(
-                System.Globalization.CultureInfo.InvariantCulture
-            )
+            ? gesture.GetDisplayStringForCulture(System.Globalization.CultureInfo.InvariantCulture)
             : gesture.DisplayString;
     }
 
@@ -462,10 +430,8 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
         }
     }
 
-    private sealed class ShortcutRegistration(
-        ShortcutService owner,
-        ShortcutEntry entry
-    ) : IShortcutRegistration
+    private sealed class ShortcutRegistration(ShortcutService owner, ShortcutEntry entry)
+        : IShortcutRegistration
     {
         public Guid Id => entry.Id;
 

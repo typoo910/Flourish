@@ -5,7 +5,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class ShellFeatureService : IShellFeatureService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly FlourishShellOptions options;
     private readonly FlourishMotionService motionService;
     private readonly FlourishToolTipService toolTipService;
@@ -43,7 +43,11 @@ internal sealed class ShellFeatureService : IShellFeatureService
     {
         if (!Enum.IsDefined(feature))
         {
-            throw new ArgumentOutOfRangeException(nameof(feature), feature, "Unknown shell feature.");
+            throw new ArgumentOutOfRangeException(
+                nameof(feature),
+                feature,
+                "Unknown shell feature."
+            );
         }
 
         if (feature == ShellFeature.Motion)
@@ -92,10 +96,7 @@ internal sealed class ShellFeatureService : IShellFeatureService
         Changed?.Invoke(this, new FlourishShellFeatureChangedEventArgs(feature, state));
     }
 
-    private void MotionService_Changed(
-        object? sender,
-        FlourishMotionChangedEventArgs e
-    )
+    private void MotionService_Changed(object? sender, FlourishMotionChangedEventArgs e)
     {
         if (e.Previous.IsEnabled == e.Current.IsEnabled)
         {
@@ -109,16 +110,10 @@ internal sealed class ShellFeatureService : IShellFeatureService
             state = CreateSnapshot(e.Current.IsEnabled);
         }
 
-        Changed?.Invoke(
-            this,
-            new FlourishShellFeatureChangedEventArgs(ShellFeature.Motion, state)
-        );
+        Changed?.Invoke(this, new FlourishShellFeatureChangedEventArgs(ShellFeature.Motion, state));
     }
 
-    private void ToolTipService_Changed(
-        object? sender,
-        FlourishToolTipChangedEventArgs e
-    )
+    private void ToolTipService_Changed(object? sender, FlourishToolTipChangedEventArgs e)
     {
         if (e.Previous.IsEnabled == e.Current.IsEnabled)
         {

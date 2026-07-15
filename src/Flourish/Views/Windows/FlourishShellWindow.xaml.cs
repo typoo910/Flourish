@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -5,12 +6,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.ComponentModel;
 using ArkheideSystem.Flourish.Abstract;
+using ArkheideSystem.Flourish.Controls;
 using ArkheideSystem.Flourish.Internal.Configuration;
 using ArkheideSystem.Flourish.Internal.Imaging;
 using ArkheideSystem.Flourish.Internal.Interaction;
-using ArkheideSystem.Flourish.Controls;
 using ArkheideSystem.Flourish.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Button = ArkheideSystem.Flourish.Controls.Button;
@@ -18,9 +18,9 @@ using ListBox = ArkheideSystem.Flourish.Controls.FlourishListBox;
 using Orientation = System.Windows.Controls.Orientation;
 using TextBlock = ArkheideSystem.Flourish.Controls.FlourishTextBlock;
 using TextBoxBase = System.Windows.Controls.Primitives.TextBoxBase;
+using WpfComboBox = System.Windows.Controls.ComboBox;
 using WpfPage = System.Windows.Controls.Page;
 using WpfPanel = System.Windows.Controls.Panel;
-using WpfComboBox = System.Windows.Controls.ComboBox;
 
 namespace ArkheideSystem.Flourish.Views.Windows;
 
@@ -61,7 +61,7 @@ internal partial class FlourishShellWindow : Window
     );
     private readonly Dictionary<Type, FlourishNavigationItem> navigationItemsByPage = [];
     private readonly Dictionary<NavigationTreeKey, FlourishNavigationItem> navigationParentsByKey =
-        [];
+    [];
     private readonly Dictionary<
         NavigationTreeKey,
         List<FlourishNavigationItem>
@@ -72,7 +72,7 @@ internal partial class FlourishShellWindow : Window
     );
     private readonly Dictionary<Guid, BackgroundTaskIconView> backgroundTaskIconsById = [];
     private readonly Dictionary<Guid, BackgroundTaskRowView> backgroundTaskRowsById = [];
-    private readonly object backgroundTaskRefreshGate = new();
+    private readonly Lock backgroundTaskRefreshGate = new();
     private readonly NavigationPaneTransitionController navigationPaneTransition = new();
     private readonly PageTransitionController pageTransition = new();
     private readonly TitleBarLogoLoadCoordinator titleBarLogoLoadCoordinator = new(
@@ -197,10 +197,7 @@ internal partial class FlourishShellWindow : Window
         themeService.Initialize(System.Windows.Application.Current);
         InitializeComponent();
         shellWindowFrame = new FlourishShellWindowFrame(this, ShellBorder);
-        backgroundTaskRefreshTimer = new DispatcherTimer(
-            DispatcherPriority.Background,
-            Dispatcher
-        )
+        backgroundTaskRefreshTimer = new DispatcherTimer(DispatcherPriority.Background, Dispatcher)
         {
             Interval = TimeSpan.FromMilliseconds(33),
         };
@@ -330,11 +327,7 @@ internal partial class FlourishShellWindow : Window
     private void ConfigureProfileSurface()
     {
         var state = profileFlyoutService.Current;
-        if (
-            options.IsTitlebarEnabled
-            && state.IsEnabled
-            && options.IsTitlebarProfileEnabled
-        )
+        if (options.IsTitlebarEnabled && state.IsEnabled && options.IsTitlebarProfileEnabled)
         {
             Titlebar.SetProfile(profileService.CurrentProfile);
             if (!isProfileServiceSubscribed)
@@ -399,9 +392,7 @@ internal partial class FlourishShellWindow : Window
         }
         catch (Exception error)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Flourish profile initialization failed: {error}"
-            );
+            System.Diagnostics.Debug.WriteLine($"Flourish profile initialization failed: {error}");
         }
     }
 
@@ -482,7 +473,9 @@ internal partial class FlourishShellWindow : Window
 
         WindowState = options.WindowState;
         ApplyTitleBarFeatureState();
-        Titlebar.SetMaximizeEnabled(ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip);
+        Titlebar.SetMaximizeEnabled(
+            ResizeMode is ResizeMode.CanResize or ResizeMode.CanResizeWithGrip
+        );
     }
 
     private void ApplyTitleBarFeatureState(bool refreshFrame = false)
@@ -514,11 +507,7 @@ internal partial class FlourishShellWindow : Window
 
         if (refreshFrame)
         {
-            windowFrameFixService.ApplyFrameTransition(
-                this,
-                useCustomFrame,
-                ApplyFrameAndSurface
-            );
+            windowFrameFixService.ApplyFrameTransition(this, useCustomFrame, ApplyFrameAndSurface);
         }
         else
         {
@@ -534,10 +523,7 @@ internal partial class FlourishShellWindow : Window
         Dispatcher.BeginInvoke(
             new Action(() =>
             {
-                if (
-                    options.IsTitlebarEnabled
-                    && titleBarSearchService.Current.FocusRequested
-                )
+                if (options.IsTitlebarEnabled && titleBarSearchService.Current.FocusRequested)
                 {
                     Titlebar.FocusSearchBox();
                     titleBarSearchService.AcknowledgeFocusRequest();
@@ -581,10 +567,7 @@ internal partial class FlourishShellWindow : Window
         profileFlyoutService.Hide();
     }
 
-    private void ProfileOverlay_PreviewMouseLeftButtonDown(
-        object sender,
-        MouseButtonEventArgs e
-    )
+    private void ProfileOverlay_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         var position = e.GetPosition(ProfileCard);
         if (
@@ -625,13 +608,7 @@ internal partial class FlourishShellWindow : Window
 
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
         var modifiers = e.KeyboardDevice.Modifiers;
-        if (
-            ShouldIgnoreShortcutInput(
-                key,
-                modifiers,
-                e.KeyboardDevice.IsKeyDown(Key.RightAlt)
-            )
-        )
+        if (ShouldIgnoreShortcutInput(key, modifiers, e.KeyboardDevice.IsKeyDown(Key.RightAlt)))
         {
             return;
         }
@@ -639,7 +616,10 @@ internal partial class FlourishShellWindow : Window
         var isTextInputFocused = IsTextInputTarget(
             e.KeyboardDevice.FocusedElement ?? e.OriginalSource
         );
-        var context = new ShortcutResolutionContext("shell", navigationService.CurrentNavigationKey);
+        var context = new ShortcutResolutionContext(
+            "shell",
+            navigationService.CurrentNavigationKey
+        );
         if (
             !shortcutService.TryResolve(
                 key,
@@ -647,8 +627,7 @@ internal partial class FlourishShellWindow : Window
                 context,
                 isTextInputFocused,
                 out var registration
-            )
-            || registration is null
+            ) || registration is null
         )
         {
             return;
@@ -668,10 +647,7 @@ internal partial class FlourishShellWindow : Window
         return key is Key.None or Key.System
             || IsModifierKey(key)
             || IsTextCompositionKey(key)
-            || (
-                isRightAltPressed
-                && (modifiers & altGraphModifiers) == altGraphModifiers
-            );
+            || (isRightAltPressed && (modifiers & altGraphModifiers) == altGraphModifiers);
     }
 
     internal static bool IsTextInputTarget(object? target)
@@ -687,49 +663,52 @@ internal partial class FlourishShellWindow : Window
                 return true;
             }
 
-            current = current is Visual
-                ? VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current)
-                : LogicalTreeHelper.GetParent(current);
+            current =
+                current is Visual
+                    ? VisualTreeHelper.GetParent(current) ?? LogicalTreeHelper.GetParent(current)
+                    : LogicalTreeHelper.GetParent(current);
         }
 
         return false;
     }
 
     private static bool IsTextCompositionKey(Key key) =>
-        key is Key.KanaMode
-            or Key.JunjaMode
-            or Key.FinalMode
-            or Key.HanjaMode
-            or Key.ImeConvert
-            or Key.ImeNonConvert
-            or Key.ImeAccept
-            or Key.ImeModeChange
-            or Key.ImeProcessed
-            or Key.DbeAlphanumeric
-            or Key.DbeKatakana
-            or Key.DbeHiragana
-            or Key.DbeSbcsChar
-            or Key.DbeDbcsChar
-            or Key.DbeRoman
-            or Key.DbeNoRoman
-            or Key.DbeEnterWordRegisterMode
-            or Key.DbeEnterImeConfigureMode
-            or Key.DbeFlushString
-            or Key.DbeCodeInput
-            or Key.DbeNoCodeInput
-            or Key.DbeDetermineString
-            or Key.DbeEnterDialogConversionMode
-            or Key.DeadCharProcessed;
+        key
+            is Key.KanaMode
+                or Key.JunjaMode
+                or Key.FinalMode
+                or Key.HanjaMode
+                or Key.ImeConvert
+                or Key.ImeNonConvert
+                or Key.ImeAccept
+                or Key.ImeModeChange
+                or Key.ImeProcessed
+                or Key.DbeAlphanumeric
+                or Key.DbeKatakana
+                or Key.DbeHiragana
+                or Key.DbeSbcsChar
+                or Key.DbeDbcsChar
+                or Key.DbeRoman
+                or Key.DbeNoRoman
+                or Key.DbeEnterWordRegisterMode
+                or Key.DbeEnterImeConfigureMode
+                or Key.DbeFlushString
+                or Key.DbeCodeInput
+                or Key.DbeNoCodeInput
+                or Key.DbeDetermineString
+                or Key.DbeEnterDialogConversionMode
+                or Key.DeadCharProcessed;
 
     private static bool IsModifierKey(Key key) =>
-        key is Key.LeftAlt
-            or Key.RightAlt
-            or Key.LeftCtrl
-            or Key.RightCtrl
-            or Key.LeftShift
-            or Key.RightShift
-            or Key.LWin
-            or Key.RWin;
+        key
+            is Key.LeftAlt
+                or Key.RightAlt
+                or Key.LeftCtrl
+                or Key.RightCtrl
+                or Key.LeftShift
+                or Key.RightShift
+                or Key.LWin
+                or Key.RWin;
 
     private void ShellRootGrid_SizeChanged(object sender, SizeChangedEventArgs e)
     {
@@ -780,15 +759,13 @@ internal partial class FlourishShellWindow : Window
         }
 
         var anchor = Titlebar.GetProfileButtonBounds(ShellRootGrid);
-        var availableWidth = Math.Max(
-            0,
-            ShellRootGrid.ActualWidth - edgeSafeMargin * 2
-        );
+        var availableWidth = Math.Max(0, ShellRootGrid.ActualWidth - edgeSafeMargin * 2);
         ProfileCard.MaxWidth = availableWidth;
 
-        var cardWidth = ProfileCard.ActualWidth > 0
-            ? Math.Min(ProfileCard.ActualWidth, availableWidth)
-            : Math.Min(ProfileCard.Width, availableWidth);
+        var cardWidth =
+            ProfileCard.ActualWidth > 0
+                ? Math.Min(ProfileCard.ActualWidth, availableWidth)
+                : Math.Min(ProfileCard.Width, availableWidth);
         var desiredLeft = anchor.Left + (anchor.Width - cardWidth) / 2;
         var maximumLeft = Math.Max(
             edgeSafeMargin,
@@ -797,10 +774,7 @@ internal partial class FlourishShellWindow : Window
         var left = Math.Clamp(desiredLeft, edgeSafeMargin, maximumLeft);
 
         var top = Math.Max(edgeSafeMargin, anchor.Bottom + anchorGap);
-        ProfileCard.MaxHeight = Math.Max(
-            0,
-            ShellRootGrid.ActualHeight - top - edgeSafeMargin
-        );
+        ProfileCard.MaxHeight = Math.Max(0, ShellRootGrid.ActualHeight - top - edgeSafeMargin);
 
         Canvas.SetLeft(ProfileCard, left);
         Canvas.SetTop(ProfileCard, top);
@@ -881,11 +855,7 @@ internal partial class FlourishShellWindow : Window
     {
         lock (backgroundTaskRefreshGate)
         {
-            if (
-                isShellClosed
-                || !backgroundTaskRefreshLoopActive
-                || Dispatcher.HasShutdownStarted
-            )
+            if (isShellClosed || !backgroundTaskRefreshLoopActive || Dispatcher.HasShutdownStarted)
             {
                 return;
             }
@@ -910,19 +880,14 @@ internal partial class FlourishShellWindow : Window
         var showConfiguredContent = options.IsStatusBarEnabled;
         var showStatusBar = showConfiguredContent || hasBackgroundTasks;
 
-        StatusBarBorder.Visibility = showStatusBar
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        StatusBarBorder.Visibility = showStatusBar ? Visibility.Visible : Visibility.Collapsed;
         StatusItemsHost.Visibility =
             showConfiguredContent && StatusItemsHost.Children.Count > 0
                 ? Visibility.Visible
                 : Visibility.Collapsed;
         SystemStatusButton.Visibility =
             showConfiguredContent
-            && (
-                statusService.IsLANConnectionStatusEnabled
-                || statusService.IsPowerStatusEnabled
-            )
+            && (statusService.IsLANConnectionStatusEnabled || statusService.IsPowerStatusEnabled)
                 ? Visibility.Visible
                 : Visibility.Collapsed;
         FooterStartRegionHost.Visibility =
@@ -948,10 +913,7 @@ internal partial class FlourishShellWindow : Window
         for (var index = 0; index < desiredChildren.Count; index++)
         {
             var desired = desiredChildren[index];
-            if (
-                index < panel.Children.Count
-                && ReferenceEquals(panel.Children[index], desired)
-            )
+            if (index < panel.Children.Count && ReferenceEquals(panel.Children[index], desired))
             {
                 continue;
             }
@@ -1002,16 +964,14 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private void RefreshBackgroundTaskStatus(
-        IReadOnlyList<FlourishBackgroundTaskInfo> tasks
-    )
+    private void RefreshBackgroundTaskStatus(IReadOnlyList<FlourishBackgroundTaskInfo> tasks)
     {
         backgroundTasks = tasks.ToArray();
         var runningTasks = backgroundTasks
             .Where(task =>
                 task.State
-                is FlourishBackgroundTaskState.Running
-                    or FlourishBackgroundTaskState.Cancelling
+                    is FlourishBackgroundTaskState.Running
+                        or FlourishBackgroundTaskState.Cancelling
             )
             .ToArray();
         var queuedTasks = backgroundTasks
@@ -1038,9 +998,8 @@ internal partial class FlourishShellWindow : Window
             backgroundTaskIconsById.Remove(taskId);
         }
 
-        BackgroundTaskQueueButton.Visibility = queuedTasks.Length > 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        BackgroundTaskQueueButton.Visibility =
+            queuedTasks.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         BackgroundTaskQueueCountText.Text = queuedTasks.Length.ToString();
         AutomationProperties.SetName(
             BackgroundTaskQueueButton,
@@ -1074,9 +1033,10 @@ internal partial class FlourishShellWindow : Window
         else
         {
             statusFlyoutAnchorTaskId = null;
-            statusFlyoutAnchor = queuedTasks.Length > 0
-                ? BackgroundTaskQueueButton
-                : desiredTaskButtons.OfType<FrameworkElement>().FirstOrDefault();
+            statusFlyoutAnchor =
+                queuedTasks.Length > 0
+                    ? BackgroundTaskQueueButton
+                    : desiredTaskButtons.OfType<FrameworkElement>().FirstOrDefault();
             if (statusFlyoutOpenedWithFocus)
             {
                 statusFlyoutRestoreFocusTarget = statusFlyoutAnchor;
@@ -1091,9 +1051,7 @@ internal partial class FlourishShellWindow : Window
         UpdateStatusFlyoutPosition();
     }
 
-    private BackgroundTaskIconView CreateBackgroundTaskIconView(
-        FlourishBackgroundTaskInfo task
-    )
+    private BackgroundTaskIconView CreateBackgroundTaskIconView(FlourishBackgroundTaskInfo task)
     {
         var icon = new TextBlock
         {
@@ -1113,7 +1071,10 @@ internal partial class FlourishShellWindow : Window
             "FlourishNeutralForeground2Brush"
         );
         var toolTipState = new TextBlock { Margin = new Thickness(0, 4, 0, 0) };
-        toolTipState.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
+        toolTipState.SetResourceReference(
+            TextBlock.ForegroundProperty,
+            "FlourishNeutralForeground2Brush"
+        );
         var toolTip = new StackPanel();
         toolTip.Children.Add(toolTipName);
         toolTip.Children.Add(toolTipDescription);
@@ -1235,9 +1196,7 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private BackgroundTaskRowView CreateBackgroundTaskRowView(
-        FlourishBackgroundTaskInfo task
-    )
+    private BackgroundTaskRowView CreateBackgroundTaskRowView(FlourishBackgroundTaskInfo task)
     {
         var row = new Border
         {
@@ -1246,10 +1205,7 @@ internal partial class FlourishShellWindow : Window
         };
         row.SetResourceReference(Border.BackgroundProperty, "FlourishNeutralBackground2Brush");
         row.SetResourceReference(Border.BorderBrushProperty, "FlourishSurfaceStrokeBrush");
-        row.SetResourceReference(
-            Border.BorderThicknessProperty,
-            "FlourishSurfaceBorderThickness"
-        );
+        row.SetResourceReference(Border.BorderThicknessProperty, "FlourishSurfaceBorderThickness");
         row.SetResourceReference(Border.CornerRadiusProperty, "FlourishSurfaceCornerRadius");
 
         var layout = new Grid();
@@ -1259,10 +1215,7 @@ internal partial class FlourishShellWindow : Window
         );
         layout.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        var icon = new TextBlock
-        {
-            VerticalAlignment = VerticalAlignment.Top,
-        };
+        var icon = new TextBlock { VerticalAlignment = VerticalAlignment.Top };
         BindIconTypography(icon, "FlourishFontSizeTitlebarIcon");
         icon.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
         layout.Children.Add(icon);
@@ -1282,13 +1235,13 @@ internal partial class FlourishShellWindow : Window
             MaxWidth = 220,
             TextWrapping = TextWrapping.Wrap,
         };
-        description.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
+        description.SetResourceReference(
+            TextBlock.ForegroundProperty,
+            "FlourishNeutralForeground2Brush"
+        );
         details.Children.Add(description);
 
-        var state = new TextBlock
-        {
-            Margin = new Thickness(0, 3, 8, 0),
-        };
+        var state = new TextBlock { Margin = new Thickness(0, 3, 8, 0) };
         BindTextSize(state, "FlourishFontSizeSmall");
         state.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
         details.Children.Add(state);
@@ -1306,14 +1259,7 @@ internal partial class FlourishShellWindow : Window
         layout.Children.Add(cancelButton);
 
         row.Child = layout;
-        return new BackgroundTaskRowView(
-            row,
-            icon,
-            name,
-            description,
-            state,
-            cancelButton
-        );
+        return new BackgroundTaskRowView(row, icon, name, description, state, cancelButton);
     }
 
     private void UpdateBackgroundTaskRowView(
@@ -1356,16 +1302,14 @@ internal partial class FlourishShellWindow : Window
             state switch
             {
                 FlourishBackgroundTaskState.Queued => FlourishLocaleKeys.BackgroundTaskQueued,
-                FlourishBackgroundTaskState.Cancelling => FlourishLocaleKeys.BackgroundTaskCancelling,
+                FlourishBackgroundTaskState.Cancelling =>
+                    FlourishLocaleKeys.BackgroundTaskCancelling,
                 _ => FlourishLocaleKeys.BackgroundTaskRunning,
             }
         );
     }
 
-    private void SystemStatusButton_MouseEnter(
-        object sender,
-        System.Windows.Input.MouseEventArgs e
-    )
+    private void SystemStatusButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (statusFlyoutOpenedWithFocus)
         {
@@ -1390,9 +1334,7 @@ internal partial class FlourishShellWindow : Window
 
         if (statusService.IsLANConnectionStatusEnabled)
         {
-            var networkState = localizationService.Get(
-                FlourishLocaleKeys.SystemStatusUnknown
-            );
+            var networkState = localizationService.Get(FlourishLocaleKeys.SystemStatusUnknown);
             try
             {
                 networkState = localizationService.Get(
@@ -1419,9 +1361,7 @@ internal partial class FlourishShellWindow : Window
 
         if (statusService.IsPowerStatusEnabled)
         {
-            var powerSource = localizationService.Get(
-                FlourishLocaleKeys.SystemStatusUnknown
-            );
+            var powerSource = localizationService.Get(FlourishLocaleKeys.SystemStatusUnknown);
             try
             {
                 var powerStatus = System.Windows.Forms.SystemInformation.PowerStatus;
@@ -1441,33 +1381,23 @@ internal partial class FlourishShellWindow : Window
                 );
                 var hasUsableBattery =
                     !hasNoSystemBattery
-                    && !batteryStatus.HasFlag(
-                        System.Windows.Forms.BatteryChargeStatus.Unknown
-                    );
+                    && !batteryStatus.HasFlag(System.Windows.Forms.BatteryChargeStatus.Unknown);
                 if (
                     hasNoSystemBattery
-                    && powerStatus.PowerLineStatus
-                        != System.Windows.Forms.PowerLineStatus.Online
+                    && powerStatus.PowerLineStatus != System.Windows.Forms.PowerLineStatus.Online
                 )
                 {
-                    powerSource = localizationService.Get(
-                        FlourishLocaleKeys.SystemStatusUnknown
-                    );
+                    powerSource = localizationService.Get(FlourishLocaleKeys.SystemStatusUnknown);
                 }
 
-                if (
-                    hasUsableBattery
-                    && powerStatus.BatteryLifePercent is >= 0 and <= 1
-                )
+                if (hasUsableBattery && powerStatus.BatteryLifePercent is >= 0 and <= 1)
                 {
                     powerSource = $"{powerSource} · {powerStatus.BatteryLifePercent:P0}";
                 }
             }
             catch (Exception error)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Flourish power status query failed: {error}"
-                );
+                System.Diagnostics.Debug.WriteLine($"Flourish power status query failed: {error}");
             }
 
             StatusFlyoutContentHost.Items.Add(
@@ -1482,51 +1412,40 @@ internal partial class FlourishShellWindow : Window
         OpenStatusFlyout(SystemStatusButton, StatusFlyoutKind.System, focusFlyout);
     }
 
-    private FrameworkElement CreateStatusDetailRow(
-        string iconGlyph,
-        string label,
-        string value
-    )
+    private FrameworkElement CreateStatusDetailRow(string iconGlyph, string label, string value)
     {
         var row = new Grid { Margin = new Thickness(0, 0, 0, 8) };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(
+            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+        );
 
-        var icon = new TextBlock
-        {
-            VerticalAlignment = VerticalAlignment.Center,
-            Text = iconGlyph,
-        };
+        var icon = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Text = iconGlyph };
         BindIconTypography(icon, "FlourishFontSizeTitlebarIcon");
         icon.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
         row.Children.Add(icon);
 
         var text = new StackPanel();
         Grid.SetColumn(text, 1);
-        var labelText = new TextBlock
-        {
-            Text = label,
-        };
+        var labelText = new TextBlock { Text = label };
         BindTextSize(labelText, "FlourishFontSizeSmall");
-        labelText.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
+        labelText.SetResourceReference(
+            TextBlock.ForegroundProperty,
+            "FlourishNeutralForeground2Brush"
+        );
         text.Children.Add(labelText);
-        var valueText = new TextBlock
-        {
-            Margin = new Thickness(0, 2, 0, 0),
-            Text = value,
-        };
+        var valueText = new TextBlock { Margin = new Thickness(0, 2, 0, 0), Text = value };
         BindTextSize(valueText, "FlourishFontSizeCaption");
-        valueText.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground1Brush");
+        valueText.SetResourceReference(
+            TextBlock.ForegroundProperty,
+            "FlourishNeutralForeground1Brush"
+        );
         text.Children.Add(valueText);
         row.Children.Add(text);
         return row;
     }
 
-    private void OpenStatusFlyout(
-        FrameworkElement anchor,
-        StatusFlyoutKind kind,
-        bool focusFlyout
-    )
+    private void OpenStatusFlyout(FrameworkElement anchor, StatusFlyoutKind kind, bool focusFlyout)
     {
         CloseProfileOverlay();
         var wasVisible = StatusFlyoutOverlay.Visibility == Visibility.Visible;
@@ -1626,10 +1545,7 @@ internal partial class FlourishShellWindow : Window
         e.Handled = true;
     }
 
-    private void StatusBarBorder_PreviewMouseLeftButtonDown(
-        object sender,
-        MouseButtonEventArgs e
-    )
+    private void StatusBarBorder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (
             StatusFlyoutOverlay.Visibility != Visibility.Visible
@@ -1669,38 +1585,24 @@ internal partial class FlourishShellWindow : Window
         );
         var anchor = new Rect(
             anchorTopLeft,
-            new System.Windows.Size(
-                statusFlyoutAnchor.ActualWidth,
-                statusFlyoutAnchor.ActualHeight
-            )
+            new System.Windows.Size(statusFlyoutAnchor.ActualWidth, statusFlyoutAnchor.ActualHeight)
         );
-        var availableWidth = Math.Max(
-            0,
-            ShellRootGrid.ActualWidth - edgeSafeMargin * 2
-        );
+        var availableWidth = Math.Max(0, ShellRootGrid.ActualWidth - edgeSafeMargin * 2);
         StatusFlyoutCard.MaxWidth = availableWidth;
-        StatusFlyoutCard.MaxHeight = Math.Max(
-            0,
-            anchor.Top - edgeSafeMargin - anchorGap
-        );
+        StatusFlyoutCard.MaxHeight = Math.Max(0, anchor.Top - edgeSafeMargin - anchorGap);
 
-        var cardWidth = StatusFlyoutCard.ActualWidth > 0
-            ? Math.Min(StatusFlyoutCard.ActualWidth, availableWidth)
-            : Math.Min(StatusFlyoutCard.Width, availableWidth);
-        var cardHeight = Math.Min(
-            StatusFlyoutCard.ActualHeight,
-            StatusFlyoutCard.MaxHeight
-        );
+        var cardWidth =
+            StatusFlyoutCard.ActualWidth > 0
+                ? Math.Min(StatusFlyoutCard.ActualWidth, availableWidth)
+                : Math.Min(StatusFlyoutCard.Width, availableWidth);
+        var cardHeight = Math.Min(StatusFlyoutCard.ActualHeight, StatusFlyoutCard.MaxHeight);
         var desiredLeft = anchor.Left + (anchor.Width - cardWidth) / 2;
         var maximumLeft = Math.Max(
             edgeSafeMargin,
             ShellRootGrid.ActualWidth - cardWidth - edgeSafeMargin
         );
         var left = Math.Clamp(desiredLeft, edgeSafeMargin, maximumLeft);
-        var top = Math.Max(
-            edgeSafeMargin,
-            anchor.Top - cardHeight - anchorGap
-        );
+        var top = Math.Max(edgeSafeMargin, anchor.Top - cardHeight - anchorGap);
 
         Canvas.SetLeft(StatusFlyoutCard, left);
         Canvas.SetTop(StatusFlyoutCard, top);
@@ -1777,9 +1679,7 @@ internal partial class FlourishShellWindow : Window
     {
         var paneColumn = GetNavigationPaneColumn();
         paneColumn.MinWidth = isOpen ? options.NavigationPaneMinWidth : 0;
-        paneColumn.MaxWidth = isOpen
-            ? options.NavigationPaneMaxWidth
-            : double.PositiveInfinity;
+        paneColumn.MaxWidth = isOpen ? options.NavigationPaneMaxWidth : double.PositiveInfinity;
     }
 
     private void UpdateNavigationPaneSplitterState()
@@ -1795,11 +1695,10 @@ internal partial class FlourishShellWindow : Window
     {
         var isNavigationVisible = options.IsNavigationPanelEnabled;
         var isOpen = isNavigationVisible && isPaneOpen;
-        var paneWidth = !isNavigationVisible
-            ? 0
-            : isOpen
-                ? CoerceOpenPaneWidth(options.OpenPaneWidth)
-                : options.ClosedPaneWidth;
+        var paneWidth =
+            !isNavigationVisible ? 0
+            : isOpen ? CoerceOpenPaneWidth(options.OpenPaneWidth)
+            : options.ClosedPaneWidth;
 
         if (isOpen)
         {
@@ -1819,9 +1718,8 @@ internal partial class FlourishShellWindow : Window
         NavigationPaneSplitter.IsEnabled = false;
         NavigationPaneSplitter.Visibility = Visibility.Collapsed;
         var paneColumn = GetNavigationPaneColumn();
-        var committedWidth = paneColumn.ActualWidth > 0
-            ? paneColumn.ActualWidth
-            : paneColumn.Width.Value;
+        var committedWidth =
+            paneColumn.ActualWidth > 0 ? paneColumn.ActualWidth : paneColumn.Width.Value;
 
         motionService.AnimateNavigationPane(
             navigationPaneTransition,
@@ -1868,9 +1766,7 @@ internal partial class FlourishShellWindow : Window
 
     private void NavigationPaneSplitter_DragStarted(object sender, DragStartedEventArgs e)
     {
-        navigationPaneDragStartWidth = CoerceOpenPaneWidth(
-            GetNavigationPaneColumn().ActualWidth
-        );
+        navigationPaneDragStartWidth = CoerceOpenPaneWidth(GetNavigationPaneColumn().ActualWidth);
     }
 
     private void RefreshWorkAreaLayout()
@@ -1993,10 +1889,7 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private void SetRegionContent(
-        FlourishRegion region,
-        IReadOnlyList<FrameworkElement> elements
-    )
+    private void SetRegionContent(FlourishRegion region, IReadOnlyList<FrameworkElement> elements)
     {
         switch (region)
         {
@@ -2034,14 +1927,15 @@ internal partial class FlourishShellWindow : Window
                 SetPanelContent(FooterEndRegionHost, elements);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(region), region, "Unknown shell region.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(region),
+                    region,
+                    "Unknown shell region."
+                );
         }
     }
 
-    private static void SetPanelContent(
-        WpfPanel host,
-        IReadOnlyList<FrameworkElement> elements
-    )
+    private static void SetPanelContent(WpfPanel host, IReadOnlyList<FrameworkElement> elements)
     {
         host.Children.Clear();
         foreach (var element in elements)
@@ -2101,7 +1995,8 @@ internal partial class FlourishShellWindow : Window
                 MinWidth = useIconOnly ? 0 : 28,
                 MinHeight = 0,
                 Padding = new Thickness(7, 0, 7, 0),
-                IsEnabled = item.IsEnabled
+                IsEnabled =
+                    item.IsEnabled
                     && (
                         string.IsNullOrWhiteSpace(item.CommandKey)
                         || commandDispatcher.CanExecute(
@@ -2126,10 +2021,7 @@ internal partial class FlourishShellWindow : Window
     {
         if (sender is Button { Tag: string commandKey })
         {
-            await commandDispatcher.ExecuteAsync(
-                commandKey,
-                source: CommandSource.Toolbar
-            );
+            await commandDispatcher.ExecuteAsync(commandKey, source: CommandSource.Toolbar);
         }
     }
 
@@ -2173,7 +2065,10 @@ internal partial class FlourishShellWindow : Window
         FixedNavigationItemsBorder.Visibility =
             options.FixedNavigationItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        if (selectedNavigationKey is not null && GetNavigationItem(selectedNavigationKey) is { } selected)
+        if (
+            selectedNavigationKey is not null
+            && GetNavigationItem(selectedNavigationKey) is { } selected
+        )
         {
             SelectNavigationItem(selected);
         }
@@ -2230,7 +2125,10 @@ internal partial class FlourishShellWindow : Window
                 Text = item.IconGlyph,
             };
             BindIconTypography(iconText, "FlourishFontSizeCaption");
-            iconText.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
+            iconText.SetResourceReference(
+                TextBlock.ForegroundProperty,
+                "FlourishNeutralForeground2Brush"
+            );
             status.Children.Add(iconText);
 
             var labelText = new TextBlock
@@ -2240,7 +2138,10 @@ internal partial class FlourishShellWindow : Window
                 Text = item.Text,
             };
             BindTextSize(labelText, "FlourishFontSizeCaption");
-            labelText.SetResourceReference(TextBlock.ForegroundProperty, "FlourishNeutralForeground2Brush");
+            labelText.SetResourceReference(
+                TextBlock.ForegroundProperty,
+                "FlourishNeutralForeground2Brush"
+            );
             status.Children.Add(labelText);
 
             StatusItemsHost.Children.Add(status);
@@ -2279,11 +2180,7 @@ internal partial class FlourishShellWindow : Window
 
             var content = new StackPanel();
             content.Children.Add(
-                new FlourishTextBlock
-                {
-                    Role = FlourishTextRole.CardTitle,
-                    Text = definition.Title,
-                }
+                new FlourishTextBlock { Role = FlourishTextRole.CardTitle, Text = definition.Title }
             );
             var message = new FlourishTextBlock
             {
@@ -2331,19 +2228,9 @@ internal partial class FlourishShellWindow : Window
             Grid.SetColumn(dismiss, 2);
             layout.Children.Add(dismiss);
 
-            var surface = new Border
-            {
-                Padding = new Thickness(14, 12, 10, 12),
-                Child = layout,
-            };
-            surface.SetResourceReference(
-                Border.BackgroundProperty,
-                "FlourishCardBackgroundBrush"
-            );
-            surface.SetResourceReference(
-                Border.BorderBrushProperty,
-                "FlourishControlStrokeBrush"
-            );
+            var surface = new Border { Padding = new Thickness(14, 12, 10, 12), Child = layout };
+            surface.SetResourceReference(Border.BackgroundProperty, "FlourishCardBackgroundBrush");
+            surface.SetResourceReference(Border.BorderBrushProperty, "FlourishControlStrokeBrush");
             surface.SetResourceReference(
                 Border.BorderThicknessProperty,
                 "FlourishControlBorderThickness"
@@ -2354,16 +2241,12 @@ internal partial class FlourishShellWindow : Window
             );
 
             surface.Margin = new Thickness(0, 0, 0, 14);
-            AutomationProperties.SetName(
-                surface,
-                $"{definition.Title}: {definition.Message}"
-            );
+            AutomationProperties.SetName(surface, $"{definition.Title}: {definition.Message}");
             NotificationItemsHost.Children.Add(surface);
         }
 
-        NotificationItemsHost.Visibility = NotificationItemsHost.Children.Count > 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        NotificationItemsHost.Visibility =
+            NotificationItemsHost.Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async void NotificationAction_Click(object sender, RoutedEventArgs e)
@@ -2410,23 +2293,21 @@ internal partial class FlourishShellWindow : Window
         FlourishNavigationPanelChangedEventArgs e
     )
     {
-        DispatchRuntimeChange(
-            () =>
-            {
-                ApplyNavigationPanelRuntimeState(e.Animate);
-                var current = navigationPanelService.Current;
-                Titlebar.ConfigureVisibility(
-                    options.IsTitlebarSearchEnabled,
-                    IsBreadcrumbFeatureEnabled(),
-                    options.IsTitlebarNavigationToggleEnabled && current.IsEnabled,
-                    options.IsTitlebarLogoEnabled,
-                    options.IsTitlebarTitleEnabled,
-                    options.IsTitlebarSubtitleEnabled,
-                    options.IsTitlebarThemeToggleEnabled && options.IsThemeEnabled,
-                    options.IsProfileEnabled && options.IsTitlebarProfileEnabled
-                );
-            }
-        );
+        DispatchRuntimeChange(() =>
+        {
+            ApplyNavigationPanelRuntimeState(e.Animate);
+            var current = navigationPanelService.Current;
+            Titlebar.ConfigureVisibility(
+                options.IsTitlebarSearchEnabled,
+                IsBreadcrumbFeatureEnabled(),
+                options.IsTitlebarNavigationToggleEnabled && current.IsEnabled,
+                options.IsTitlebarLogoEnabled,
+                options.IsTitlebarTitleEnabled,
+                options.IsTitlebarSubtitleEnabled,
+                options.IsTitlebarThemeToggleEnabled && options.IsThemeEnabled,
+                options.IsProfileEnabled && options.IsTitlebarProfileEnabled
+            );
+        });
     }
 
     private void ApplyNavigationPanelRuntimeState(bool animate)
@@ -2451,29 +2332,25 @@ internal partial class FlourishShellWindow : Window
         FlourishNavigationMenuChangedEventArgs e
     )
     {
-        DispatchRuntimeChange(
-            () =>
+        DispatchRuntimeChange(() =>
+        {
+            BuildNavigationItems();
+            ClearToolbarButtonCache();
+            BuildToolbarItems(navigationService.CurrentSourcePageType, force: true);
+            if (navigationService.CurrentSourcePageType is { } pageType)
             {
-                BuildNavigationItems();
-                ClearToolbarButtonCache();
-                BuildToolbarItems(navigationService.CurrentSourcePageType, force: true);
-                if (navigationService.CurrentSourcePageType is { } pageType)
-                {
-                    UpdateBreadcrumb(pageType);
-                }
+                UpdateBreadcrumb(pageType);
             }
-        );
+        });
     }
 
     private void ToolbarService_Changed(object? sender, FlourishToolbarChangedEventArgs e)
     {
-        DispatchRuntimeChange(
-            () =>
-            {
-                ClearToolbarButtonCache();
-                BuildToolbarItems(navigationService.CurrentSourcePageType, force: true);
-            }
-        );
+        DispatchRuntimeChange(() =>
+        {
+            ClearToolbarButtonCache();
+            BuildToolbarItems(navigationService.CurrentSourcePageType, force: true);
+        });
     }
 
     private void StatusService_Changed(object? sender, FlourishStatusBarChangedEventArgs e)
@@ -2481,10 +2358,7 @@ internal partial class FlourishShellWindow : Window
         DispatchRuntimeChange(BuildStatusItems);
     }
 
-    private void ShellRegionService_Changed(
-        object? sender,
-        FlourishShellRegionChangedEventArgs e
-    )
+    private void ShellRegionService_Changed(object? sender, FlourishShellRegionChangedEventArgs e)
     {
         DispatchRuntimeChange(() => BuildRegionContents(e.Region));
     }
@@ -2530,11 +2404,7 @@ internal partial class FlourishShellWindow : Window
         }
     }
 
-    private void RequestTitleBarLogo(
-        string? logoPath,
-        string fallbackText,
-        bool isVisible
-    )
+    private void RequestTitleBarLogo(string? logoPath, string fallbackText, bool isVisible)
     {
         if (isShellClosed)
         {
@@ -2586,15 +2456,13 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        DispatchRuntimeChange(
-            () =>
+        DispatchRuntimeChange(() =>
+        {
+            if (titleBarLogoLoadCoordinator.IsCurrent(result))
             {
-                if (titleBarLogoLoadCoordinator.IsCurrent(result))
-                {
-                    ApplyTitleBarLogoSource(result.Source);
-                }
+                ApplyTitleBarLogoSource(result.Source);
             }
-        );
+        });
     }
 
     private void ApplyTitleBarLogoSource(ImageSource? source)
@@ -2656,10 +2524,7 @@ internal partial class FlourishShellWindow : Window
         DispatchRuntimeChange(ConfigureProfileSurface);
     }
 
-    private void ShellFeatureService_Changed(
-        object? sender,
-        FlourishShellFeatureChangedEventArgs e
-    )
+    private void ShellFeatureService_Changed(object? sender, FlourishShellFeatureChangedEventArgs e)
     {
         DispatchRuntimeChange(() =>
         {
@@ -2688,10 +2553,7 @@ internal partial class FlourishShellWindow : Window
         });
     }
 
-    private void LocalizationService_Changed(
-        object? sender,
-        FlourishLocalizationChangedEventArgs e
-    )
+    private void LocalizationService_Changed(object? sender, FlourishLocalizationChangedEventArgs e)
     {
         DispatchRuntimeChange(() =>
         {
@@ -2734,17 +2596,11 @@ internal partial class FlourishShellWindow : Window
                 && (contentPageType ?? contentPage.GetType()) == affectedPageType
             )
             {
-                fontService.ApplyToPage(
-                    contentPage,
-                    contentPageType ?? contentPage.GetType()
-                );
+                fontService.ApplyToPage(contentPage, contentPageType ?? contentPage.GetType());
             }
 
             var profilePageType = profileFlyoutService.Current.ContentPageType;
-            if (
-                ProfileFrame.Content is WpfPage profilePage
-                && profilePageType == affectedPageType
-            )
+            if (ProfileFrame.Content is WpfPage profilePage && profilePageType == affectedPageType)
             {
                 fontService.ApplyToPage(profilePage, profilePageType);
             }
@@ -2760,8 +2616,7 @@ internal partial class FlourishShellWindow : Window
             navigationPaneTransition.IsActive
             && (
                 !e.CanAnimate
-                || e.Current.NavigationPanelTransition
-                    == FlourishNavigationPanelTransition.None
+                || e.Current.NavigationPanelTransition == FlourishNavigationPanelTransition.None
             );
         if (!cancelPageTransition && !resetNavigationPane)
         {
@@ -2807,11 +2662,7 @@ internal partial class FlourishShellWindow : Window
     {
         void ExecuteIfActive()
         {
-            if (
-                isShellClosed
-                || Dispatcher.HasShutdownStarted
-                || Dispatcher.HasShutdownFinished
-            )
+            if (isShellClosed || Dispatcher.HasShutdownStarted || Dispatcher.HasShutdownFinished)
             {
                 return;
             }
@@ -2830,10 +2681,7 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        _ = Dispatcher.BeginInvoke(
-            DispatcherPriority.DataBind,
-            new Action(ExecuteIfActive)
-        );
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.DataBind, new Action(ExecuteIfActive));
     }
 
     private void ClearToolbarButtonCache()
@@ -2997,7 +2845,10 @@ internal partial class FlourishShellWindow : Window
         ActivateNavigationItem(item, true);
     }
 
-    private void NavigationItemsHost_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private void NavigationItemsHost_PreviewKeyDown(
+        object sender,
+        System.Windows.Input.KeyEventArgs e
+    )
     {
         if (suppressNavigationSelection || sender is not ListBox listBox)
         {
@@ -3030,10 +2881,7 @@ internal partial class FlourishShellWindow : Window
         ActivateNavigationItem(item, true);
     }
 
-    private void NavigationItemsHost_SelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e
-    )
+    private void NavigationItemsHost_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (suppressNavigationSelection || sender is not ListBox listBox)
         {
@@ -3080,26 +2928,20 @@ internal partial class FlourishShellWindow : Window
 
     private void UpdateBreadcrumb(Type sourcePageType)
     {
-        if (
-            !IsBreadcrumbFeatureEnabled()
-        )
+        if (!IsBreadcrumbFeatureEnabled())
         {
             BreadcrumbHost.Visibility = Visibility.Collapsed;
             return;
         }
 
-        if (
-            options.BreadcrumbShowOption == BreadcrumbShowOption.Auto
-            && !HasBreadcrumbNavigation()
-        )
+        if (options.BreadcrumbShowOption == BreadcrumbShowOption.Auto && !HasBreadcrumbNavigation())
         {
             BreadcrumbHost.Visibility = Visibility.Collapsed;
             return;
         }
 
         var label =
-            navigationItemsByPage.GetValueOrDefault(sourcePageType)?.Label
-            ?? sourcePageType.Name;
+            navigationItemsByPage.GetValueOrDefault(sourcePageType)?.Label ?? sourcePageType.Name;
 
         BreadcrumbText.Text = $"{options.Title} / {label}";
         BreadcrumbHost.Visibility = Visibility.Visible;
@@ -3130,10 +2972,9 @@ internal partial class FlourishShellWindow : Window
         {
             if (!item.HasChildren && !string.IsNullOrWhiteSpace(item.CommandKey))
             {
-                _ = commandDispatcher.ExecuteAsync(
-                    item.CommandKey,
-                    source: CommandSource.Navigation
-                ).AsTask();
+                _ = commandDispatcher
+                    .ExecuteAsync(item.CommandKey, source: CommandSource.Navigation)
+                    .AsTask();
             }
 
             return;
@@ -3210,7 +3051,8 @@ internal partial class FlourishShellWindow : Window
         FlourishNavigationItem parent
     )
     {
-        return parent.ParentId != 0
+        return
+            parent.ParentId != 0
             && navigationChildrenByParentKey.TryGetValue(
                 CreateNavigationTreeKey(parent, parent.ParentId),
                 out var children
@@ -3254,7 +3096,8 @@ internal partial class FlourishShellWindow : Window
             return;
         }
 
-        var isVisible = IsBreadcrumbFeatureEnabled()
+        var isVisible =
+            IsBreadcrumbFeatureEnabled()
             && (
                 options.BreadcrumbShowOption == BreadcrumbShowOption.Always
                 || HasBreadcrumbNavigation()
@@ -3329,18 +3172,12 @@ internal partial class FlourishShellWindow : Window
     {
         FlourishMessageOption[] closeOptions =
         [
-            new(
-                "no",
-                localizationService.Get(FlourishLocaleKeys.MessageBoxNo)
-            )
+            new("no", localizationService.Get(FlourishLocaleKeys.MessageBoxNo))
             {
                 IsDefault = true,
                 IsCancel = true,
             },
-            new(
-                "yes",
-                localizationService.Get(FlourishLocaleKeys.MessageBoxYes)
-            )
+            new("yes", localizationService.Get(FlourishLocaleKeys.MessageBoxYes))
             {
                 IsPrimary = true,
             },
@@ -3574,9 +3411,10 @@ internal partial class FlourishShellWindow : Window
 
     private void UpdateActiveChildParent(FlourishNavigationItem activeItem)
     {
-        var parent = activeItem.IsPageItem && activeItem.ChildId != 0
-            ? FindParentNavigationItem(activeItem)
-            : null;
+        var parent =
+            activeItem.IsPageItem && activeItem.ChildId != 0
+                ? FindParentNavigationItem(activeItem)
+                : null;
 
         if (activeChildParentItem == parent)
         {
@@ -3614,8 +3452,10 @@ internal partial class FlourishShellWindow : Window
 
     private static FlourishNavigationItem? GetNavigationItemFromInputSource(object source)
     {
-        return source is DependencyObject dependencyObject
-            && FindAncestor<ListBoxItem>(dependencyObject)?.DataContext is FlourishNavigationItem item
+        return
+            source is DependencyObject dependencyObject
+            && FindAncestor<ListBoxItem>(dependencyObject)?.DataContext
+                is FlourishNavigationItem item
             ? item
             : null;
     }

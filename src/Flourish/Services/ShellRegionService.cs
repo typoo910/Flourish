@@ -6,7 +6,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class ShellRegionService : IShellRegionService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly FlourishShellOptions options;
     private readonly Dictionary<string, Guid> leases = new(StringComparer.Ordinal);
     private long version;
@@ -198,8 +198,8 @@ internal sealed class ShellRegionService : IShellRegionService
         Mutate(
             () =>
             {
-                var ids = options.RegionContents
-                    .Where(content => content.Region == region)
+                var ids = options
+                    .RegionContents.Where(content => content.Region == region)
                     .Select(content => content.Id)
                     .ToArray();
                 if (ids.Length == 0)
@@ -225,8 +225,8 @@ internal sealed class ShellRegionService : IShellRegionService
     {
         lock (gate)
         {
-            return options.RegionContents
-                .Where(content => content.Region == region && content.IsEnabled)
+            return options
+                .RegionContents.Where(content => content.Region == region && content.IsEnabled)
                 .OrderBy(content => content.Order)
                 .ToArray();
         }
@@ -310,8 +310,8 @@ internal sealed class ShellRegionService : IShellRegionService
 
     private FlourishShellRegionSnapshot CreateSnapshot()
     {
-        var entries = options.RegionContents
-            .OrderBy(content => content.Region)
+        var entries = options
+            .RegionContents.OrderBy(content => content.Region)
             .ThenBy(content => content.Order)
             .Select(content => new FlourishShellRegionEntry(
                 content.Id,
@@ -335,9 +335,7 @@ internal sealed class ShellRegionService : IShellRegionService
         var index = FindIndex(id);
         return index >= 0
             ? index
-            : throw new KeyNotFoundException(
-                $"Shell region registration ID '{id}' was not found."
-            );
+            : throw new KeyNotFoundException($"Shell region registration ID '{id}' was not found.");
     }
 
     private static void ValidateRegistration(

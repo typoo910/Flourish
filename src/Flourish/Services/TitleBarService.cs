@@ -5,7 +5,7 @@ namespace ArkheideSystem.Flourish.Services;
 
 internal sealed class TitleBarService(FlourishShellOptions options) : ITitleBarService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
 
     public event EventHandler<FlourishTitleBarChangedEventArgs>? Changed;
 
@@ -77,7 +77,11 @@ internal sealed class TitleBarService(FlourishShellOptions options) : ITitleBarS
     {
         if (!Enum.IsDefined(element))
         {
-            throw new ArgumentOutOfRangeException(nameof(element), element, "Unknown title bar element.");
+            throw new ArgumentOutOfRangeException(
+                nameof(element),
+                element,
+                "Unknown title bar element."
+            );
         }
 
         Update(() =>

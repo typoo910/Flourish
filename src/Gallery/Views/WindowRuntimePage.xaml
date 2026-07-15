@@ -7,20 +7,16 @@
 >
   <flourish:FlourishScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-      <flourish:FlourishTextBlock Role="PageTitle" Text="Window, profile &amp; notifications" />
-      <flourish:FlourishTextBlock Role="Subtitle"
-        Margin="{DynamicResource FlourishPageSubtitleMargin}"
-        Text="Control the live shell window and tray icon, install close guards, manage the profile flyout, and publish modal or non-modal messages."
+      <flourish:Chunk
+        ChunkDescription="Control the live shell window and tray icon, install close guards, manage the profile flyout, and publish modal or non-modal messages."
+        ChunkTitle="Window, profile &amp; notifications"
       />
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Shell window" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Resize, position, activate, and change window flags through IWindowService."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Resize, position, activate, and change window flags through IWindowService."
+        ChunkTitle="Shell window"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
           <WrapPanel>
             <flourish:Button Margin="0,0,8,8" Click="SetDemoSize_Click" Content="Set 1100 × 760" />
@@ -35,16 +31,13 @@
           <flourish:FlourishTextBlock x:Name="WindowStatusText" Margin="0,6,0,0" Role="Status" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Notification-area tray" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="The tray service can be enabled after startup and can restore a hidden shell window."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="The tray service can be enabled after startup and can restore a hidden shell window."
+        ChunkTitle="Notification-area tray"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
           <Grid>
             <Grid.ColumnDefinitions>
@@ -62,16 +55,13 @@
           <flourish:FlourishTextBlock x:Name="TrayStatusText" Margin="0,12,0,0" Role="Description" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Close behavior &amp; guards" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Choose the default close policy and install a disposable guard whose decision can change at runtime."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Choose the default close policy and install a disposable guard whose decision can change at runtime."
+        ChunkTitle="Close behavior &amp; guards"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
           <WrapPanel>
             <flourish:FlourishComboBox x:Name="CloseBehaviorBox" Width="220" />
@@ -87,16 +77,13 @@
           <flourish:FlourishTextBlock x:Name="CloseStatusText" Margin="0,12,0,0" Role="Description" Text="No close guard registered by this page." />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Profile flyout" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Enable and open the profile surface or replace its content page at runtime. Restore returns to the startup profile page type."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Enable and open the profile surface or replace its content page at runtime. Restore returns to the startup profile page type."
+        ChunkTitle="Profile flyout"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
           <WrapPanel>
             <flourish:Button x:Name="ToggleProfileEnabledButton" Margin="0,0,8,0" Click="ToggleProfileEnabled_Click" />
@@ -107,16 +94,13 @@
           <flourish:FlourishTextBlock x:Name="ProfileStatusText" Margin="0,12,0,0" Role="Description" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Messages &amp; notifications" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Await modal choices without blocking application logic, or publish non-modal notifications to the shell host."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Await modal choices without blocking application logic, or publish non-modal notifications to the shell host."
+        ChunkTitle="Messages &amp; notifications"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
           <WrapPanel>
             <flourish:Button Margin="0,0,8,8" Click="ShowMessage_Click" Content="Show async message" />
@@ -146,7 +130,7 @@
           <flourish:FlourishTextBlock x:Name="NotificationStatusText" Margin="0,6,0,0" Role="Description" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
     </StackPanel>
   </flourish:FlourishScrollViewer>
 </Page>

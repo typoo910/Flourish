@@ -9,7 +9,7 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
     private readonly INavigationPageProvider pageProvider;
     private readonly PageHistoryService pageHistoryService;
     private readonly NavigationRouteRegistry routeRegistry;
-    private readonly object routeChangeGate = new();
+    private readonly Lock routeChangeGate = new();
     private INavigationContentHost? contentHost;
     private Dispatcher? dispatcher;
     private object? currentParameter;
@@ -205,7 +205,6 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
                 );
             }
 
-
             var sourcePageType = route.PageType;
 
             if (CurrentNavigationKey == navigationKey && Equals(currentParameter, parameter))
@@ -258,10 +257,7 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
             : new FlourishPageStackEntry(CurrentNavigationKey, currentParameter);
     }
 
-    private void RouteRegistry_Changed(
-        object? sender,
-        FlourishNavigationRoutesChangedEventArgs e
-    )
+    private void RouteRegistry_Changed(object? sender, FlourishNavigationRoutesChangedEventArgs e)
     {
         var historyChanged = false;
         lock (routeChangeGate)
@@ -285,8 +281,7 @@ internal sealed class NavigationService : INavigationService, IFrameNavigationSe
             }
 
             historyChanged =
-                staleHistoryKeys.Length > 0
-                || e.ChangeKind == FlourishRuntimeChangeKind.Removed;
+                staleHistoryKeys.Length > 0 || e.ChangeKind == FlourishRuntimeChangeKind.Removed;
         }
 
         if (historyChanged)

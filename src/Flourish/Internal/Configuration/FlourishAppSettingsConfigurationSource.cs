@@ -21,16 +21,15 @@ internal sealed class FlourishAppSettingsConfigurationProvider
         IDisposable
 {
     private readonly CancellationTokenSource disposal = new();
-    private readonly object reloadGate = new();
+    private readonly Lock reloadGate = new();
     private readonly FlourishAppSettingsConfigurationSource source;
     private readonly IDisposable? watchRegistration;
     private byte[]? lastContentHash;
     private int reloadGeneration;
     private bool isDisposed;
 
-    public FlourishAppSettingsConfigurationProvider(
-        FlourishAppSettingsConfigurationSource source
-    ) : base(source)
+    public FlourishAppSettingsConfigurationProvider(FlourishAppSettingsConfigurationSource source)
+        : base(source)
     {
         this.source = source;
         if (
@@ -99,10 +98,7 @@ internal sealed class FlourishAppSettingsConfigurationProvider
                 return false;
             }
 
-            var previous = new Dictionary<string, string?>(
-                Data,
-                StringComparer.OrdinalIgnoreCase
-            );
+            var previous = new Dictionary<string, string?>(Data, StringComparer.OrdinalIgnoreCase);
             using var stream = new MemoryStream(utf8Json, writable: false);
             base.Load(stream);
             lastContentHash = contentHash;
@@ -129,9 +125,7 @@ internal sealed class FlourishAppSettingsConfigurationProvider
             await Task.Delay(source.ReloadDelay, disposal.Token).ConfigureAwait(false);
             ReloadCurrentFile(generation);
         }
-        catch (OperationCanceledException) when (disposal.IsCancellationRequested)
-        {
-        }
+        catch (OperationCanceledException) when (disposal.IsCancellationRequested) { }
         catch (Exception error)
         {
             if (!HandleReloadException(error))
@@ -145,10 +139,7 @@ internal sealed class FlourishAppSettingsConfigurationProvider
     {
         lock (reloadGate)
         {
-            if (
-                isDisposed
-                || generation != Volatile.Read(ref reloadGeneration)
-            )
+            if (isDisposed || generation != Volatile.Read(ref reloadGeneration))
             {
                 return;
             }
@@ -203,11 +194,7 @@ internal sealed class FlourishAppSettingsConfigurationProvider
             return false;
         }
 
-        var context = new FileLoadExceptionContext
-        {
-            Provider = this,
-            Exception = error,
-        };
+        var context = new FileLoadExceptionContext { Provider = this, Exception = error };
         source.OnLoadException(context);
         return context.Ignore;
     }
@@ -220,10 +207,7 @@ internal sealed class FlourishAppSettingsConfigurationProvider
     private static bool ContentHashesMatch(byte[]? left, byte[] right)
     {
         return left is not null
-            && System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
-                left,
-                right
-            );
+            && System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(left, right);
     }
 
     private static bool ConfigurationDataMatches(

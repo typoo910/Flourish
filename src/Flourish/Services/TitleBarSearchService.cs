@@ -10,8 +10,11 @@ internal sealed class TitleBarSearchService(
     ILogger<TitleBarSearchService> logger
 ) : ITitleBarSearchService, IDisposable
 {
-    private readonly object gate = new();
-    private readonly Dictionary<Guid, Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>> handlers = [];
+    private readonly Lock gate = new();
+    private readonly Dictionary<
+        Guid,
+        Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>
+    > handlers = [];
     private CancellationTokenSource queryCancellation = new();
     private string text = string.Empty;
     private bool focusRequested;
@@ -141,7 +144,9 @@ internal sealed class TitleBarSearchService(
     }
 
     private async Task DispatchAsync(
-        IReadOnlyList<Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>> subscribers,
+        IReadOnlyList<
+            Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>
+        > subscribers,
         FlourishTitleBarSearchChangedEventArgs args,
         CancellationToken cancellationToken
     )

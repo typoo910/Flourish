@@ -7,20 +7,16 @@
 >
   <flourish:FlourishScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-      <flourish:FlourishTextBlock Role="PageTitle" Text="Toolbar, status and shell regions" />
-      <flourish:FlourishTextBlock Role="Subtitle"
-        Margin="{DynamicResource FlourishPageSubtitleMargin}"
-        Text="Every control below edits a live shell surface. Stable IDs make add, update, move, enable, hide and remove operations deterministic."
+      <flourish:Chunk
+        ChunkDescription="Every control below edits a live shell surface. Stable IDs make add, update, move, enable, hide and remove operations deterministic."
+        ChunkTitle="Toolbar, status and shell regions"
       />
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Dynamic toolbar" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Add an action for this page, then use the actual shell toolbar button above the page to execute the runtime command."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Add an action for this page, then use the actual shell toolbar button above the page to execute the runtime command."
+        ChunkTitle="Dynamic toolbar"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <WrapPanel>
               <flourish:Button Click="AddToolbarItem_Click" Content="Add / update action" />
@@ -34,16 +30,13 @@
             <flourish:FlourishTextBlock x:Name="CommandLogText" Margin="0,8,0,0" FontFamily="Consolas" Role="Status" Text="The toolbar command has not run yet." />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Status bar" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Update persistent and timed status items, shell indicators, and the visibility of the status bar itself."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Update persistent and timed status items, shell indicators, and the visibility of the status bar itself."
+        ChunkTitle="Status bar"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <WrapPanel>
               <StackPanel Margin="0,0,10,0">
@@ -64,16 +57,13 @@
             <flourish:FlourishTextBlock x:Name="StatusStateText" Margin="0,12,0,0" Role="Description" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
 
-      <StackPanel Margin="{DynamicResource FlourishSectionMargin}">
-        <flourish:FlourishTextBlock Role="SectionTitle" Text="Custom shell region" />
-        <flourish:FlourishTextBlock
-          Margin="{DynamicResource FlourishSectionDescriptionMargin}"
-          Role="Description"
-          Text="Register a WPF element in ContentHeader. The registration can be disabled, reordered, replaced or removed while the shell is visible."
-        />
-        <flourish:FlourishCard Margin="{DynamicResource FlourishSectionCardMargin}">
+      <flourish:Chunk
+        ChunkDescription="Register a WPF element in ContentHeader. The registration can be disabled, reordered, replaced or removed while the shell is visible."
+        ChunkTitle="Custom shell region"
+      >
+        <flourish:FlourishCard>
           <StackPanel>
             <WrapPanel>
               <flourish:Button Click="AddRegion_Click" Content="Add header content" />
@@ -84,7 +74,7 @@
             <flourish:FlourishTextBlock x:Name="RegionStateText" Margin="0,12,0,0" Role="Description" />
           </StackPanel>
         </flourish:FlourishCard>
-      </StackPanel>
+      </flourish:Chunk>
     </StackPanel>
   </flourish:FlourishScrollViewer>
 </Page>

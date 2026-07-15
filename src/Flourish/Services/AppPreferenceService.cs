@@ -12,51 +12,42 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, IDisposable
+internal sealed class AppPreferenceService(
+    IConfiguration configuration,
+    IHostEnvironment hostEnvironment,
+    ILogger<AppPreferenceService> logger
+) : IAppSettingsStore, IHostedService, IDisposable
 {
     private const string AppSettingsFileName = "appsettings.json";
     private const string ThemeConfigurationKey = "Flourish:Preferences:Theme";
-    private static readonly TimeSpan ThemeWriteCoalescingDelay =
-        TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan ThemeWriteCoalescingDelay = TimeSpan.FromMilliseconds(50);
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
     };
-    private readonly IConfiguration configuration;
-    private readonly FlourishAppSettingsConfigurationProvider? appSettingsProvider;
-    private readonly IHostEnvironment hostEnvironment;
-    private readonly ILogger<AppPreferenceService> logger;
+    private readonly IConfiguration configuration =
+        configuration ?? throw new ArgumentNullException(nameof(configuration));
+    private readonly FlourishAppSettingsConfigurationProvider? appSettingsProvider = (
+        configuration as IConfigurationRoot
+    )
+        ?.Providers.OfType<FlourishAppSettingsConfigurationProvider>()
+        .FirstOrDefault();
+    private readonly IHostEnvironment hostEnvironment =
+        hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
+    private readonly ILogger<AppPreferenceService> logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly AsyncLocal<bool> isEditorActive = new();
-    private readonly object lifecycleGate = new();
+    private readonly Lock lifecycleGate = new();
     private Channel<PreferenceWorkItem> workItems = CreateWorkItemChannel();
     private Task? workerTask;
     private Exception? lastThemePersistenceError;
     private bool isAcceptingWork = true;
     private bool isDisposed;
 
-    public AppPreferenceService(
-        IConfiguration configuration,
-        IHostEnvironment hostEnvironment,
-        ILogger<AppPreferenceService> logger
-    )
-    {
-        this.configuration = configuration
-            ?? throw new ArgumentNullException(nameof(configuration));
-        this.hostEnvironment = hostEnvironment
-            ?? throw new ArgumentNullException(nameof(hostEnvironment));
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        appSettingsProvider = (configuration as IConfigurationRoot)
-            ?.Providers.OfType<FlourishAppSettingsConfigurationProvider>()
-            .FirstOrDefault();
-    }
+    internal AppPreferenceService(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        : this(configuration, hostEnvironment, NullLogger<AppPreferenceService>.Instance) { }
 
-    internal AppPreferenceService(
-        IConfiguration configuration,
-        IHostEnvironment hostEnvironment
-    ) : this(configuration, hostEnvironment, NullLogger<AppPreferenceService>.Instance) { }
-
-    public string FilePath =>
-        Path.Combine(hostEnvironment.ContentRootPath, AppSettingsFileName);
+    public string FilePath => Path.Combine(hostEnvironment.ContentRootPath, AppSettingsFileName);
 
     public FlourishTheme? ReadTheme()
     {
@@ -94,9 +85,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         }
     }
 
-    internal async ValueTask FlushThemeSavesAsync(
-        CancellationToken cancellationToken = default
-    )
+    internal async ValueTask FlushThemeSavesAsync(CancellationToken cancellationToken = default)
     {
         var completion = new TaskCompletionSource<bool>(
             TaskCreationOptions.RunContinuationsAsynchronously
@@ -130,9 +119,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         lock (lifecycleGate)
         {
             ThrowIfNotAcceptingWork();
-            EnqueueCore(
-                new UpdatePreferenceWorkItem(update, cancellationToken, completion)
-            );
+            EnqueueCore(new UpdatePreferenceWorkItem(update, cancellationToken, completion));
         }
 
         return new ValueTask<AppSettingsUpdateResult>(completion.Task);
@@ -272,8 +259,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
                     await ProcessUpdateAsync(update).ConfigureAwait(false);
                     break;
                 case ThemePreferenceWorkItem theme:
-                    await ProcessThemeSaveAsync(reader, theme)
-                        .ConfigureAwait(false);
+                    await ProcessThemeSaveAsync(reader, theme).ConfigureAwait(false);
                     break;
                 case FlushThemePreferenceWorkItem flush:
                     if (lastThemePersistenceError is { } error)
@@ -331,11 +317,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         try
         {
             await ExecuteUpdateAsync(
-                    editor =>
-                        editor.Set(
-                            ThemeConfigurationKey,
-                            latestApplied.Theme.ToString()
-                        ),
+                    editor => editor.Set(ThemeConfigurationKey, latestApplied.Theme.ToString()),
                     CancellationToken.None
                 )
                 .ConfigureAwait(false);
@@ -362,15 +344,11 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
 
         try
         {
-            var result = await ExecuteUpdateAsync(
-                    workItem.Update,
-                    workItem.CancellationToken
-                )
+            var result = await ExecuteUpdateAsync(workItem.Update, workItem.CancellationToken)
                 .ConfigureAwait(false);
             workItem.Completion.TrySetResult(result);
         }
-        catch (OperationCanceledException)
-            when (workItem.CancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (workItem.CancellationToken.IsCancellationRequested)
         {
             workItem.Completion.TrySetCanceled(workItem.CancellationToken);
         }
@@ -418,9 +396,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         }
     }
 
-    private async ValueTask<JsonObject> ReadAppSettingsAsync(
-        CancellationToken cancellationToken
-    )
+    private async ValueTask<JsonObject> ReadAppSettingsAsync(CancellationToken cancellationToken)
     {
         if (!File.Exists(FilePath))
         {
@@ -439,15 +415,17 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
                     Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
                 }
             );
-            var node = await JsonNode.ParseAsync(
-                stream,
-                documentOptions: new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = true,
-                    CommentHandling = JsonCommentHandling.Skip,
-                },
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+            var node = await JsonNode
+                .ParseAsync(
+                    stream,
+                    documentOptions: new JsonDocumentOptions
+                    {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip,
+                    },
+                    cancellationToken: cancellationToken
+                )
+                .ConfigureAwait(false);
             return node as JsonObject
                 ?? throw new InvalidDataException(
                     $"{AppSettingsFileName} must contain a JSON object."
@@ -467,7 +445,8 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         CancellationToken cancellationToken
     )
     {
-        var directory = Path.GetDirectoryName(FilePath)
+        var directory =
+            Path.GetDirectoryName(FilePath)
             ?? throw new InvalidOperationException(
                 $"{AppSettingsFileName} has no parent directory."
             );
@@ -480,16 +459,18 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
 
         try
         {
-            await using (var stream = new FileStream(
-                temporaryPath,
-                new FileStreamOptions
-                {
-                    Mode = FileMode.CreateNew,
-                    Access = FileAccess.Write,
-                    Share = FileShare.None,
-                    Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
-                }
-            ))
+            await using (
+                var stream = new FileStream(
+                    temporaryPath,
+                    new FileStreamOptions
+                    {
+                        Mode = FileMode.CreateNew,
+                        Access = FileAccess.Write,
+                        Share = FileShare.None,
+                        Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
+                    }
+                )
+            )
             {
                 await stream.WriteAsync(content, cancellationToken).ConfigureAwait(false);
                 await stream.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -524,11 +505,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         return true;
     }
 
-    private void TryLogError(
-        Exception error,
-        string message,
-        params object?[] arguments
-    )
+    private void TryLogError(Exception error, string message, params object?[] arguments)
     {
         try
         {
@@ -560,15 +537,11 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         TaskCompletionSource<AppSettingsUpdateResult> Completion
     ) : PreferenceWorkItem;
 
-    private sealed record ThemePreferenceWorkItem(
-        FlourishTheme Theme,
-        Task<bool> RuntimeApplied
-    )
+    private sealed record ThemePreferenceWorkItem(FlourishTheme Theme, Task<bool> RuntimeApplied)
         : PreferenceWorkItem;
 
-    private sealed record FlushThemePreferenceWorkItem(
-        TaskCompletionSource<bool> Completion
-    ) : PreferenceWorkItem;
+    private sealed record FlushThemePreferenceWorkItem(TaskCompletionSource<bool> Completion)
+        : PreferenceWorkItem;
 
     private sealed class AppSettingsEditor(JsonObject root) : IAppSettingsEditor
     {
@@ -584,10 +557,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
             var propertyName = segments[^1];
             var existingName = FindPropertyName(parent, propertyName);
             var node = Serialize(value);
-            if (
-                existingName is not null
-                && JsonNode.DeepEquals(parent[existingName], node)
-            )
+            if (existingName is not null && JsonNode.DeepEquals(parent[existingName], node))
             {
                 return;
             }
@@ -618,7 +588,8 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
         public void Merge<T>(string path, T value)
         {
             EnsureActive();
-            var incoming = Serialize(value) as JsonObject
+            var incoming =
+                Serialize(value) as JsonObject
                 ?? throw new ArgumentException(
                     "A merged appsettings value must serialize to a JSON object.",
                     nameof(value)
@@ -636,7 +607,8 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
             }
             else
             {
-                target = parent[existingName] as JsonObject
+                target =
+                    parent[existingName] as JsonObject
                     ?? throw new InvalidDataException(
                         $"The {AppSettingsFileName} value '{path}' must be a JSON object."
                     );
@@ -660,7 +632,8 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
             }
             else
             {
-                target = parent[existingName] as JsonArray
+                target =
+                    parent[existingName] as JsonArray
                     ?? throw new InvalidDataException(
                         $"The {AppSettingsFileName} value '{path}' must be a JSON array."
                     );
@@ -715,7 +688,8 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
                     continue;
                 }
 
-                current = current[existingName] as JsonObject
+                current =
+                    current[existingName] as JsonObject
                     ?? throw new InvalidDataException(
                         $"The {AppSettingsFileName} value '{string.Join(':', segments[..(index + 1)])}' must be a JSON object."
                     );
@@ -724,11 +698,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
             return current;
         }
 
-        private static bool TryGetParent(
-            JsonObject root,
-            string[] segments,
-            out JsonObject parent
-        )
+        private static bool TryGetParent(JsonObject root, string[] segments, out JsonObject parent)
         {
             parent = root;
             for (var index = 0; index < segments.Length - 1; index++)
@@ -781,11 +751,7 @@ internal sealed class AppPreferenceService : IAppSettingsStore, IHostedService, 
             return parent
                 .Select(property => property.Key)
                 .FirstOrDefault(existingName =>
-                    string.Equals(
-                        existingName,
-                        propertyName,
-                        StringComparison.OrdinalIgnoreCase
-                    )
+                    string.Equals(existingName, propertyName, StringComparison.OrdinalIgnoreCase)
                 );
         }
     }

@@ -12,7 +12,20 @@ internal enum FlourishNavigationItemKind
     Command,
 }
 
-internal sealed class FlourishNavigationItem : INotifyPropertyChanged
+internal sealed class FlourishNavigationItem(
+    string key,
+    string label,
+    string? iconGlyph,
+    int groupId,
+    FlourishNavigationItemKind kind,
+    Type? pageType = null,
+    string? commandKey = null,
+    bool isInitial = false,
+    bool isFixed = false,
+    int parentId = 0,
+    int childId = 0,
+    string? id = null
+) : INotifyPropertyChanged
 {
     private bool isActiveChildParent;
     private bool isEnabled = true;
@@ -20,60 +33,31 @@ internal sealed class FlourishNavigationItem : INotifyPropertyChanged
     private bool isExplicitlyVisible = true;
     private bool isTreeVisible = true;
 
-    public FlourishNavigationItem(
-        string key,
-        string label,
-        string? iconGlyph,
-        int groupId,
-        FlourishNavigationItemKind kind,
-        Type? pageType = null,
-        string? commandKey = null,
-        bool isInitial = false,
-        bool isFixed = false,
-        int parentId = 0,
-        int childId = 0,
-        string? id = null
-    )
-    {
-        Id = string.IsNullOrWhiteSpace(id) ? key : id;
-        Key = key;
-        Label = label;
-        IconGlyph = iconGlyph ?? string.Empty;
-        GroupId = groupId;
-        Kind = kind;
-        PageType = pageType;
-        CommandKey = commandKey;
-        IsInitial = isInitial;
-        IsFixed = isFixed;
-        ParentId = parentId;
-        ChildId = childId;
-    }
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Id { get; }
+    public string Id { get; } = string.IsNullOrWhiteSpace(id) ? key : id;
 
-    public string Key { get; internal set; }
+    public string Key { get; internal set; } = key;
 
-    public string Label { get; internal set; }
+    public string Label { get; internal set; } = label;
 
-    public string IconGlyph { get; internal set; }
+    public string IconGlyph { get; internal set; } = iconGlyph ?? string.Empty;
 
-    public int GroupId { get; }
+    public int GroupId { get; } = groupId;
 
-    public FlourishNavigationItemKind Kind { get; }
+    public FlourishNavigationItemKind Kind { get; } = kind;
 
-    public Type? PageType { get; internal set; }
+    public Type? PageType { get; internal set; } = pageType;
 
-    public string? CommandKey { get; }
+    public string? CommandKey { get; } = commandKey;
 
-    public bool IsInitial { get; internal set; }
+    public bool IsInitial { get; internal set; } = isInitial;
 
-    public bool IsFixed { get; }
+    public bool IsFixed { get; } = isFixed;
 
-    public int ParentId { get; }
+    public int ParentId { get; } = parentId;
 
-    public int ChildId { get; }
+    public int ChildId { get; } = childId;
 
     public bool HasChildren { get; internal set; }
 

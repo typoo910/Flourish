@@ -17,7 +17,7 @@ internal sealed class TrayIconService(
     private const string DefaultIconUri =
         "pack://application:,,,/Flourish;component/Assets/favicon.ico";
 
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private Forms.NotifyIcon? notifyIcon;
     private Icon? icon;
     private Window? owner;
@@ -245,9 +245,7 @@ internal sealed class TrayIconService(
     {
         try
         {
-            if (
-                await windowCloseService.RequestCloseAsync(WindowCloseRequestReason.Tray)
-            )
+            if (await windowCloseService.RequestCloseAsync(WindowCloseRequestReason.Tray))
             {
                 return;
             }
@@ -376,10 +374,7 @@ internal sealed class TrayIconService(
         RaiseChanged();
     }
 
-    private void LocalizationService_Changed(
-        object? sender,
-        FlourishLocalizationChangedEventArgs e
-    )
+    private void LocalizationService_Changed(object? sender, FlourishLocalizationChangedEventArgs e)
     {
         InvokeOnOwner(() =>
         {

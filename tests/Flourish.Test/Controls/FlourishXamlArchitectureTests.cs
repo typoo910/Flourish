@@ -410,6 +410,77 @@ public sealed class FlourishXamlArchitectureTests
     }
 
     [Fact]
+    public void EveryGalleryPage_ComposesItsContentFromChunks()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = Directory
+            .EnumerateFiles(viewsRoot, "*.xaml", SearchOption.AllDirectories)
+            .Select(path => new { Path = path, Document = LoadXaml(path) })
+            .Where(item => item.Document.Root?.Name.LocalName == "Page")
+            .Where(item =>
+                !item.Document.Descendants().Any(element =>
+                    element.Name.LocalName is nameof(Chunk) or nameof(ChunkHero)
+                )
+            )
+            .Select(item => RelativePath(item.Path))
+            .ToArray();
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Every Gallery page must place its content in a Chunk or ChunkHero."
+        );
+    }
+
+    [Fact]
+    public void GalleryChunkHero_IsUniqueAndPrecedesRegularChunks()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            if (document.Root?.Name.LocalName != "Page")
+            {
+                continue;
+            }
+
+            var chunks = document
+                .Descendants()
+                .Where(element =>
+                    element.Name.LocalName is nameof(Chunk) or nameof(ChunkHero)
+                )
+                .ToArray();
+            var heroCount = chunks.Count(element =>
+                element.Name.LocalName == nameof(ChunkHero)
+            );
+
+            if (heroCount > 1)
+            {
+                violations.Add($"{RelativePath(path)} declares {heroCount} ChunkHero elements");
+            }
+            else if (
+                heroCount == 1
+                && chunks.FirstOrDefault()?.Name.LocalName != nameof(ChunkHero)
+            )
+            {
+                violations.Add($"{RelativePath(path)} places ChunkHero after a regular Chunk");
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "A Gallery page may have one leading ChunkHero only."
+        );
+    }
+
+    [Fact]
     public void ShellTypography_UsesRootPixelAlignmentAndWpfTextRenderingDefaults()
     {
         var shell = LoadXaml(

@@ -11,9 +11,9 @@ namespace ArkheideSystem.Flourish.Services;
 internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IHostedService
 {
     private const int DefaultMaxConcurrency = 3;
-    private readonly object gate = new();
-    private readonly object lifecycleGate = new();
-    private readonly object notificationGate = new();
+    private readonly Lock gate = new();
+    private readonly Lock lifecycleGate = new();
+    private readonly Lock notificationGate = new();
     private readonly ILogger<FlourishBackgroundTaskService> logger;
     private readonly Channel<BackgroundOperation> queue;
     private readonly Dictionary<Guid, BackgroundOperation> activeOperationsById = [];
@@ -32,9 +32,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
     public FlourishBackgroundTaskService()
         : this(NullLogger<FlourishBackgroundTaskService>.Instance, DefaultMaxConcurrency) { }
 
-    public FlourishBackgroundTaskService(
-        ILogger<FlourishBackgroundTaskService> logger
-    )
+    public FlourishBackgroundTaskService(ILogger<FlourishBackgroundTaskService> logger)
         : this(logger, DefaultMaxConcurrency) { }
 
     internal FlourishBackgroundTaskService(int maxConcurrency)
@@ -184,10 +182,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
 
         if (cancellationDispatch is not null)
         {
-            _ = CancelWithoutBlockingAsync(
-                operation.CancellationSource,
-                cancellationDispatch
-            );
+            _ = CancelWithoutBlockingAsync(operation.CancellationSource, cancellationDispatch);
         }
         else
         {
@@ -559,10 +554,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
         activeOperations.Remove(operation);
     }
 
-    private async Task StopCoreAsync(
-        BackgroundOperation[] operations,
-        Task workerDrainTask
-    )
+    private async Task StopCoreAsync(BackgroundOperation[] operations, Task workerDrainTask)
     {
         foreach (var operation in operations)
         {
@@ -574,9 +566,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
         lock (gate)
         {
             cancellationDispatchTasks = operations
-                .Select(operation =>
-                    operation.CancellationDispatchTask ?? Task.CompletedTask
-                )
+                .Select(operation => operation.CancellationDispatchTask ?? Task.CompletedTask)
                 .ToArray();
         }
 
@@ -585,9 +575,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
 
     private static TaskCompletionSource CreateCompletedSignal()
     {
-        var signal = new TaskCompletionSource(
-            TaskCreationOptions.RunContinuationsAsynchronously
-        );
+        var signal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         signal.TrySetResult();
         return signal;
     }
@@ -724,9 +712,9 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
         return new FlourishBackgroundTaskResult(completion.Info);
     }
 
-    private static async Task<FlourishBackgroundTaskResult<TResult>> ConvertCompletionAsync<TResult>(
-        Task<OperationCompletion> completionTask
-    )
+    private static async Task<
+        FlourishBackgroundTaskResult<TResult>
+    > ConvertCompletionAsync<TResult>(Task<OperationCompletion> completionTask)
     {
         var completion = await completionTask.ConfigureAwait(false);
         var value = completion.Value is null ? default : (TResult)completion.Value;
@@ -750,8 +738,7 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
         public TaskCompletionSource<OperationCompletion> Completion { get; } =
             new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        public FlourishBackgroundTaskState State { get; set; } =
-            FlourishBackgroundTaskState.Queued;
+        public FlourishBackgroundTaskState State { get; set; } = FlourishBackgroundTaskState.Queued;
 
         public double? Progress { get; set; }
 
@@ -780,8 +767,5 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
         }
     }
 
-    private sealed record OperationCompletion(
-        FlourishBackgroundTaskInfo Info,
-        object? Value
-    );
+    private sealed record OperationCompletion(FlourishBackgroundTaskInfo Info, object? Value);
 }

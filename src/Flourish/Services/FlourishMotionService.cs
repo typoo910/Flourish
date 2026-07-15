@@ -12,7 +12,7 @@ internal sealed class FlourishMotionService : IMotionService
 {
     private const string HoverRevealEnabledResourceKey = "FlourishHoverRevealEnabled";
     private const string HoverRevealDurationResourceKey = "FlourishHoverRevealDuration";
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly FlourishShellOptions options;
     private readonly Func<bool> isSystemAnimationEnabled;
     private Dispatcher? applicationDispatcher;
@@ -52,10 +52,7 @@ internal sealed class FlourishMotionService : IMotionService
         UpdateOptions(() => options.Motion.IsEnabled = enabled);
     }
 
-    public void SetPageTransition(
-        FlourishPageTransition transition,
-        TimeSpan? duration = null
-    )
+    public void SetPageTransition(FlourishPageTransition transition, TimeSpan? duration = null)
     {
         ValidateEnum(transition, nameof(transition));
         if (duration.HasValue)
@@ -199,10 +196,7 @@ internal sealed class FlourishMotionService : IMotionService
         ArgumentNullException.ThrowIfNull(controller);
         var settings = Current;
 
-        if (
-            !CanAnimateSettings(settings)
-            || settings.PageTransition == FlourishPageTransition.None
-        )
+        if (!CanAnimateSettings(settings) || settings.PageTransition == FlourishPageTransition.None)
         {
             controller.Cancel();
             return;
@@ -271,18 +265,11 @@ internal sealed class FlourishMotionService : IMotionService
         RaiseChanged(previous, current);
     }
 
-    private void RaiseChanged(
-        FlourishMotionSettings previous,
-        FlourishMotionSettings current
-    )
+    private void RaiseChanged(FlourishMotionSettings previous, FlourishMotionSettings current)
     {
         Changed?.Invoke(
             this,
-            new FlourishMotionChangedEventArgs(
-                previous,
-                current,
-                CanAnimateSettings(current)
-            )
+            new FlourishMotionChangedEventArgs(previous, current, CanAnimateSettings(current))
         );
     }
 
@@ -306,13 +293,9 @@ internal sealed class FlourishMotionService : IMotionService
             && (!settings.RespectSystemReducedMotion || isSystemAnimationEnabled());
     }
 
-    private void ApplyResources(
-        ResourceDictionary resources,
-        FlourishMotionSettings settings
-    )
+    private void ApplyResources(ResourceDictionary resources, FlourishMotionSettings settings)
     {
-        var isHoverRevealEnabled =
-            CanAnimateSettings(settings) && settings.IsHoverRevealEnabled;
+        var isHoverRevealEnabled = CanAnimateSettings(settings) && settings.IsHoverRevealEnabled;
         SetResource(
             resources,
             HoverRevealDurationResourceKey,
@@ -321,11 +304,7 @@ internal sealed class FlourishMotionService : IMotionService
         SetResource(resources, HoverRevealEnabledResourceKey, isHoverRevealEnabled);
     }
 
-    private static void SetResource(
-        ResourceDictionary resources,
-        string key,
-        object value
-    )
+    private static void SetResource(ResourceDictionary resources, string key, object value)
     {
         if (resources.Contains(key) && Equals(resources[key], value))
         {

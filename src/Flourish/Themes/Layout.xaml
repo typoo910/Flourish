@@ -27,7 +27,7 @@
   <sys:Double x:Key="FlourishSpaceXXLarge">40</sys:Double>
 
   <Thickness x:Key="FlourishContentBodyMargin">32,0,32,0</Thickness>
-  <Thickness x:Key="FlourishPageContentMargin">0,32,0,48</Thickness>
+  <Thickness x:Key="FlourishPageContentMargin">0,0,0,48</Thickness>
   <Thickness x:Key="FlourishPageSubtitleMargin">0,8,0,0</Thickness>
   <Thickness x:Key="FlourishSectionMargin">0,32,0,0</Thickness>
   <Thickness x:Key="FlourishSectionDescriptionMargin">0,6,0,0</Thickness>
@@ -36,4 +36,11 @@
   <Thickness x:Key="FlourishCardPadding">20</Thickness>
   <Thickness x:Key="FlourishHeroCardPadding">32</Thickness>
   <Thickness x:Key="FlourishInteractiveCardPadding">18</Thickness>
+  <Thickness x:Key="FlourishChunkMargin">0,32,0,0</Thickness>
+  <Thickness x:Key="FlourishChunkSpacing">0,12,0,0</Thickness>
+  <Thickness x:Key="FlourishChunkHeroMargin">0,32,0,0</Thickness>
+  <Thickness x:Key="FlourishChunkHeroPadding">40</Thickness>
+  <Thickness x:Key="FlourishChunkHeroDescriptionMargin">0,8,0,0</Thickness>
+  <Thickness x:Key="FlourishChunkHeroBodyMargin">0,20,0,0</Thickness>
+  <sys:Double x:Key="FlourishChunkHeroMinHeight">280</sys:Double>
 </ResourceDictionary>

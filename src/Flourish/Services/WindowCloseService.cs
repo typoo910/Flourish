@@ -3,12 +3,10 @@ using ArkheideSystem.Flourish.Internal.Configuration;
 
 namespace ArkheideSystem.Flourish.Services;
 
-internal sealed class WindowCloseService(
-    FlourishShellOptions options,
-    IServiceProvider services
-) : IWindowCloseService
+internal sealed class WindowCloseService(FlourishShellOptions options, IServiceProvider services)
+    : IWindowCloseService
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly Dictionary<string, GuardEntry> guards = new(StringComparer.Ordinal);
     private Func<WindowCloseRequestReason, CancellationToken, ValueTask<bool>>? requestClose;
     private WindowCloseBehavior behavior = options.IsTrayExitEnabled
@@ -30,7 +28,11 @@ internal sealed class WindowCloseService(
     {
         if (!Enum.IsDefined(behavior))
         {
-            throw new ArgumentOutOfRangeException(nameof(behavior), behavior, "Unknown close behavior.");
+            throw new ArgumentOutOfRangeException(
+                nameof(behavior),
+                behavior,
+                "Unknown close behavior."
+            );
         }
 
         lock (gate)
@@ -57,7 +59,9 @@ internal sealed class WindowCloseService(
         {
             if (!guards.TryAdd(id, new GuardEntry(id, order, guard)))
             {
-                throw new InvalidOperationException($"A close guard with ID '{id}' is already registered.");
+                throw new InvalidOperationException(
+                    $"A close guard with ID '{id}' is already registered."
+                );
             }
         }
 
@@ -72,7 +76,11 @@ internal sealed class WindowCloseService(
         cancellationToken.ThrowIfCancellationRequested();
         if (!Enum.IsDefined(reason))
         {
-            throw new ArgumentOutOfRangeException(nameof(reason), reason, "Unknown close request reason.");
+            throw new ArgumentOutOfRangeException(
+                nameof(reason),
+                reason,
+                "Unknown close request reason."
+            );
         }
 
         GuardEntry[] snapshot;
@@ -113,7 +121,11 @@ internal sealed class WindowCloseService(
         cancellationToken.ThrowIfCancellationRequested();
         if (!Enum.IsDefined(reason))
         {
-            throw new ArgumentOutOfRangeException(nameof(reason), reason, "Unknown close request reason.");
+            throw new ArgumentOutOfRangeException(
+                nameof(reason),
+                reason,
+                "Unknown close request reason."
+            );
         }
 
         if (!await CanCloseAsync(reason, cancellationToken).ConfigureAwait(false))
@@ -135,9 +147,7 @@ internal sealed class WindowCloseService(
         return await request(reason, cancellationToken).ConfigureAwait(false);
     }
 
-    internal void Attach(
-        Func<WindowCloseRequestReason, CancellationToken, ValueTask<bool>> request
-    )
+    internal void Attach(Func<WindowCloseRequestReason, CancellationToken, ValueTask<bool>> request)
     {
         ArgumentNullException.ThrowIfNull(request);
         lock (gate)
