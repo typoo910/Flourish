@@ -16,7 +16,7 @@ The Flourish button family consists of one general-purpose text button and three
 
 ## Button
 
-`Button.Variant` selects the button's Material Design 3 presentation and visual emphasis, not its size or layout. Its default is `Outlined`.
+`Button.Variant` selects the button's visual presentation and emphasis, not its size or layout. Its default is `Outlined`.
 
 | `ButtonVariant` | When to use it |
 | --- | --- |
@@ -56,9 +56,9 @@ The Flourish button family consists of one general-purpose text button and three
 </WrapPanel>
 ```
 
-An action group should normally have only one `Filled` button. Use `Danger` for destructive intent; it is a Flourish semantic extension to the five Material Design 3 emphasis variants. Let the containing layout control external placement, and do not use `Variant` to select structural dimensions.
+An action group should normally have only one `Filled` button. Use `Danger` for destructive intent; it is the destructive semantic option in Flourish's six-variant set. Let the containing layout control external placement, and do not use `Variant` to select structural dimensions.
 
-`Tonal` uses Fluent Web's `colorBrandBackground2` and `colorBrandForeground2` ramps in both themes. All non-danger variants share the inherited `HoverReveal.OverrideColor`; `Danger` is the only semantic color override. Elevated shadows are drawn on a background-only template layer so text remains ClearType-rendered.
+`Tonal` uses a palette inspired by Fluent Web's brand color ramp and tuned independently for each theme. All non-danger variants share the inherited `HoverReveal.OverrideColor`; `Danger` is the only semantic color override. Elevated shadows are drawn on a background-only template layer so text remains ClearType-rendered.
 
 ## IconButton
 

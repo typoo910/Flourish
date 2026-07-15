@@ -56,7 +56,7 @@
               <flourish:FlourishTextBlock Margin="0,12,0,5" Role="FieldLabel" Text="SEARCH BOX" />
               <flourish:FlourishSearchBox Placeholder="Search controls" />
 
-              <flourish:FlourishCheckBox Margin="0,14,0,0" Content="Use compact Fluent controls" IsChecked="True" />
+              <flourish:FlourishCheckBox Margin="0,14,0,0" Content="Use compact Flourish controls" IsChecked="True" />
 
               <flourish:FlourishTextBlock Margin="0,14,0,5" Role="FieldLabel" Text="RADIO BUTTON" />
               <StackPanel Orientation="Horizontal">

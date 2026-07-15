@@ -523,7 +523,7 @@ public sealed class FlourishControlStylesTests
     }
 
     [Fact]
-    public void ButtonVariants_ApplyFluentSurfacesAndBackgroundOnlyElevatedShadow()
+    public void ButtonVariants_ApplyFlourishSurfacesAndBackgroundOnlyElevatedShadow()
     {
         RunInSta(() =>
         {

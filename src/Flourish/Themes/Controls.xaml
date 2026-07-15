@@ -32,7 +32,7 @@
   <sys:Int32 x:Key="FlourishToolTipInitialShowDelay">200</sys:Int32>
   <sys:Double x:Key="FlourishToolTipSpawnableMargin">5</sys:Double>
 
-  <!-- Compact Fluent geometry with light borders and Material-style surface hierarchy. -->
+  <!-- Compact Flourish geometry with light borders and a layered surface hierarchy. -->
   <sys:Double x:Key="FlourishControlHeight">30</sys:Double>
   <sys:Double x:Key="FlourishControlMinWidth">64</sys:Double>
   <sys:Double x:Key="FlourishButtonHeight">32</sys:Double>

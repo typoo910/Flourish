@@ -20,7 +20,7 @@ public sealed class FlourishHoverRevealContractTests
         "src",
         "Flourish"
     );
-    private static readonly HashSet<string> FluentWebBrandRamp = new(
+    private static readonly HashSet<string> ApprovedBrandRamp = new(
         StringComparer.OrdinalIgnoreCase
     )
     {
@@ -229,10 +229,53 @@ public sealed class FlourishHoverRevealContractTests
         var pressedTrigger = FindTrigger(template, "IsPressed", "True");
         AssertSetter(pressedTrigger, "HoverChrome", "Opacity", "0");
         AssertSetter(pressedTrigger, "PressedChrome", "Opacity", "1");
+        Assert.DoesNotContain(
+            pressedTrigger.Descendants(),
+            element =>
+                element.Name.LocalName == "Setter"
+                && (string?)element.Attribute("TargetName") == "InteractionRoot"
+                && (string?)element.Attribute("Property") == "RenderTransform"
+        );
 
         var disabledTrigger = FindTrigger(template, "IsEnabled", "False");
         AssertSetter(disabledTrigger, "HoverChrome", "Visibility", "Collapsed");
         AssertSetter(disabledTrigger, "PressedChrome", "Visibility", "Collapsed");
+
+        foreach (
+            var (fileName, templateKey) in new[]
+            {
+                ("IconButton.xaml", "IconOnlyButtonTemplate"),
+                ("CardButton.xaml", "CardButtonTemplate"),
+                ("WindowCaptionButton.xaml", "WindowCaptionButtonTemplate"),
+            }
+        )
+        {
+            var familyDocument = LoadXaml(
+                Path.Combine(FlourishRoot, "Controls", fileName)
+            );
+            var familyTemplate = familyDocument
+                .Descendants()
+                .Single(element =>
+                    element.Name.LocalName == "ControlTemplate"
+                    && (string?)element.Attribute(XName.Get("Key", XamlNamespace))
+                        == templateKey
+                );
+            var familyPressedTrigger = FindTrigger(
+                familyTemplate,
+                "IsPressed",
+                "True"
+            );
+
+            Assert.DoesNotContain(
+                familyPressedTrigger.Descendants(),
+                element =>
+                    element.Name.LocalName == "Setter"
+                    && (string?)element.Attribute("TargetName")
+                        == "InteractionRoot"
+                    && (string?)element.Attribute("Property")
+                        == "RenderTransform"
+            );
+        }
     }
 
     [Fact]
@@ -488,7 +531,7 @@ public sealed class FlourishHoverRevealContractTests
         "#730F6CBD",
         "#33E37D83"
     )]
-    public void Palettes_UseBrighterFluentColorsWithADeeperPressedState(
+    public void Palettes_UseBrighterThemeColorsWithADeeperPressedState(
         string fileName,
         string expectedHover,
         string expectedSelected,
@@ -549,7 +592,7 @@ public sealed class FlourishHoverRevealContractTests
         "#061724",
         "#EBF3FC"
     )]
-    public void TonalButtonPalette_UsesFluentBrandBackground2Tokens(
+    public void TonalButtonPalette_UsesExpectedBrandInspiredTokens(
         string fileName,
         string expectedBackground,
         string expectedForeground,
@@ -575,7 +618,7 @@ public sealed class FlourishHoverRevealContractTests
     [Theory]
     [InlineData("Colors.Light.xaml")]
     [InlineData("Colors.Dark.xaml")]
-    public void InteractiveAccentColors_ComeFromTheFluentWebBrandRamp(
+    public void InteractiveAccentColors_ComeFromTheApprovedBrandRamp(
         string fileName
     )
     {
@@ -593,7 +636,7 @@ public sealed class FlourishHoverRevealContractTests
         )
         {
             var rgb = ParseColor(GetBrushColor(document, key)).Rgb;
-            Assert.Contains(ToHex(rgb), FluentWebBrandRamp);
+            Assert.Contains(ToHex(rgb), ApprovedBrandRamp);
         }
     }
 

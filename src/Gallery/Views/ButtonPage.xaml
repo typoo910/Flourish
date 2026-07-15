@@ -10,13 +10,13 @@
     VerticalScrollBarVisibility="Auto"
   >
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
-      <flourish:Chunk
-        ChunkDescription="Buttons use six Material Design 3 variants to express visual hierarchy and destructive intent. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
-        ChunkTitle="Button"
+      <flourish:ChunkHero
+        ChunkHeroDescription="Six variants express visual hierarchy and destructive intent. Dedicated derived controls add icon, card, and window-caption behavior without changing the common button contract."
+        ChunkHeroTitle="Button"
       />
 
       <flourish:Chunk
-        ChunkDescription="Button is the standard content action. Variant changes its Material Design 3 emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
+        ChunkDescription="Button is the standard content action. Variant changes its visual emphasis while Content, Command, IsEnabled, ToolTip, and sizing remain standard WPF button properties."
         ChunkTitle="Button and Variant"
       >
         <flourish:FlourishCard>
@@ -57,7 +57,7 @@
       </flourish:Chunk>
 
       <flourish:Chunk
-        ChunkDescription="IconButton derives from Button and adds Icon. Icon-only actions use compact 30 by 30 geometry by default, while icon-plus-label commands keep the ordinary Button geometry. Plain ToolTip content automatically uses FlourishToolTip."
+        ChunkDescription="IconButton derives from Button and adds Icon. Icon-only actions use compact 32 by 32 geometry by default, while icon-plus-label commands keep the ordinary Button geometry. Plain ToolTip content automatically uses FlourishToolTip."
         ChunkTitle="IconButton"
       >
         <flourish:FlourishCard>
