@@ -13,7 +13,7 @@
   >
     <StackPanel Margin="{DynamicResource FlourishPageContentMargin}">
       <flourish:ChunkHero
-        ChunkHeroDescription="Explore Card content, alignment, variants, and IconCard presenter layouts."
+        ChunkHeroDescription="Explore Card content, ListCard configuration rows, alignment, variants, and IconCard presenter layouts."
         ChunkHeroTitle="Card"
       />
 
@@ -95,6 +95,47 @@
             </flourish:Card.Body>
           </flourish:Card>
         </UniformGrid>
+      </flourish:Chunk>
+
+      <flourish:Chunk
+        ChunkDescription="Compose compact settings as vertically centered rows with Presenter on the left and Body on the right."
+        ChunkTitle="ListCard"
+      >
+        <StackPanel>
+          <flourish:ListCard
+            Presenter="&#xE790;"
+            Text="Choose a value and apply the selection immediately."
+            Title="Application theme"
+          >
+            <flourish:ListCard.Body>
+              <flourish:FlourishComboBox Width="160" SelectedIndex="0">
+                <flourish:FlourishComboBoxItem Content="System" />
+                <flourish:FlourishComboBoxItem Content="Light" />
+                <flourish:FlourishComboBoxItem Content="Dark" />
+              </flourish:FlourishComboBox>
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+          <flourish:ListCard
+            Margin="{DynamicResource FlourishPeerCardMargin}"
+            Presenter="&#xE838;"
+            Text="Use a local button when the row represents one explicit operation."
+            Title="Open configuration"
+          >
+            <flourish:ListCard.Body>
+              <flourish:Button Content="Open" />
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+          <flourish:ListCard
+            Margin="{DynamicResource FlourishPeerCardMargin}"
+            Presenter="&#xE8D2;"
+            Text="Text input is appropriate when a setting requires a free-form value."
+            Title="Configuration key"
+          >
+            <flourish:ListCard.Body>
+              <flourish:FlourishTextBox Width="200" Text="Flourish:Theme" />
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+        </StackPanel>
       </flourish:Chunk>
 
       <flourish:Chunk

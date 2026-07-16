@@ -137,6 +137,7 @@ public sealed class FlourishXamlArchitectureTests
             "Button.xaml",
             "Card.xaml",
             "IconButton.xaml",
+            "ListCard.xaml",
             "WindowCaptionButton.xaml",
         };
         var expectedSources = Directory
@@ -156,9 +157,15 @@ public sealed class FlourishXamlArchitectureTests
         );
 
         Assert.Equal(
-            ["Card.xaml"],
+            ["ListCard.xaml"],
             GetMergedDictionarySources(
                 LoadXaml(Path.Combine(controlsRoot, "IconCard.xaml"))
+            )
+        );
+        Assert.Equal(
+            ["Card.xaml"],
+            GetMergedDictionarySources(
+                LoadXaml(Path.Combine(controlsRoot, "ListCard.xaml"))
             )
         );
         Assert.Equal(
@@ -537,6 +544,272 @@ public sealed class FlourishXamlArchitectureTests
     }
 
     [Fact]
+    public void GalleryListCardColumns_StayPureAndUseTheFixedLayoutContract()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            if (document.Root?.Name.LocalName != "Page")
+            {
+                continue;
+            }
+
+            foreach (
+                var listCard in document.Descendants().Where(element =>
+                    element.Name.LocalName == nameof(ListCard)
+                )
+            )
+            {
+                string[] fixedProperties =
+                [
+                    nameof(Card.Variant),
+                    nameof(Card.ContentHorizontalAlignment),
+                    nameof(Card.ContentVerticalAlignment),
+                    nameof(IconCard.PresenterMode),
+                    nameof(IconCard.PresenterPosition),
+                ];
+                foreach (var property in fixedProperties)
+                {
+                    if (listCard.Attribute(property) is not null)
+                    {
+                        violations.Add(
+                            $"{FormatViolation(path, listCard)} sets fixed property {property}"
+                        );
+                    }
+                }
+            }
+
+            foreach (
+                var parent in document.Descendants().Where(element =>
+                    element.Name.LocalName == "StackPanel"
+                )
+            )
+            {
+                var directCards = parent
+                    .Elements()
+                    .Where(element =>
+                        element.Name.LocalName
+                            is nameof(Card) or nameof(IconCard) or nameof(ListCard)
+                    )
+                    .ToArray();
+                if (
+                    directCards.Any(element => element.Name.LocalName == nameof(ListCard))
+                    && directCards.Any(element => element.Name.LocalName != nameof(ListCard))
+                )
+                {
+                    violations.Add(
+                        $"{FormatViolation(path, parent)} mixes ListCard with another card type"
+                    );
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "ListCard columns must stay pure and must use their fixed Standard left-copy-right contract."
+        );
+    }
+
+    [Fact]
+    public void GalleryListCardBodies_ContainAtMostOneInteractiveControl()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var interactiveControlNames = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Button",
+            "IconButton",
+            "FlourishTextBox",
+            "FlourishPasswordBox",
+            "FlourishSearchBox",
+            "FlourishCheckBox",
+            "FlourishRadioButton",
+            "FlourishComboBox",
+            "TextBox",
+            "PasswordBox",
+            "CheckBox",
+            "RadioButton",
+            "ComboBox",
+        };
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var body in document.Descendants().Where(element =>
+                    element.Name.LocalName == "ListCard.Body"
+                )
+            )
+            {
+                var interactiveControls = body
+                    .Descendants()
+                    .Where(element => interactiveControlNames.Contains(element.Name.LocalName))
+                    .ToArray();
+                if (interactiveControls.Length > 1)
+                {
+                    violations.Add(
+                        $"{FormatViolation(path, body)} contains {interactiveControls.Length} interactive controls: "
+                            + string.Join(
+                                ", ",
+                                interactiveControls.Select(element => element.Name.LocalName)
+                            )
+                    );
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "ListCard.Body must contain at most one interactive control; split independent inputs and actions into separate rows."
+        );
+    }
+
+    [Fact]
+    public void GalleryListCards_DoNotAddApplyRows()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var listCard in document.Descendants().Where(element =>
+                    element.Name.LocalName == nameof(ListCard)
+                )
+            )
+            {
+                var title = (string?)listCard.Attribute(nameof(Card.Title)) ?? string.Empty;
+                var hasApplyHandler = listCard
+                    .Descendants()
+                    .Where(element => element.Name.LocalName == "Button")
+                    .Select(element => (string?)element.Attribute("Click"))
+                    .Any(handler =>
+                        handler?.StartsWith("Apply", StringComparison.OrdinalIgnoreCase)
+                        == true
+                    );
+                if (
+                    title.StartsWith("Apply", StringComparison.OrdinalIgnoreCase)
+                    || hasApplyHandler
+                )
+                {
+                    violations.Add(FormatViolation(path, listCard));
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "ListCard settings must apply as their value is committed; do not add a separate Apply row."
+        );
+    }
+
+    [Fact]
+    public void GalleryOutputAndResultCards_KeepDescriptionInBody()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var card in document.Descendants().Where(element =>
+                    element.Name.LocalName is nameof(Card) or nameof(IconCard)
+                )
+            )
+            {
+                var title = (string?)card.Attribute(nameof(Card.Title)) ?? string.Empty;
+                var isOutput = title.Contains("Output", StringComparison.OrdinalIgnoreCase)
+                    || title.Contains("Result", StringComparison.OrdinalIgnoreCase);
+                var text = (string?)card.Attribute(nameof(Card.Text));
+                if (isOutput && !string.IsNullOrWhiteSpace(text))
+                {
+                    violations.Add(FormatViolation(path, card));
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Output and Result cards should keep only their title in built-in copy; explanatory and result content belongs in Body."
+        );
+    }
+
+    [Fact]
+    public void GalleryTwoColumnSingleListCard_IsNotWrappedInAStackPanel()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var uniformGrid in document.Descendants().Where(element =>
+                    element.Name.LocalName == "UniformGrid"
+                        && (string?)element.Attribute("Columns") == "2"
+                )
+            )
+            {
+                foreach (
+                    var stack in uniformGrid.Elements().Where(element =>
+                        element.Name.LocalName == "StackPanel"
+                    )
+                )
+                {
+                    var listCards = stack
+                        .Elements()
+                        .Where(element => element.Name.LocalName == nameof(ListCard))
+                        .ToArray();
+                    if (listCards.Length == 1)
+                    {
+                        violations.Add(FormatViolation(path, stack));
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "A single ListCard must be a direct stretched column peer so its visible surface matches the Output or Result card height."
+        );
+    }
+
+    [Fact]
     public void GalleryCardBodies_DoNotCreateASecondCopyHierarchy()
     {
         var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
@@ -559,7 +832,10 @@ public sealed class FlourishXamlArchitectureTests
             var secondaryCopy = document
                 .Descendants()
                 .Where(element =>
-                    element.Name.LocalName is "Card.Body" or "IconCard.Body"
+                    element.Name.LocalName
+                        is "Card.Body"
+                            or "IconCard.Body"
+                            or "ListCard.Body"
                 )
                 .SelectMany(body => body.Descendants())
                 .Where(element => element.Name.LocalName == "FlourishTextBlock")
@@ -601,7 +877,10 @@ public sealed class FlourishXamlArchitectureTests
                 var body in document
                     .Descendants()
                     .Where(element =>
-                        element.Name.LocalName is "Card.Body" or "IconCard.Body"
+                        element.Name.LocalName
+                            is "Card.Body"
+                                or "IconCard.Body"
+                                or "ListCard.Body"
                     )
             )
             {

@@ -1,14 +1,14 @@
 ---
 title: Card
-description: Use Card and IconCard to group information on themed, non-interactive surfaces with optional body and presenter content.
+description: Use Card, ListCard, and IconCard for longer information, compact configuration rows, and visual presentation on themed, non-interactive surfaces.
 ---
 
 # Card
 
-`Card` is a non-interactive surface for grouping one subject's related information. It provides built-in title, supporting text, and body regions and adapts its colors to the active Flourish theme.
+`Card` is a non-interactive surface for grouping one subject's longer explanatory or display-oriented information. It provides built-in title, supporting text, and body regions and adapts its colors to the active Flourish theme. Use `ListCard` instead for a compact setting or local configuration action.
 
 > [!IMPORTANT]
-> Use `CardButton` when clicking anywhere on the surface performs one action. Do not add mouse handlers to `Card` or `IconCard` to reproduce button behavior.
+> Use `CardButton` when clicking anywhere on the surface performs one action. Do not add mouse handlers to `Card`, `ListCard`, or `IconCard` to reproduce button behavior.
 
 ## Basic usage
 
@@ -104,6 +104,67 @@ The built-in copy consists of `Title` and `Text`. `ContentHorizontalAlignment` a
 </flourish:Card>
 ```
 
+## Output and Result cards
+
+Use an `Output` Card for raw or ongoing output and a `Result` Card for a completed outcome. Prefer only `Title` on these cards. Omit `Text`, then put one concise Description-role text element followed by the output or status content in `Body`.
+
+```xml
+<flourish:Card Title="Result">
+  <flourish:Card.Body>
+    <StackPanel>
+      <flourish:FlourishTextBlock
+        Role="Description"
+        Text="The most recent synchronization result." />
+      <flourish:FlourishTextBlock
+        Margin="{DynamicResource FlourishCardBodySpacing}"
+        Role="Status"
+        Text="{Binding SynchronizationResult}" />
+    </StackPanel>
+  </flourish:Card.Body>
+</flourish:Card>
+```
+
+## ListCard
+
+`ListCard` inherits from `Card` and represents one compact, independent configuration option. The surface remains non-interactive while the local control in `Body` handles input or invocation. Reserve ordinary `Card` and `IconCard` surfaces for longer explanatory or display-oriented content.
+
+Its arrangement is fixed: an optional icon or image `Presenter` stays on the left with deliberately generous horizontal breathing room on both sides, `Title` and the short `Text` description form a vertical copy stack in the center, and `Body` stays on the right. Presenter, copy, and Body are all vertically centered. Do not collapse the presenter spacing with local margins; Card content-alignment properties do not reposition these regions.
+
+Keep `Title` and `Text` concise. Each is limited to one line and overflows with an ellipsis, so rewrite copy that would depend on wrapping. `Body` must contain exactly one interactive control; do not combine several inputs or actions in a panel inside one ListCard.
+
+```xml
+<flourish:ListCard
+  Title="Theme"
+  Text="Choose the appearance used by the application.">
+  <flourish:ListCard.Presenter>
+    <flourish:FlourishTextBlock
+      AutomationProperties.Name="Theme"
+      Role="Icon"
+      Text="&#xE790;" />
+  </flourish:ListCard.Presenter>
+  <flourish:ListCard.Body>
+    <flourish:FlourishComboBox
+      Width="160"
+      ItemsSource="{Binding Themes}"
+      SelectedItem="{Binding Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+  </flourish:ListCard.Body>
+</flourish:ListCard>
+```
+
+### ListCard properties
+
+| Property | Type | Default | Purpose |
+| --- | --- | --- | --- |
+| `Title` | `string` | `""` | Inherited concise, single-line setting heading; overflow uses an ellipsis. |
+| `Text` | `string` | `""` | Inherited concise, single-line description below the title; overflow uses an ellipsis. |
+| `Presenter` | `object?` | `null` | Optional icon, image, or other visual displayed on the left. |
+| `Body` | `object?` | `null` | Exactly one local interactive control displayed on the right. |
+| `Variant` | `Variant` | `Standard` | Inherited property that is always coerced to `Standard`; ListCard has no visual variants. |
+
+Stack related ListCards so every row fills its column, and use one row for one independent function. Do not mix `ListCard` with any other card type in that same column. Prefer a single-column `Chunk` containing only ListCards. When the section also needs output, another column in the same Chunk may hold a dedicated `Output` or `Result` Card; the complete ListCard column and adjacent Card must have the same overall height. A `UniformGrid` or another stretching parent can enforce this equality.
+
+Prefer `FlourishComboBox`, `FlourishCheckBox`, and `Button` in `Body`; use `FlourishTextBox` and `FlourishRadioButton` when the option requires them. Selections, toggles, and edits must apply immediately. Never add a separate Apply action to a ListCard.
+
 ## IconCard
 
 `IconCard` shares Card's title, text, body, alignment, and variant contract. Its `Presenter` can hold an icon, image, illustration, preview, or any other WPF visual content. It remains non-interactive.
@@ -172,4 +233,4 @@ In `Overlay` mode, `Presenter` fills the card while copy and `Body` are rendered
 - [Conception](../conception/index.md) defines how cards participate in a consistent page hierarchy.
 - [Chunk](chunk.md) explains how to place cards in page sections.
 - [Button](button.md) explains when an information surface should instead be an interactive `CardButton`.
-- The [Variant API](xref:ArkheideSystem.Flourish.Controls.Variant), [Card API](xref:ArkheideSystem.Flourish.Controls.Card), [IconCard API](xref:ArkheideSystem.Flourish.Controls.IconCard), [PresenterMode API](xref:ArkheideSystem.Flourish.Controls.PresenterMode), and [PresenterPosition API](xref:ArkheideSystem.Flourish.Controls.PresenterPosition) list all members.
+- The [Variant API](xref:ArkheideSystem.Flourish.Controls.Variant), [Card API](xref:ArkheideSystem.Flourish.Controls.Card), [ListCard API](xref:ArkheideSystem.Flourish.Controls.ListCard), [IconCard API](xref:ArkheideSystem.Flourish.Controls.IconCard), [PresenterMode API](xref:ArkheideSystem.Flourish.Controls.PresenterMode), and [PresenterPosition API](xref:ArkheideSystem.Flourish.Controls.PresenterPosition) list all members.

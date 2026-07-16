@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ArkheideSystem.Flourish.Abstract;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,7 @@ public partial class NavigationRuntimePage : Page
     private readonly INavigationRouteRegistry routes;
     private readonly INavigationService navigation;
     private readonly IPageCacheService cache;
+    private bool isRefreshing;
 
     public NavigationRuntimePage(
         INavigationPanelService panel,
@@ -67,7 +69,9 @@ public partial class NavigationRuntimePage : Page
 
     private void DirectionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (IsLoaded && DirectionBox.SelectedItem is NavigationPanelDirection direction)
+        if (!isRefreshing
+            && IsLoaded
+            && DirectionBox.SelectedItem is NavigationPanelDirection direction)
         {
             panel.SetDirection(direction);
         }
@@ -87,6 +91,27 @@ public partial class NavigationRuntimePage : Page
         catch (Exception error)
         {
             PanelStateText.Text = error.Message;
+        }
+    }
+
+    private void WidthBox_LostFocus(object sender, RoutedEventArgs e) => CommitWidths();
+
+    private void WidthBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        CommitWidths();
+        e.Handled = true;
+    }
+
+    private void CommitWidths()
+    {
+        if (IsLoaded && !isRefreshing)
+        {
+            ApplyWidths_Click(this, new RoutedEventArgs());
         }
     }
 
@@ -210,10 +235,13 @@ public partial class NavigationRuntimePage : Page
 
     private void RefreshState()
     {
-        var panelState = panel.Current;
-        DirectionBox.SelectedItem = panelState.Direction;
-        PanelStateText.Text =
-            $"Enabled: {panelState.IsEnabled}  |  Open: {panelState.IsOpen}  |  Side: {panelState.Direction}  |  Widths: {panelState.ClosedWidth:0}-{panelState.OpenWidth:0} ({panelState.MinWidth:0}-{panelState.MaxWidth:0})";
+        isRefreshing = true;
+        try
+        {
+            var panelState = panel.Current;
+            DirectionBox.SelectedItem = panelState.Direction;
+            PanelStateText.Text =
+                $"Enabled: {panelState.IsEnabled}  |  Open: {panelState.IsOpen}  |  Side: {panelState.Direction}  |  Widths: {panelState.ClosedWidth:0}-{panelState.OpenWidth:0} ({panelState.MinWidth:0}-{panelState.MaxWidth:0})";
 
         var routeInstalled = routes.Contains(RuntimeRouteKey);
         var menuItem = menu.Current.Groups.SelectMany(group => group.Items)
@@ -226,8 +254,13 @@ public partial class NavigationRuntimePage : Page
             typeof(RuntimeRoutePage),
             FlourishPageCacheMode.Disabled
         );
-        CacheStateText.Text =
-            $"Mode: {configuredMode}  |  Instance cached: {cacheState.CachedPageTypes.Contains(typeof(RuntimeRoutePage))}  |  Total cached types: {cacheState.CachedPageTypes.Count}";
+            CacheStateText.Text =
+                $"Mode: {configuredMode}  |  Instance cached: {cacheState.CachedPageTypes.Contains(typeof(RuntimeRoutePage))}  |  Total cached types: {cacheState.CachedPageTypes.Count}";
+        }
+        finally
+        {
+            isRefreshing = false;
+        }
     }
 
     private static double Parse(string value) =>

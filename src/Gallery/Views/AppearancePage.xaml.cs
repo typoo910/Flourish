@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Controls;
 
@@ -13,6 +14,7 @@ public partial class AppearancePage : Page
     private readonly IToolTipService toolTips;
     private readonly IMotionService motion;
     private readonly IMaterialEffectService material;
+    private bool isRefreshing;
 
     public AppearancePage(
         IThemeService theme,
@@ -72,6 +74,14 @@ public partial class AppearancePage : Page
         }
     }
 
+    private void ThemeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyTheme_Click(sender, new RoutedEventArgs());
+        }
+    }
+
     private void ToggleTheme_Click(object sender, RoutedEventArgs e)
     {
         Execute(theme.ToggleTheme, ThemeStatusText);
@@ -90,6 +100,19 @@ public partial class AppearancePage : Page
         );
     }
 
+    private void TypographyBox_LostFocus(object sender, RoutedEventArgs e) => CommitTypography();
+
+    private void TypographyBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitTypography);
+
+    private void CommitTypography()
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyFont_Click(this, new RoutedEventArgs());
+        }
+    }
+
     private void ApplyPageFontOverride_Click(object sender, RoutedEventArgs e)
     {
         Execute(
@@ -105,6 +128,20 @@ public partial class AppearancePage : Page
             },
             PageFontOverrideStatusText
         );
+    }
+
+    private void PageOverrideBox_LostFocus(object sender, RoutedEventArgs e) =>
+        CommitPageOverride();
+
+    private void PageOverrideBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitPageOverride);
+
+    private void CommitPageOverride()
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyPageFontOverride_Click(this, new RoutedEventArgs());
+        }
     }
 
     private void ClearPageFontOverride_Click(object sender, RoutedEventArgs e)
@@ -127,6 +164,19 @@ public partial class AppearancePage : Page
         );
     }
 
+    private void ToolTipBox_LostFocus(object sender, RoutedEventArgs e) => CommitToolTips();
+
+    private void ToolTipBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitToolTips);
+
+    private void CommitToolTips()
+    {
+        if (CanApplyImmediately)
+        {
+            ConfigureToolTip_Click(this, new RoutedEventArgs());
+        }
+    }
+
     private void ToggleToolTip_Click(object sender, RoutedEventArgs e)
     {
         Execute(() => toolTips.SetEnabled(!toolTips.Current.IsEnabled), ToolTipStatusText);
@@ -144,7 +194,6 @@ public partial class AppearancePage : Page
                     throw new InvalidOperationException("Select both transition modes.");
                 }
 
-                motion.SetEnabled(MotionEnabledBox.IsChecked == true);
                 motion.SetPageTransition(
                     pageTransition,
                     TimeSpan.FromMilliseconds(ParseDouble(PageDurationBox.Text, "page duration"))
@@ -155,28 +204,125 @@ public partial class AppearancePage : Page
                         ParseDouble(NavigationDurationBox.Text, "navigation duration")
                     )
                 );
-                motion.SetHoverReveal(HoverRevealBox.IsChecked == true);
-                motion.SetRespectSystemReducedMotion(ReducedMotionBox.IsChecked == true);
             },
             MotionStatusText
         );
     }
 
-    private void ApplyMaterial_Click(object sender, RoutedEventArgs e)
+    private void MotionDurationBox_LostFocus(object sender, RoutedEventArgs e) =>
+        CommitMotionDurations();
+
+    private void MotionDurationBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitMotionDurations);
+
+    private void CommitMotionDurations()
     {
+        if (CanApplyImmediately)
+        {
+            ApplyMotion_Click(this, new RoutedEventArgs());
+        }
+    }
+
+    private void PageTransitionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!CanApplyImmediately || PageTransitionBox.SelectedItem is not FlourishPageTransition transition)
+        {
+            return;
+        }
+
+        Execute(
+            () => motion.SetPageTransition(transition, motion.Current.PageTransitionDuration),
+            MotionStatusText
+        );
+    }
+
+    private void NavigationTransitionBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e
+    )
+    {
+        if (!CanApplyImmediately
+            || NavigationTransitionBox.SelectedItem
+                is not FlourishNavigationPanelTransition transition)
+        {
+            return;
+        }
+
         Execute(
             () =>
-            {
-                if (MaterialBox.SelectedItem is not MaterialEffect effect)
-                {
-                    throw new InvalidOperationException("Select a material effect.");
-                }
-
-                material.SetEffect(effect);
-                material.SetDarkMode(MaterialDarkModeBox.IsChecked == true);
-            },
-            MaterialStatusText
+                motion.SetNavigationPanelTransition(
+                    transition,
+                    motion.Current.NavigationPanelTransitionDuration
+                ),
+            MotionStatusText
         );
+    }
+
+    private void MotionEnabledBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            Execute(
+                () => motion.SetEnabled(MotionEnabledBox.IsChecked == true),
+                MotionStatusText
+            );
+        }
+    }
+
+    private void HoverRevealBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            Execute(
+                () => motion.SetHoverReveal(HoverRevealBox.IsChecked == true),
+                MotionStatusText
+            );
+        }
+    }
+
+    private void ReducedMotionBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            Execute(
+                () => motion.SetRespectSystemReducedMotion(ReducedMotionBox.IsChecked == true),
+                MotionStatusText
+            );
+        }
+    }
+
+    private void MaterialBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!CanApplyImmediately || MaterialBox.SelectedItem is not MaterialEffect effect)
+        {
+            return;
+        }
+
+        Execute(() => material.SetEffect(effect), MaterialStatusText);
+    }
+
+    private void MaterialDarkModeBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            Execute(
+                () => material.SetDarkMode(MaterialDarkModeBox.IsChecked == true),
+                MaterialStatusText
+            );
+        }
+    }
+
+    private bool CanApplyImmediately => IsLoaded && !isRefreshing;
+
+    private static void CommitOnEnter(KeyEventArgs e, Action commit)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        commit();
+        e.Handled = true;
     }
 
     private void Execute(Action action, FlourishTextBlock status)
@@ -194,9 +340,12 @@ public partial class AppearancePage : Page
 
     private void RefreshAll()
     {
-        ThemeBox.SelectedItem = theme.CurrentTheme;
-        ThemeStatusText.Text =
-            $"Requested: {theme.CurrentTheme}  |  Effective: {theme.EffectiveTheme}  |  Dark: {theme.IsDark}";
+        isRefreshing = true;
+        try
+        {
+            ThemeBox.SelectedItem = theme.CurrentTheme;
+            ThemeStatusText.Text =
+                $"Requested: {theme.CurrentTheme}  |  Effective: {theme.EffectiveTheme}  |  Dark: {theme.IsDark}";
 
         FontFamilyBox.Text = font.FontFamily;
         FontSizeBox.Text = font.FontSize.ToString("0.##", CultureInfo.CurrentCulture);
@@ -255,8 +404,13 @@ public partial class AppearancePage : Page
 
         MaterialBox.SelectedItem = material.CurrentEffect;
         MaterialDarkModeBox.IsChecked = material.IsDarkMode;
-        MaterialStatusText.Text =
-            $"Requested: {material.CurrentEffect}  |  Supported: {material.IsSupported(material.CurrentEffect)}  |  Applied: {material.IsApplied}";
+            MaterialStatusText.Text =
+                $"Requested: {material.CurrentEffect}  |  Supported: {material.IsSupported(material.CurrentEffect)}  |  Applied: {material.IsApplied}";
+        }
+        finally
+        {
+            isRefreshing = false;
+        }
     }
 
     private static double ParseDouble(string text, string name)

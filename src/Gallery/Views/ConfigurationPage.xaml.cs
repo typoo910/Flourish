@@ -14,6 +14,7 @@ public partial class ConfigurationPage : Page
     private readonly IFlourishConfiguration configuration;
     private readonly IAppSettingsStore settings;
     private readonly IFlourishLocalization localization;
+    private bool isRefreshingLocale;
     public ConfigurationPage(
         IFlourishConfiguration configuration,
         IAppSettingsStore settings,
@@ -122,6 +123,21 @@ public partial class ConfigurationPage : Page
         }
     }
 
+    private void LocaleBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+        ApplySelectedLocale();
+
+    private void LocaleBox_LostFocus(object sender, RoutedEventArgs e) => ApplySelectedLocale();
+
+    private void ApplySelectedLocale()
+    {
+        if (!IsLoaded || isRefreshingLocale || string.IsNullOrWhiteSpace(LocaleBox.Text))
+        {
+            return;
+        }
+
+        ApplyLocale_Click(LocaleBox, new RoutedEventArgs());
+    }
+
     private void RegisterLocaleFile_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -215,18 +231,26 @@ public partial class ConfigurationPage : Page
 
     private void RefreshLocaleState()
     {
-        var locales = localization.AvailableLocales;
-        if (!availableLocales.SequenceEqual(locales, StringComparer.OrdinalIgnoreCase))
+        isRefreshingLocale = true;
+        try
         {
-            availableLocales.Clear();
-            foreach (var locale in locales)
+            var locales = localization.AvailableLocales;
+            if (!availableLocales.SequenceEqual(locales, StringComparer.OrdinalIgnoreCase))
             {
-                availableLocales.Add(locale);
+                availableLocales.Clear();
+                foreach (var locale in locales)
+                {
+                    availableLocales.Add(locale);
+                }
             }
-        }
 
-        LocaleBox.Text = localization.CurrentLocale;
-        LocaleStatusText.Text = $"Current locale: {localization.CurrentLocale}";
+            LocaleBox.Text = localization.CurrentLocale;
+            LocaleStatusText.Text = $"Current locale: {localization.CurrentLocale}";
+        }
+        finally
+        {
+            isRefreshingLocale = false;
+        }
     }
 
     private void RefreshSnapshotState()

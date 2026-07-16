@@ -50,10 +50,7 @@ public interface IFlourishShellBuilder
     /// The finite, positive maximum width of navigated page content in device-independent pixels.
     /// </param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishShellBuilder UseCenterContent(
-        bool enabled = true,
-        double contentWidth = 1200
-    );
+    IFlourishShellBuilder UseCenterContent(bool enabled = true, double contentWidth = 1200);
 
     /// <summary>
     /// Enables or disables the dynamic toolbar surface.
@@ -81,9 +78,7 @@ public interface IFlourishShellBuilder
     /// </summary>
     /// <param name="effect">The material effect applied to the shell window.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishShellBuilder UseMaterialEffect(
-        MaterialEffect effect = MaterialEffect.Mica
-    );
+    IFlourishShellBuilder UseMaterialEffect(MaterialEffect effect = MaterialEffect.Mica);
 
     /// <summary>
     /// Configures the primary, secondary, and accent colors used by Flourish theme resources.
@@ -116,10 +111,7 @@ public interface IFlourishShellBuilder
     /// The page-specific base font size, or <see langword="null"/> to continue following the global size.
     /// </param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishShellBuilder SetOverrideFont<TPage>(
-        string fontFamily,
-        double? fontSize = null
-    )
+    IFlourishShellBuilder SetOverrideFont<TPage>(string fontFamily, double? fontSize = null)
         where TPage : Page;
 
     /// <summary>

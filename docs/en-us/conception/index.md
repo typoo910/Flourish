@@ -31,7 +31,7 @@ Use the three `Chunk` regions deliberately:
 </flourish:Chunk>
 ```
 
-Keep detailed content in a `Card` through its `Title`, `Text`, and `Body`. A plain `TextBlock` is appropriate when the information is continuous prose and a surface would add no meaningful grouping, but it must still live inside `ChunkBody`. Do not turn `ChunkDescription` into a paragraph or use several descriptions to avoid structuring the body.
+Keep detailed content in the appropriate Card-family surface through its `Title`, `Text`, and `Body`. A plain `TextBlock` is appropriate when the information is continuous prose and a surface would add no meaningful grouping, but it must still live inside `ChunkBody`. Do not turn `ChunkDescription` into a paragraph or use several descriptions to avoid structuring the body.
 
 ## Assign one subject or behavior to each surface
 
@@ -41,13 +41,20 @@ Choose the surface by semantics:
 
 | Control | Meaning |
 | --- | --- |
-| `Card` | A non-interactive information surface. Buttons, links, or inputs may appear in its `Body`, but the card surface itself does not invoke an action. |
+| `Card` | A non-interactive surface for longer explanatory or display-oriented information. Buttons, links, or inputs may appear in its `Body`, but the card surface itself does not invoke an action. |
+| `ListCard` | A compact, non-interactive configuration row for one independent setting. Its `Body` contains the local control; the row itself does not invoke an action. |
 | `CardButton` | One action represented by the entire card. Use it for navigation, selection, or another single invocation. Do not place independent interactive controls inside it. |
-| `IconCard` | A non-interactive card whose icon, image, illustration, or preview is part of the information. `Presenter` provides visual context; it does not make the card clickable. |
+| `IconCard` | A non-interactive card whose icon, image, illustration, or preview is part of longer explanatory or display-oriented information. `Presenter` provides visual context; it does not make the card clickable. |
 
-Give each card exactly one `Title` and one subject. Treat `Text` as the card's Description region and place all supporting explanatory copy there. Do not add another heading or explanatory paragraph inside `Body`. Necessary field labels, option labels, list data, and result values may remain in `Body` because they label or constitute the content rather than create a second copy hierarchy.
+Give each ordinary card exactly one `Title` and one subject. Treat `Text` as the ordinary card's Description region and place all supporting explanatory copy there. Do not add another heading or explanatory paragraph inside its `Body`. Necessary field labels, option labels, list data, and result values may remain in `Body` because they label or constitute the content rather than create a second copy hierarchy.
 
-If one card would require several subjects or headings, split it into peer cards. When an action produces changing response text, keep the action in its own card and place an adjacent `Output` card for ongoing or raw output, or a `Result` card for a completed outcome. Both cards belong in the same full-width chunk.
+If one card would require several subjects or headings, split it into peer surfaces. When an action produces changing response text, keep the action in its own surface and place an adjacent `Output` Card for ongoing or raw output, or a `Result` Card for a completed outcome. Prefer only `Title` on Output and Result Cards: omit `Text`, then place one concise Description-role text element followed by the output or status content in `Body`. Both surfaces belong in the same full-width chunk.
+
+Use one `ListCard` for each independent configuration option and let every row fill its column. Do not mix `ListCard` with any other card type in that column. Prefer a single-column chunk containing only ListCards. When the section also needs display output, the same chunk may use another column for a dedicated `Output` or `Result` Card.
+
+Keep both `ListCard.Title` and `ListCard.Text` concise. Each is limited to one line and overflows with an ellipsis; rewrite copy that would depend on wrapping. The presenter region retains deliberately generous horizontal breathing room on both sides, so do not collapse it with local margins. Put exactly one interactive control in each `ListCard.Body`; do not group several inputs or actions in one row.
+
+Prefer `FlourishComboBox`, `FlourishCheckBox`, and `Button` in `ListCard.Body`; use `FlourishTextBox` and `FlourishRadioButton` when the option requires them. Selections, toggles, and edits must apply immediately. Never add a separate Apply action to a ListCard.
 
 ## Use Variant as semantic hierarchy
 
@@ -62,6 +69,8 @@ If one card would require several subjects or headings, split it into peer cards
 
 Button variants describe action hierarchy separately. An action group normally has one `Filled` primary action, supporting actions use lower-emphasis variants, and destructive actions use `Danger`. Do not use a card variant to imply clickability, and do not use a button variant to solve external layout or sizing.
 
+`ListCard` inherits from `Card`, but its compact configuration semantics require the `Standard` variant. The control coerces `Variant` to `Standard`; do not use a ListCard where tonal, filled, or elevated emphasis is needed.
+
 ## Respect themes and color roles
 
 Use Flourish theme resources through `DynamicResource` when a local override is necessary. Avoid hard-coded colors chosen for only one theme. A `Filled` card may override `Background`, but the replacement must preserve readable foreground, border, disabled, and focus states in both light and dark themes.
@@ -72,9 +81,11 @@ Color must reinforce meaning rather than carry it alone. Pair status color with 
 
 The parent `Grid`, `StackPanel`, or other layout container controls where a control sits on the page. A control's content-alignment properties organize its internal copy and body. Do not use `Variant`, presenter position, or repeated local margins to perform the parent's layout work.
 
-Cards in the same row must have the same height. When cards wrap onto several rows, use the same spacing between rows as between columns. Prefer a shared spacing resource or a layout container that enforces one consistent gap instead of unrelated per-card margins.
+Cards in the same row must have the same height. A two-column ListCard-plus-Output/Result composition must give the complete ListCard column and the adjacent Card the same overall height. When cards wrap onto several rows, use the same spacing between rows as between columns. Prefer a shared spacing resource or a layout container that enforces one consistent gap instead of unrelated per-card margins.
 
 For `Card`, the normal arrangement places the copy above `Body`. `ContentVerticalAlignment="Bottom"` reverses that order, and setting both content alignments to `Center` centers the copy-and-body composition as one unit.
+
+For `ListCard`, the layout is fixed: the optional `Presenter` stays on the left with wider horizontal breathing room, the vertically stacked title and short description occupy the center, and `Body` stays on the right. The presenter, copy, and Body are all vertically centered. Card alignment properties do not reposition these regions.
 
 For `IconCard` in `Split` mode, `PresenterPosition` always names the presenter's location; the copy and `Body` stay together on the opposing side. `Top` and `Bottom` positions arrange the copy and body horizontally in that opposing region. The other split positions arrange them vertically. In `Overlay` mode, the presenter fills the surface, `PresenterPosition` is ignored, and the copy/body composition returns to the card-style vertical arrangement.
 
@@ -84,6 +95,7 @@ The same presenter-centered language applies to `ChunkHero`: `PresenterPosition=
 
 - Preserve a clear heading hierarchy. Concise, distinct `ChunkTitle` and card `Title` values make the page easier to scan visually and through assistive technology.
 - Do not communicate state or action through color, position, or an icon alone. Supply visible text or an equivalent accessible name.
+- Give a meaningful ListCard presenter an accessible name when the adjacent title does not already describe it, and keep Body focus after the row's copy in reading order.
 - Give every icon-only `IconButton` a useful `AutomationProperties.Name` and a visible tooltip. The name must describe the action, not the glyph.
 - Use `CardButton` only when the complete surface is one action so its focus and invocation semantics match its visual boundary.
 - Keep keyboard focus order consistent with visual and reading order. Splitting independent behaviors into separate cards usually makes this automatic.
@@ -95,16 +107,20 @@ Before considering a page complete, verify that:
 
 1. Every ordinary page section is a full-width `Chunk`, with at most one leading `ChunkHero` and no side-by-side chunks.
 2. Every `ChunkTitle` is concise and every `ChunkDescription` is no more than one short purpose sentence.
-3. Every card has one title and keeps all explanatory copy in its `Text` Description region.
-4. Independent subjects or behaviors are split into independent cards, and changing output uses an adjacent Output or Result card.
-5. Cards in the same row have the same height, and row and column gaps use the same spacing.
-6. Non-interactive, whole-card action, and visual-presenter cases use `Card`, `CardButton`, and `IconCard` respectively.
-7. Variants retain the same semantic meaning across pages.
-8. Theme overrides work in light and dark modes and do not make color the only carrier of meaning.
-9. Internal alignment, presenter position, reading order, and keyboard order agree.
+3. Every ordinary card has one title and keeps all explanatory copy in its `Text` Description region.
+4. Independent subjects or behaviors are split into independent surfaces; Output and Result Cards normally keep only `Title` and place their description and output in `Body`.
+5. Compact settings use one Standard `ListCard` per option; Card and IconCard remain reserved for longer copy or display content.
+6. Every ListCard keeps Presenter left and Body right with all regions vertically centered, preserves generous presenter spacing, and shares its column with no other card type.
+7. Every ListCard Title and Text is concise and single-line with ellipsis overflow, and its Body contains exactly one interactive control.
+8. ListCard selections, toggles, and edits apply immediately, with no separate Apply action.
+9. Cards in the same row have the same height; ListCard-plus-Output/Result columns also have the same overall height, and row and column gaps use the same spacing.
+10. Non-interactive information, compact configuration, whole-card action, and visual-presenter cases use `Card`, `ListCard`, `CardButton`, and `IconCard` respectively.
+11. Variants retain the same semantic meaning across pages, and ListCard remains Standard.
+12. Theme overrides work in light and dark modes and do not make color the only carrier of meaning.
+13. Internal alignment, presenter position, reading order, and keyboard order agree.
 
 ## Related content
 
 - [Chunk](../controls/chunk.md) documents the page-section controls and their properties.
-- [Card](../controls/card.md) documents card variants, `Body`, and presenter arrangements.
+- [Card](../controls/card.md) documents Card, ListCard, and IconCard semantics, variants, `Body`, and presenter arrangements.
 - [Button](../controls/button.md) documents action hierarchy and specialized button controls.

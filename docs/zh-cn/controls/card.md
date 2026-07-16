@@ -1,14 +1,14 @@
 ---
 title: Card
-description: 使用 Card 与 IconCard 在适配主题的非交互式表面上组织信息，并按需加入 Body 与视觉展示内容。
+description: 使用 Card、ListCard 与 IconCard，在适配主题的非交互式表面上承载较长信息、紧凑配置行与视觉展示内容。
 ---
 
 # Card
 
-`Card` 是用于组织单一主题相关信息的非交互式表面。它内置标题、辅助文本和 Body 区域，并会随当前 Flourish 主题调整颜色。
+`Card` 是用于组织单一主题下较长说明或展示型信息的非交互式表面。它内置标题、辅助文本和 Body 区域，并会随当前 Flourish 主题调整颜色。紧凑设置或局部配置操作应改用 `ListCard`。
 
 > [!IMPORTANT]
-> 如果点击表面任意位置都会执行同一个操作，请改用 `CardButton`。不要给 `Card` 或 `IconCard` 添加鼠标事件来模拟按钮行为。
+> 如果点击表面任意位置都会执行同一个操作，请改用 `CardButton`。不要给 `Card`、`ListCard` 或 `IconCard` 添加鼠标事件来模拟按钮行为。
 
 ## 基本用法
 
@@ -104,6 +104,67 @@ description: 使用 Card 与 IconCard 在适配主题的非交互式表面上组
 </flourish:Card>
 ```
 
+## Output 与 Result 卡片
+
+使用 `Output` Card 承载原始或持续输出，使用 `Result` Card 展示完成结果。这类卡片推荐只保留 `Title`。省略 `Text`，然后在 `Body` 中先放一个简洁的 Description 角色文本，再放输出或状态内容。
+
+```xml
+<flourish:Card Title="结果">
+  <flourish:Card.Body>
+    <StackPanel>
+      <flourish:FlourishTextBlock
+        Role="Description"
+        Text="最近一次同步结果。" />
+      <flourish:FlourishTextBlock
+        Margin="{DynamicResource FlourishCardBodySpacing}"
+        Role="Status"
+        Text="{Binding SynchronizationResult}" />
+    </StackPanel>
+  </flourish:Card.Body>
+</flourish:Card>
+```
+
+## ListCard
+
+`ListCard` 继承自 `Card`，表示一个紧凑且独立的配置项。表面本身仍然非交互，本地输入或调用由 `Body` 中的控件处理。普通 `Card` 与 `IconCard` 应保留给较长说明或展示型内容。
+
+它使用固定排列：可选的图标或图片 `Presenter` 始终在左侧，并在左右两侧保留刻意加宽的水平留白；`Title` 与简短的 `Text` 说明在中间纵向排列，`Body` 始终在右侧。Presenter、文字区与 Body 都纵向居中。不要用局部 Margin 压缩 Presenter 留白；Card 的内容对齐属性不会改变这些区域的位置。
+
+`Title` 与 `Text` 都必须简洁。两者各自最多一行，溢出时显示省略号；不要依赖换行，应重新精简过长文案。`Body` 必须且只能放一个交互控件；不要在一个 ListCard 内用面板组合多个输入或操作。
+
+```xml
+<flourish:ListCard
+  Title="主题"
+  Text="选择应用使用的外观。">
+  <flourish:ListCard.Presenter>
+    <flourish:FlourishTextBlock
+      AutomationProperties.Name="主题"
+      Role="Icon"
+      Text="&#xE790;" />
+  </flourish:ListCard.Presenter>
+  <flourish:ListCard.Body>
+    <flourish:FlourishComboBox
+      Width="160"
+      ItemsSource="{Binding Themes}"
+      SelectedItem="{Binding Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+  </flourish:ListCard.Body>
+</flourish:ListCard>
+```
+
+### ListCard 属性
+
+| 属性 | 类型 | 默认值 | 用途 |
+| --- | --- | --- | --- |
+| `Title` | `string` | `""` | 从 Card 继承的简洁单行设置项标题；溢出使用省略号。 |
+| `Text` | `string` | `""` | 从 Card 继承、显示在标题下方的简洁单行说明；溢出使用省略号。 |
+| `Presenter` | `object?` | `null` | 显示在左侧的可选图标、图片或其他视觉内容。 |
+| `Body` | `object?` | `null` | 显示在右侧且只能有一个的局部交互控件。 |
+| `Variant` | `Variant` | `Standard` | 从 Card 继承但始终被强制转换为 `Standard`；ListCard 没有视觉变种。 |
+
+将相关 ListCard 纵向堆叠且让每一行铺满所在列，一行只承载一个独立功能。同一列中不能混用 `ListCard` 与任何其他卡片类型。每个 `Chunk` 优先采用仅含 ListCard 的单列布局。章节还需要输出时，同一 Chunk 可以增加另一列专门放置 `Output` 或 `Result` Card；完整 ListCard 列与相邻 Card 的整体高度必须一致，可以使用 `UniformGrid` 或其他拉伸父布局强制等高。
+
+`Body` 优先使用 `FlourishComboBox`、`FlourishCheckBox` 与 `Button`；选项确有需要时再使用 `FlourishTextBox` 与 `FlourishRadioButton`。选择、开关与编辑必须立即应用，ListCard 中绝不增加独立的 Apply 操作。
+
 ## IconCard
 
 `IconCard` 与 Card 具有相同的标题、文本、Body、对齐和变种约定。它的 `Presenter` 可以承载图标、图片、插图、预览或其他任意 WPF 视觉内容；控件仍然是非交互式表面。
@@ -172,4 +233,4 @@ description: 使用 Card 与 IconCard 在适配主题的非交互式表面上组
 - [理念](../conception/index.md) 定义卡片如何参与一致的页面层级。
 - [Chunk](chunk.md) 说明如何将卡片放入页面章节。
 - [Button](button.md) 说明何时应当将信息表面改为可交互的 `CardButton`。
-- [Variant API](xref:ArkheideSystem.Flourish.Controls.Variant)、[Card API](xref:ArkheideSystem.Flourish.Controls.Card)、[IconCard API](xref:ArkheideSystem.Flourish.Controls.IconCard)、[PresenterMode API](xref:ArkheideSystem.Flourish.Controls.PresenterMode) 与 [PresenterPosition API](xref:ArkheideSystem.Flourish.Controls.PresenterPosition) 列出完整成员。
+- [Variant API](xref:ArkheideSystem.Flourish.Controls.Variant)、[Card API](xref:ArkheideSystem.Flourish.Controls.Card)、[ListCard API](xref:ArkheideSystem.Flourish.Controls.ListCard)、[IconCard API](xref:ArkheideSystem.Flourish.Controls.IconCard)、[PresenterMode API](xref:ArkheideSystem.Flourish.Controls.PresenterMode) 与 [PresenterPosition API](xref:ArkheideSystem.Flourish.Controls.PresenterPosition) 列出完整成员。

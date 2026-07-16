@@ -16,38 +16,69 @@
         ChunkDescription="Register and invoke a command handler."
         ChunkTitle="Runtime command registration"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-            Margin="0,0,8,0"
-            Title="Command handler"
-            Text="The demo waits briefly, increments an execution counter, and returns a value through CommandResult."
-          >
-            <flourish:Card.Body>
-              <StackPanel>
-                <Grid>
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                  </Grid.ColumnDefinitions>
-                  <StackPanel Margin="0,0,8,0">
-                    <flourish:FlourishTextBlock Role="FieldLabel" Text="Command key" />
-                    <flourish:FlourishTextBox x:Name="CommandKeyBox" Text="gallery.runtime.greet" />
-                  </StackPanel>
-                  <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                    <flourish:FlourishTextBlock Role="FieldLabel" Text="Dispatch parameter" />
-                    <flourish:FlourishTextBox x:Name="CommandParameterBox" Text="Flourish user" />
-                  </StackPanel>
-                </Grid>
-                <WrapPanel Margin="0,14,0,0">
-                  <flourish:Button Margin="0,0,8,0" Click="RegisterCommand_Click" Content="Register / replace" />
-                  <flourish:Button Margin="0,0,8,0" Click="ExecuteCommand_Click" Content="Execute async" />
-                  <flourish:Button Margin="0,0,8,0" Click="RemoveCommand_Click" Content="Remove command" />
-                  <flourish:FlourishCheckBox x:Name="CommandEnabledBox" Margin="12,0,8,0" VerticalAlignment="Center" IsChecked="True" Content="Can execute" />
-                </WrapPanel>
-              </StackPanel>
-            </flourish:Card.Body>
-          </flourish:Card>
-          <flourish:Card Margin="8,0,0,0" Title="Result" Text="Shows registration and dispatch results.">
+        <UniformGrid VerticalAlignment="Stretch" Columns="2">
+          <StackPanel Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE71B;"
+              Title="Command key"
+              Text="Identify the handler registered in the runtime command registry."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="CommandKeyBox" Width="220" Text="gallery.runtime.greet" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8D2;"
+              Title="Dispatch parameter"
+              Text="Provide the value passed to the demo handler."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="CommandParameterBox" Width="220" Text="Flourish user" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE74E;"
+              Title="Command availability"
+              Text="Choose whether the registered handler can execute."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishCheckBox x:Name="CommandEnabledBox" VerticalAlignment="Center" IsChecked="True" Content="Can execute" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE710;"
+              Title="Register command"
+              Text="Register the handler or replace its existing definition."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="RegisterCommand_Click" Content="Register / replace" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE72A;"
+              Title="Execute command"
+              Text="Dispatch the registered handler asynchronously."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="ExecuteCommand_Click" Content="Execute async" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Presenter="&#xE74D;"
+              Title="Remove command"
+              Text="Delete the handler from the runtime registry."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="RemoveCommand_Click" Content="Remove command" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
+          <flourish:Card Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Result">
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="CommandResultText" Role="Status" Text="Register the demo command to begin." />
             </flourish:Card.Body>
@@ -59,21 +90,39 @@
         ChunkDescription="Bind and invoke a runtime shortcut."
         ChunkTitle="Keyboard shortcut"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-            Margin="0,0,8,0"
-            Title="Ctrl+Shift+G"
-            Text="The shell resolves the shortcut globally, while the local button invokes the same API directly."
-          >
-            <flourish:Card.Body>
-              <WrapPanel>
-                <flourish:Button Margin="0,0,8,0" Click="RegisterShortcut_Click" Content="Register Ctrl+Shift+G" />
-                <flourish:Button Margin="0,0,8,0" Click="ExecuteShortcut_Click" Content="Dispatch shortcut" />
+        <UniformGrid VerticalAlignment="Stretch" Columns="2">
+          <StackPanel Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE710;"
+              Title="Register Ctrl+Shift+G"
+              Text="Bind the global shortcut to the runtime command."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="RegisterShortcut_Click" Content="Register Ctrl+Shift+G" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE72A;"
+              Title="Dispatch shortcut"
+              Text="Invoke the same command API from this page."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="ExecuteShortcut_Click" Content="Dispatch shortcut" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Presenter="&#xE74D;"
+              Title="Remove shortcut"
+              Text="Unregister the global Ctrl+Shift+G binding."
+            >
+              <flourish:ListCard.Body>
                 <flourish:Button Click="RemoveShortcut_Click" Content="Remove shortcut" />
-              </WrapPanel>
-            </flourish:Card.Body>
-          </flourish:Card>
-          <flourish:Card Margin="8,0,0,0" Title="Result" Text="Shows the active shortcut state.">
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
+          <flourish:Card Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Result">
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="ShortcutResultText" Role="Status" Text="No shortcut registered by this page." />
             </flourish:Card.Body>

@@ -16,26 +16,62 @@
         ChunkDescription="Submit several forms of runtime work."
         ChunkTitle="Queue runtime work"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-            Margin="0,0,8,0"
-            Title="Task controls"
-            Text="Progress tasks report updates, result tasks return a value, and a burst demonstrates bounded concurrency."
-          >
-            <flourish:Card.Body>
-              <WrapPanel>
-                <flourish:Button Margin="0,0,8,8" Click="AddProgressTask_Click" Content="Add progress task" />
-                <flourish:Button Margin="0,0,8,8" Click="AddResultTask_Click" Content="Add result task" />
-                <flourish:Button Margin="0,0,8,8" Click="AddBurst_Click" Content="Queue 4 tasks" />
-                <flourish:Button Margin="0,0,8,8" Click="CancelLast_Click" Content="Cancel last" />
-                <flourish:Button Margin="0,0,8,8" Click="CancelSelected_Click" Content="Cancel selected" />
-              </WrapPanel>
-            </flourish:Card.Body>
-          </flourish:Card>
+        <UniformGrid VerticalAlignment="Stretch" Columns="2">
+          <StackPanel Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Presenter="&#xE768;"
+              Text="Queue work that reports progress while it runs."
+              Title="Progress task"
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="AddProgressTask_Click" Content="Add task" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Presenter="&#xE8F1;"
+              Text="Queue work that returns a captured value."
+              Title="Result task"
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="AddResultTask_Click" Content="Add task" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Presenter="&#xE8FD;"
+              Text="Queue four tasks to demonstrate bounded concurrency."
+              Title="Task burst"
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="AddBurst_Click" Content="Queue 4 tasks" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Presenter="&#xE711;"
+              Text="Cancel the most recently submitted task."
+              Title="Last task"
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="CancelLast_Click" Content="Cancel last" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Presenter="&#xE74D;"
+              Text="Cancel the task selected in the live task list."
+              Title="Selected task"
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="CancelSelected_Click" Content="Cancel selected" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
           <flourish:Card
             Margin="8,0,0,0"
+            VerticalAlignment="Stretch"
             Title="Output"
-            Text="Shows the latest queue or cancellation response."
           >
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="ServiceStatusText" Role="Status" />
@@ -48,9 +84,10 @@
         ChunkDescription="Compare active tasks with their captured outcomes."
         ChunkTitle="Task state"
       >
-        <UniformGrid Columns="2">
+        <UniformGrid VerticalAlignment="Stretch" Columns="2">
           <flourish:Card
             Margin="0,0,8,0"
+            VerticalAlignment="Stretch"
             Title="Live tasks"
             Text="Queued, running, and cancelling items update through TasksChanged."
           >
@@ -60,6 +97,7 @@
           </flourish:Card>
           <flourish:Card
             Margin="8,0,0,0"
+            VerticalAlignment="Stretch"
             Title="Recent outcomes"
             Text="Completion never faults; failures and cancellation are represented in the result object."
           >

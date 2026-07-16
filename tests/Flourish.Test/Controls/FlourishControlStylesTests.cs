@@ -34,6 +34,7 @@ public sealed class FlourishControlStylesTests
             "/Flourish;component/Controls/ChunkHero.xaml",
             "/Flourish;component/Controls/Card.xaml",
             "/Flourish;component/Controls/IconCard.xaml",
+            "/Flourish;component/Controls/ListCard.xaml",
             "/Flourish;component/Controls/CheckBox.xaml",
             "/Flourish;component/Controls/ComboBox.xaml",
             "/Flourish;component/Controls/ComboBoxItem.xaml",
@@ -213,6 +214,7 @@ public sealed class FlourishControlStylesTests
                 },
                 new Card { Title = "Card", Text = "Description" },
                 new IconCard { Title = "Icon card", Presenter = "Icon" },
+                new ListCard { Title = "List card", Presenter = "Icon" },
                 new FlourishCheckBox { Content = "Check" },
                 comboBox,
                 new FlourishComboBoxItem { Content = "Choice" },
@@ -881,6 +883,102 @@ public sealed class FlourishControlStylesTests
                     AssertTemplatePart<ContentPresenter>(emptyBody, "BodyHost")
                         .Visibility
                 );
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void ListCard_FixesStandardLeftCopyRightLayoutAndCollapsesEmptyRegions()
+    {
+        RunInSta(() =>
+        {
+            var presenterContent = new Border { Width = 24, Height = 24 };
+            var bodyContent = new FlourishComboBox
+            {
+                Width = 160,
+                ItemsSource = new[] { "System", "Light", "Dark" },
+                SelectedIndex = 0,
+            };
+            var card = new ListCard
+            {
+                Width = 520,
+                Presenter = presenterContent,
+                Title = "Theme",
+                Text = "Choose the application color theme.",
+                Body = bodyContent,
+                Variant = Variant.Filled,
+                ContentHorizontalAlignment = HorizontalAlignment.Right,
+                ContentVerticalAlignment = VerticalAlignment.Bottom,
+            };
+            var empty = new ListCard { Width = 520, Title = "Presenterless" };
+            var window = CreateWindow(
+                new StackPanel { Children = { card, empty } }
+            );
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                card.ApplyTemplate();
+                empty.ApplyTemplate();
+
+                Assert.Equal(Variant.Standard, card.Variant);
+                Assert.Equal(HorizontalAlignment.Stretch, card.ContentHorizontalAlignment);
+                Assert.Equal(VerticalAlignment.Center, card.ContentVerticalAlignment);
+                Assert.Equal(new Thickness(16, 12, 16, 12), card.Padding);
+                Assert.Equal(72, card.MinHeight);
+                Assert.Same(
+                    card.TryFindResource("FlourishCardBackgroundBrush"),
+                    card.Background
+                );
+
+                var surface = AssertTemplatePart<Border>(card, "SurfaceChrome");
+                Assert.Equal(new CornerRadius(8), surface.CornerRadius);
+
+                var presenter = AssertTemplatePart<ContentPresenter>(
+                    card,
+                    "PresenterHost"
+                );
+                var copy = AssertTemplatePart<StackPanel>(card, "CopyHost");
+                var body = AssertTemplatePart<ContentPresenter>(card, "BodyHost");
+                Assert.Equal(0, Grid.GetColumn(presenter));
+                Assert.Equal(1, Grid.GetColumn(copy));
+                Assert.Equal(2, Grid.GetColumn(body));
+                Assert.Equal(VerticalAlignment.Center, presenter.VerticalAlignment);
+                Assert.Equal(VerticalAlignment.Center, copy.VerticalAlignment);
+                Assert.Equal(VerticalAlignment.Center, body.VerticalAlignment);
+                Assert.Equal(new Thickness(8, 0, 24, 0), presenter.Margin);
+                Assert.Same(presenterContent, presenter.Content);
+                Assert.Same(bodyContent, body.Content);
+                var title = AssertTemplatePart<FlourishTextBlock>(card, "TitleHost");
+                var description = AssertTemplatePart<FlourishTextBlock>(
+                    card,
+                    "TextHost"
+                );
+                Assert.Equal(TextWrapping.NoWrap, title.TextWrapping);
+                Assert.Equal(TextWrapping.NoWrap, description.TextWrapping);
+                Assert.Equal(TextTrimming.CharacterEllipsis, title.TextTrimming);
+                Assert.Equal(
+                    TextTrimming.CharacterEllipsis,
+                    description.TextTrimming
+                );
+
+                var emptyPresenter = AssertTemplatePart<ContentPresenter>(
+                    empty,
+                    "PresenterHost"
+                );
+                var emptyBody = AssertTemplatePart<ContentPresenter>(
+                    empty,
+                    "BodyHost"
+                );
+                Assert.Equal(Visibility.Collapsed, emptyPresenter.Visibility);
+                Assert.Equal(new Thickness(), emptyPresenter.Margin);
+                Assert.Equal(Visibility.Collapsed, emptyBody.Visibility);
+                Assert.Equal(new Thickness(), emptyBody.Margin);
             }
             finally
             {

@@ -4,7 +4,7 @@
   xmlns:controls="clr-namespace:ArkheideSystem.Flourish.Controls"
 >
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="Card.xaml" />
+    <ResourceDictionary Source="ListCard.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <ControlTemplate x:Key="IconCardTemplate" TargetType="{x:Type controls:IconCard}">

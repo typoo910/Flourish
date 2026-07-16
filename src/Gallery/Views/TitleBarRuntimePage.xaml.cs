@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Controls;
 
@@ -11,6 +12,7 @@ public partial class TitleBarRuntimePage : Page
     private readonly ITitleBarSearchService search;
     private readonly IShellFeatureService shellFeatures;
     private IDisposable? searchSubscription;
+    private bool isRefreshing;
 
     public TitleBarRuntimePage(
         ITitleBarService titleBar,
@@ -90,6 +92,19 @@ public partial class TitleBarRuntimePage : Page
         );
     }
 
+    private void IdentityBox_LostFocus(object sender, RoutedEventArgs e) => CommitIdentity();
+
+    private void IdentityBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitIdentity);
+
+    private void CommitIdentity()
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyIdentity_Click(this, new RoutedEventArgs());
+        }
+    }
+
     private void ApplyLogo_Click(object sender, RoutedEventArgs e)
     {
         Execute(
@@ -100,6 +115,18 @@ public partial class TitleBarRuntimePage : Page
                 ),
             IdentityStatusText
         );
+    }
+
+    private void LogoBox_LostFocus(object sender, RoutedEventArgs e) => CommitLogo();
+
+    private void LogoBox_KeyDown(object sender, KeyEventArgs e) => CommitOnEnter(e, CommitLogo);
+
+    private void CommitLogo()
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyLogo_Click(this, new RoutedEventArgs());
+        }
     }
 
     private void TitleBarElementBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -118,6 +145,14 @@ public partial class TitleBarRuntimePage : Page
         }
     }
 
+    private void TitleBarElementVisibleBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyElementVisibility_Click(sender, new RoutedEventArgs());
+        }
+    }
+
     private void ApplyBreadcrumbMode_Click(object sender, RoutedEventArgs e)
     {
         if (BreadcrumbModeBox.SelectedItem is BreadcrumbShowOption mode)
@@ -126,9 +161,30 @@ public partial class TitleBarRuntimePage : Page
         }
     }
 
+    private void BreadcrumbModeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyBreadcrumbMode_Click(sender, new RoutedEventArgs());
+        }
+    }
+
     private void SetSearchText_Click(object sender, RoutedEventArgs e)
     {
         Execute(() => search.SetText(SearchTextBox.Text), SearchStatusText);
+    }
+
+    private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e) => CommitSearchText();
+
+    private void SearchTextBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitSearchText);
+
+    private void CommitSearchText()
+    {
+        if (CanApplyImmediately)
+        {
+            SetSearchText_Click(this, new RoutedEventArgs());
+        }
     }
 
     private void FocusSearch_Click(object sender, RoutedEventArgs e)
@@ -144,6 +200,20 @@ public partial class TitleBarRuntimePage : Page
     private void ApplySearchPlaceholder_Click(object sender, RoutedEventArgs e)
     {
         Execute(() => search.SetPlaceholder(SearchPlaceholderBox.Text), SearchStatusText);
+    }
+
+    private void SearchPlaceholderBox_LostFocus(object sender, RoutedEventArgs e) =>
+        CommitSearchPlaceholder();
+
+    private void SearchPlaceholderBox_KeyDown(object sender, KeyEventArgs e) =>
+        CommitOnEnter(e, CommitSearchPlaceholder);
+
+    private void CommitSearchPlaceholder()
+    {
+        if (CanApplyImmediately)
+        {
+            ApplySearchPlaceholder_Click(this, new RoutedEventArgs());
+        }
     }
 
     private void ToggleSearchVisibility_Click(object sender, RoutedEventArgs e)
@@ -167,6 +237,27 @@ public partial class TitleBarRuntimePage : Page
         }
     }
 
+    private void ShellFeatureEnabledBox_Changed(object sender, RoutedEventArgs e)
+    {
+        if (CanApplyImmediately)
+        {
+            ApplyShellFeature_Click(sender, new RoutedEventArgs());
+        }
+    }
+
+    private bool CanApplyImmediately => IsLoaded && !isRefreshing;
+
+    private static void CommitOnEnter(KeyEventArgs e, Action commit)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        commit();
+        e.Handled = true;
+    }
+
     private void Execute(Action action, FlourishTextBlock status)
     {
         try
@@ -182,17 +273,25 @@ public partial class TitleBarRuntimePage : Page
 
     private void RefreshState()
     {
-        var current = titleBar.Current;
-        TitleBox.Text = current.Title;
-        SubtitleBox.Text = current.Subtitle;
-        LogoPathBox.Text = current.LogoPath ?? string.Empty;
-        LogoFallbackBox.Text = current.LogoFallbackText;
-        BreadcrumbModeBox.SelectedItem = current.BreadcrumbMode;
-        IdentityStatusText.Text =
-            $"Title: {current.Title}  |  Subtitle visible: {current.IsSubtitleVisible}  |  Logo visible: {current.IsLogoVisible}";
-        RefreshSelectedElementState();
-        RefreshSearchState();
-        RefreshShellFeatureState();
+        isRefreshing = true;
+        try
+        {
+            var current = titleBar.Current;
+            TitleBox.Text = current.Title;
+            SubtitleBox.Text = current.Subtitle;
+            LogoPathBox.Text = current.LogoPath ?? string.Empty;
+            LogoFallbackBox.Text = current.LogoFallbackText;
+            BreadcrumbModeBox.SelectedItem = current.BreadcrumbMode;
+            IdentityStatusText.Text =
+                $"Title: {current.Title}  |  Subtitle visible: {current.IsSubtitleVisible}  |  Logo visible: {current.IsLogoVisible}";
+            RefreshSelectedElementState();
+            RefreshSearchState();
+            RefreshShellFeatureState();
+        }
+        finally
+        {
+            isRefreshing = false;
+        }
     }
 
     private void RefreshSearchState()
@@ -207,7 +306,19 @@ public partial class TitleBarRuntimePage : Page
     {
         if (TitleBarElementBox.SelectedItem is TitleBarElement element)
         {
-            TitleBarElementVisibleBox.IsChecked = IsTitleBarElementVisible(titleBar.Current, element);
+            var wasRefreshing = isRefreshing;
+            isRefreshing = true;
+            try
+            {
+                TitleBarElementVisibleBox.IsChecked = IsTitleBarElementVisible(
+                    titleBar.Current,
+                    element
+                );
+            }
+            finally
+            {
+                isRefreshing = wasRefreshing;
+            }
         }
     }
 
@@ -215,10 +326,19 @@ public partial class TitleBarRuntimePage : Page
     {
         if (ShellFeatureBox.SelectedItem is ShellFeature feature)
         {
-            var enabled = shellFeatures.Current.IsEnabled(feature);
-            ShellFeatureEnabledBox.IsChecked = enabled;
-            ShellFeatureStatusText.Text =
-                $"{feature}: {(enabled ? "enabled" : "disabled")}  |  State version: {shellFeatures.Current.Version}";
+            var wasRefreshing = isRefreshing;
+            isRefreshing = true;
+            try
+            {
+                var enabled = shellFeatures.Current.IsEnabled(feature);
+                ShellFeatureEnabledBox.IsChecked = enabled;
+                ShellFeatureStatusText.Text =
+                    $"{feature}: {(enabled ? "enabled" : "disabled")}  |  State version: {shellFeatures.Current.Version}";
+            }
+            finally
+            {
+                isRefreshing = wasRefreshing;
+            }
         }
     }
 

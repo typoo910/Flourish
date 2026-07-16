@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Controls;
 
@@ -18,6 +19,8 @@ public partial class WindowRuntimePage : Page
     private readonly Type startupProfilePageType;
     private IWindowCloseGuardRegistration? closeGuard;
     private FlourishNotificationHandle? notificationHandle;
+    private bool closeGuardAllows = true;
+    private bool isRefreshingTrayToolTip;
 
     public WindowRuntimePage(
         IWindowService window,
@@ -113,8 +116,36 @@ public partial class WindowRuntimePage : Page
     private void ToggleTray_Click(object sender, RoutedEventArgs e) =>
         Execute(() => tray.SetEnabled(!tray.Current.IsEnabled), TrayStatusText);
 
-    private void ApplyTrayToolTip_Click(object sender, RoutedEventArgs e) =>
+    private void TrayToolTipBox_LostFocus(object sender, RoutedEventArgs e) =>
+        ApplyTrayToolTip();
+
+    private void TrayToolTipBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        ApplyTrayToolTip();
+        e.Handled = true;
+    }
+
+    private void ApplyTrayToolTip()
+    {
+        if (
+            isRefreshingTrayToolTip
+            || string.Equals(
+                TrayToolTipBox.Text,
+                tray.Current.ToolTipText,
+                StringComparison.Ordinal
+            )
+        )
+        {
+            return;
+        }
+
         Execute(() => tray.SetToolTip(TrayToolTipBox.Text), TrayStatusText);
+    }
 
     private void MinimizeToTray_Click(object sender, RoutedEventArgs e) =>
         Execute(
@@ -131,12 +162,23 @@ public partial class WindowRuntimePage : Page
     private void RestoreFromTray_Click(object sender, RoutedEventArgs e) =>
         Execute(tray.Restore, TrayStatusText);
 
-    private void ApplyCloseBehavior_Click(object sender, RoutedEventArgs e)
+    private void CloseBehaviorBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e
+    )
     {
         if (CloseBehaviorBox.SelectedItem is WindowCloseBehavior behavior)
         {
             Execute(() => close.SetBehavior(behavior), CloseStatusText);
         }
+    }
+
+    private void CloseGuardAllowsBox_Click(object sender, RoutedEventArgs e)
+    {
+        closeGuardAllows = CloseGuardAllowsBox.IsChecked == true;
+        CloseStatusText.Text = closeGuard is null
+            ? $"The next registered guard will {(closeGuardAllows ? "allow" : "cancel")} close requests."
+            : $"The registered guard will now {(closeGuardAllows ? "allow" : "cancel")} close requests.";
     }
 
     private void RegisterCloseGuard_Click(object sender, RoutedEventArgs e)
@@ -145,12 +187,12 @@ public partial class WindowRuntimePage : Page
             () =>
             {
                 closeGuard?.Dispose();
-                var allowsClose = CloseGuardAllowsBox.IsChecked == true;
+                closeGuardAllows = CloseGuardAllowsBox.IsChecked == true;
                 closeGuard = close.RegisterGuard(
                     "gallery.runtime.guard",
                     (_, _) =>
                         ValueTask.FromResult(
-                            allowsClose
+                            closeGuardAllows
                                 ? WindowCloseDecision.Allow
                                 : WindowCloseDecision.Cancel
                         ),
@@ -333,7 +375,15 @@ public partial class WindowRuntimePage : Page
 
         var trayState = tray.Current;
         ToggleTrayButton.Content = trayState.IsEnabled ? "Disable tray" : "Enable tray";
-        TrayToolTipBox.Text = trayState.ToolTipText;
+        isRefreshingTrayToolTip = true;
+        try
+        {
+            TrayToolTipBox.Text = trayState.ToolTipText;
+        }
+        finally
+        {
+            isRefreshingTrayToolTip = false;
+        }
         TrayStatusText.Text =
             $"Enabled: {trayState.IsEnabled}  |  Icon visible: {trayState.IsIconVisible}  |  Window hidden: {trayState.IsWindowHidden}";
 

@@ -16,152 +16,213 @@
         ChunkDescription="Update shell identity values."
         ChunkTitle="Identity"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-          Margin="0,0,8,0"
-          Title="Window identity"
-          Text="Title, subtitle, and logo changes are reflected by the existing shell instance."
-        >
-          <flourish:Card.Body>
-            <StackPanel>
-              <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <StackPanel Margin="0,0,8,0">
-                <flourish:FlourishTextBlock Role="FieldLabel" Text="Title" />
-                <flourish:FlourishTextBox x:Name="TitleBox" />
-              </StackPanel>
-              <StackPanel Grid.Column="1" Margin="8,0">
-                <flourish:FlourishTextBlock Role="FieldLabel" Text="Subtitle" />
-                <flourish:FlourishTextBox x:Name="SubtitleBox" />
-              </StackPanel>
-              <flourish:Button Grid.Column="2" Margin="8,20,0,0" Click="ApplyIdentity_Click" Content="Apply identity" />
-              </Grid>
-              <Grid Margin="0,14,0,0">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <StackPanel Margin="0,0,8,0">
-                <flourish:FlourishTextBlock Role="FieldLabel" Text="Logo path (optional)" />
-                <flourish:FlourishTextBox x:Name="LogoPathBox" />
-              </StackPanel>
-              <StackPanel Grid.Column="1" Margin="8,0">
-                <flourish:FlourishTextBlock Role="FieldLabel" Text="Logo fallback text" />
-                <flourish:FlourishTextBox x:Name="LogoFallbackBox" />
-              </StackPanel>
-              <flourish:Button Grid.Column="2" Margin="8,20,0,0" Click="ApplyLogo_Click" Content="Apply logo" />
-              </Grid>
-            </StackPanel>
-          </flourish:Card.Body>
-        </flourish:Card>
-          <flourish:Card Margin="8,0,0,0" Title="Output" Text="Shows the effective title-bar identity.">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8D2;"
+              Title="Window title"
+              Text="Set the primary identity text shown by the shell."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="TitleBox" Width="220" KeyDown="IdentityBox_KeyDown" LostFocus="IdentityBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8D2;"
+              Title="Window subtitle"
+              Text="Set the supporting identity text shown by the shell."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="SubtitleBox" Width="220" KeyDown="IdentityBox_KeyDown" LostFocus="IdentityBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8B9;"
+              Title="Logo path"
+              Text="Optionally provide an image for the title-bar logo."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="LogoPathBox" Width="220" KeyDown="LogoBox_KeyDown" LostFocus="LogoBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Presenter="&#xE8D2;"
+              Title="Logo fallback text"
+              Text="Provide text to use when an image is unavailable."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="LogoFallbackBox" Width="220" KeyDown="LogoBox_KeyDown" LostFocus="LogoBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
+          <flourish:Card Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Output">
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="IdentityStatusText" Role="Status" />
             </flourish:Card.Body>
           </flourish:Card>
-        </UniformGrid>
+        </Grid>
       </flourish:Chunk>
 
       <flourish:Chunk
         ChunkDescription="Toggle individual title-bar elements."
         ChunkTitle="Element visibility"
       >
-        <flourish:Card
-          Title="Element controls"
-          Text="Each element can be shown or hidden independently, while breadcrumbs provide an additional display policy."
-        >
-          <flourish:Card.Body>
-            <StackPanel>
-              <WrapPanel>
-                <flourish:FlourishComboBox x:Name="TitleBarElementBox" Width="220" SelectionChanged="TitleBarElementBox_SelectionChanged" />
-                <flourish:FlourishCheckBox x:Name="TitleBarElementVisibleBox" Margin="18,0,0,0" VerticalAlignment="Center" Content="Visible" />
-                <flourish:Button Margin="18,0,0,0" Click="ApplyElementVisibility_Click" Content="Apply visibility" />
-              </WrapPanel>
-              <WrapPanel Margin="0,14,0,0">
-                <flourish:FlourishComboBox x:Name="BreadcrumbModeBox" Width="220" />
-                <flourish:Button Margin="18,0,0,0" Click="ApplyBreadcrumbMode_Click" Content="Apply breadcrumb mode" />
-              </WrapPanel>
-            </StackPanel>
-          </flourish:Card.Body>
-        </flourish:Card>
+        <StackPanel>
+          <flourish:ListCard
+            Margin="0,0,0,16"
+            Presenter="&#xE713;"
+            Title="Title-bar element"
+            Text="Choose the element whose visibility will change."
+          >
+            <flourish:ListCard.Body>
+              <flourish:FlourishComboBox x:Name="TitleBarElementBox" Width="220" SelectionChanged="TitleBarElementBox_SelectionChanged" />
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+          <flourish:ListCard
+            Margin="0,0,0,16"
+            Presenter="&#xE7B3;"
+            Title="Element visibility"
+            Text="Show or hide the selected title-bar element."
+          >
+            <flourish:ListCard.Body>
+              <flourish:FlourishCheckBox
+                x:Name="TitleBarElementVisibleBox"
+                VerticalAlignment="Center"
+                Checked="TitleBarElementVisibleBox_Changed"
+                Content="Visible"
+                Unchecked="TitleBarElementVisibleBox_Changed"
+              />
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+          <flourish:ListCard
+            Presenter="&#xE72A;"
+            Title="Breadcrumb display"
+            Text="Choose the breadcrumb visibility policy."
+          >
+            <flourish:ListCard.Body>
+              <flourish:FlourishComboBox x:Name="BreadcrumbModeBox" Width="220" SelectionChanged="BreadcrumbModeBox_SelectionChanged" />
+            </flourish:ListCard.Body>
+          </flourish:ListCard>
+        </StackPanel>
       </flourish:Chunk>
 
       <flourish:Chunk
         ChunkDescription="Bind and exercise asynchronous search."
         ChunkTitle="Runtime search binding"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-          Margin="0,0,8,0"
-          Title="Search subscription"
-          Text="This page owns a disposable asynchronous query subscription shared with the real title-bar search box."
-        >
-          <flourish:Card.Body>
-            <StackPanel>
-              <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <flourish:FlourishTextBox x:Name="SearchTextBox" Text="runtime API" />
-              <flourish:Button Grid.Column="1" Margin="10,0,0,0" Click="SetSearchText_Click" Content="Set query" />
-              <flourish:Button Grid.Column="2" Margin="8,0,0,0" Click="FocusSearch_Click" Content="Focus search" />
-              <flourish:Button Grid.Column="3" Margin="8,0,0,0" Click="ClearSearch_Click" Content="Clear" />
-              </Grid>
-              <Grid Margin="0,14,0,0">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <flourish:FlourishTextBox x:Name="SearchPlaceholderBox" />
-              <flourish:Button Grid.Column="1" Margin="10,0,0,0" Click="ApplySearchPlaceholder_Click" Content="Set placeholder" />
-              <flourish:Button x:Name="ToggleSearchVisibilityButton" Grid.Column="2" Margin="8,0,0,0" Click="ToggleSearchVisibility_Click" />
-              </Grid>
-            </StackPanel>
-          </flourish:Card.Body>
-        </flourish:Card>
-          <flourish:Card Margin="8,0,0,0" Title="Output" Text="Shows the latest asynchronous query response.">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE721;"
+              Title="Search query"
+              Text="Set the text shared with the title-bar search box."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="SearchTextBox" Width="220" KeyDown="SearchTextBox_KeyDown" LostFocus="SearchTextBox_LostFocus" Text="runtime API" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8A7;"
+              Title="Search focus"
+              Text="Move keyboard focus to the title-bar search box."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="FocusSearch_Click" Content="Focus search" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE74D;"
+              Title="Clear query"
+              Text="Remove the current title-bar search text."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button Click="ClearSearch_Click" Content="Clear" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE8D2;"
+              Title="Search placeholder"
+              Text="Set the hint shown when the search box is empty."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="SearchPlaceholderBox" Width="220" KeyDown="SearchPlaceholderBox_KeyDown" LostFocus="SearchPlaceholderBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Presenter="&#xE7B3;"
+              Title="Search visibility"
+              Text="Show or hide the title-bar search feature."
+            >
+              <flourish:ListCard.Body>
+                <flourish:Button x:Name="ToggleSearchVisibilityButton" Click="ToggleSearchVisibility_Click" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
+          <flourish:Card Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Output">
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="SearchStatusText" Role="Status" Text="Waiting for a query." />
             </flourish:Card.Body>
           </flourish:Card>
-        </UniformGrid>
+        </Grid>
       </flourish:Chunk>
 
       <flourish:Chunk
         ChunkDescription="Toggle complete shell capabilities."
         ChunkTitle="High-level shell features"
       >
-        <UniformGrid Columns="2">
-          <flourish:Card
-          Margin="0,0,8,0"
-          Title="Feature switches"
-          Text="Feature switches coordinate complete shell surfaces, while the controls above manage their detailed state."
-        >
-          <flourish:Card.Body>
-            <StackPanel>
-              <WrapPanel>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
+            <flourish:ListCard
+              Margin="0,0,0,16"
+              Presenter="&#xE713;"
+              Title="Shell feature"
+              Text="Choose the complete shell surface to configure."
+            >
+              <flourish:ListCard.Body>
                 <flourish:FlourishComboBox x:Name="ShellFeatureBox" Width="220" SelectionChanged="ShellFeatureBox_SelectionChanged" />
-                <flourish:FlourishCheckBox x:Name="ShellFeatureEnabledBox" Margin="18,0,0,0" VerticalAlignment="Center" Content="Enabled" />
-                <flourish:Button Margin="18,0,0,0" Click="ApplyShellFeature_Click" Content="Apply feature" />
-              </WrapPanel>
-            </StackPanel>
-          </flourish:Card.Body>
-        </flourish:Card>
-          <flourish:Card Margin="8,0,0,0" Title="Output" Text="Shows the effective shell feature state.">
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Presenter="&#xE74E;"
+              Title="Feature availability"
+              Text="Enable or disable the selected shell surface."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishCheckBox
+                  x:Name="ShellFeatureEnabledBox"
+                  VerticalAlignment="Center"
+                  Checked="ShellFeatureEnabledBox_Changed"
+                  Content="Enabled"
+                  Unchecked="ShellFeatureEnabledBox_Changed"
+                />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+          </StackPanel>
+          <flourish:Card Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Output">
             <flourish:Card.Body>
               <flourish:FlourishTextBlock x:Name="ShellFeatureStatusText" Role="Status" />
             </flourish:Card.Body>
           </flourish:Card>
-        </UniformGrid>
+        </Grid>
       </flourish:Chunk>
     </StackPanel>
   </flourish:FlourishScrollViewer>
