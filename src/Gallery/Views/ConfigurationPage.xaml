@@ -23,7 +23,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE721;"
               Title="Configuration key"
               Text="Choose a value from the active provider chain."
@@ -33,7 +32,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE721;"
               Title="Read merged value"
               Text="Resolve the selected configuration key."
@@ -43,6 +42,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72C;"
               Title="Configuration providers"
               Text="Reload every registered provider."
@@ -74,7 +74,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE71B;"
               Title="Configuration path"
               Text="Choose the appsettings key to edit."
@@ -84,7 +83,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE70F;"
               Title="String value"
               Text="Provide the value used by write operations."
@@ -94,7 +93,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74E;"
               Title="Set value"
               Text="Replace the selected value and save atomically."
@@ -104,7 +103,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72D;"
               Title="Merge value"
               Text="Merge the value into its parent object."
@@ -114,7 +113,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE710;"
               Title="Append value"
               Text="Append the value to the selected array."
@@ -124,6 +123,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Remove value"
               Text="Remove the selected key from appsettings.json."
@@ -162,8 +162,6 @@
               <flourish:FlourishComboBox
                 x:Name="LocaleBox"
                 Width="220"
-                IsEditable="True"
-                LostFocus="LocaleBox_LostFocus"
                 SelectionChanged="LocaleBox_SelectionChanged"
               />
             </flourish:ListCard.Body>
@@ -187,7 +185,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE8A5;"
               Title="Locale file path"
               Text="Choose an external lang_&lt;locale&gt;.json source."
@@ -197,7 +194,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE710;"
               Title="Register locale file"
               Text="Register the selected source with localization."
@@ -207,7 +204,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72C;"
               Title="Reload locale file"
               Text="Reload edits from the registered source."
@@ -217,6 +214,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Remove locale file"
               Text="Unregister the current external source."

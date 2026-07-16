@@ -23,27 +23,27 @@
                 <flourish:Button Click="AddToolbarItem_Click" Content="Add / update" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8D7;" Text="Enable or disable command invocation." Title="Action availability">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8D7;" Text="Enable or disable command invocation." Title="Action availability">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleToolbarItemEnabled_Click" Content="Enable / disable" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE890;" Text="Show or hide the toolbar action." Title="Action visibility">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE890;" Text="Show or hide the toolbar action." Title="Action visibility">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleToolbarItemVisible_Click" Content="Show / hide" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8A5;" Text="Switch between icon-only and icon-with-text presentation." Title="Action presentation">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8A5;" Text="Switch between icon-only and icon-with-text presentation." Title="Action presentation">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleIconOnly_Click" Content="Toggle format" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8CB;" Text="Move the action within the toolbar order." Title="Action order">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8CB;" Text="Move the action within the toolbar order." Title="Action order">
               <flourish:ListCard.Body>
                 <flourish:Button Click="MoveToolbarItem_Click" Content="Move action" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE74D;" Text="Remove the runtime toolbar action." Title="Toolbar action">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE74D;" Text="Remove the runtime toolbar action." Title="Toolbar action">
               <flourish:ListCard.Body>
                 <flourish:Button Click="RemoveToolbarItem_Click" Content="Remove" />
               </flourish:ListCard.Body>
@@ -71,42 +71,42 @@
                 <flourish:FlourishTextBox x:Name="StatusTextBox" Width="230" Text="Gallery runtime API is ready" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE710;" Text="Add the persistent item or update its current text." Title="Persistent status">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE710;" Text="Add the persistent item or update its current text." Title="Persistent status">
               <flourish:ListCard.Body>
                 <flourish:Button Click="UpsertStatus_Click" Content="Add / update" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE823;" Text="Show the current status text for four seconds." Title="Timed status">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE823;" Text="Show the current status text for four seconds." Title="Timed status">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ShowTimedStatus_Click" Content="Show for 4 seconds" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE890;" Text="Show or hide the registered status item." Title="Status visibility">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE890;" Text="Show or hide the registered status item." Title="Status visibility">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleStatusVisible_Click" Content="Show / hide" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8CB;" Text="Move the item within the status bar order." Title="Status order">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8CB;" Text="Move the item within the status bar order." Title="Status order">
               <flourish:ListCard.Body>
                 <flourish:Button Click="MoveStatus_Click" Content="Move item" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE74D;" Text="Remove the registered status item." Title="Persistent status">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE74D;" Text="Remove the registered status item." Title="Persistent status">
               <flourish:ListCard.Body>
                 <flourish:Button Click="RemoveStatus_Click" Content="Remove" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE968;" Text="Toggle the shell LAN indicator." Title="LAN indicator">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE968;" Text="Toggle the shell LAN indicator." Title="LAN indicator">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleLan_Click" Content="Toggle LAN" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE945;" Text="Toggle the shell power indicator." Title="Power indicator">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE945;" Text="Toggle the shell power indicator." Title="Power indicator">
               <flourish:ListCard.Body>
                 <flourish:Button Click="TogglePower_Click" Content="Toggle power" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE7E8;" Text="Enable or disable the complete status bar." Title="Status bar availability">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE7E8;" Text="Enable or disable the complete status bar." Title="Status bar availability">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleStatusBar_Click" Content="Enable / disable" />
               </flourish:ListCard.Body>
@@ -131,17 +131,17 @@
                 <flourish:Button Click="AddRegion_Click" Content="Add content" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8D7;" Text="Enable or disable the custom shell region." Title="Region availability">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8D7;" Text="Enable or disable the custom shell region." Title="Region availability">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ToggleRegion_Click" Content="Enable / disable" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE8CB;" Text="Move the region within the shell order." Title="Region order">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE8CB;" Text="Move the region within the shell order." Title="Region order">
               <flourish:ListCard.Body>
                 <flourish:Button Click="ReorderRegion_Click" Content="Change order" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
-            <flourish:ListCard Margin="{DynamicResource FlourishPeerCardMargin}" Presenter="&#xE74D;" Text="Remove the ContentHeader registration." Title="Header content">
+            <flourish:ListCard Margin="{DynamicResource FlourishListCardPeerMargin}" Presenter="&#xE74D;" Text="Remove the ContentHeader registration." Title="Header content">
               <flourish:ListCard.Body>
                 <flourish:Button Click="RemoveRegion_Click" Content="Remove" />
               </flourish:ListCard.Body>

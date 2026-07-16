@@ -23,7 +23,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE700;"
               Title="Panel state"
               Text="Open or close the live navigation panel."
@@ -33,7 +32,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Panel availability"
               Text="Enable or disable navigation without recreating the shell."
@@ -43,7 +42,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72A;"
               Title="Panel direction"
               Text="Choose the edge that hosts the navigation panel."
@@ -53,7 +52,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Open width"
               Text="Set the panel width while navigation is open."
@@ -63,7 +62,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Closed width"
               Text="Set the panel width while navigation is closed."
@@ -73,7 +72,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Minimum width"
               Text="Set the minimum allowed panel width."
@@ -83,6 +82,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Maximum width"
               Text="Set the maximum allowed panel width."
@@ -111,7 +111,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE710;"
               Title="Install demo route"
               Text="Register the runtime route and its navigation item."
@@ -121,7 +120,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72A;"
               Title="Navigate to route"
               Text="Open the registered runtime destination."
@@ -131,7 +130,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE713;"
               Title="Navigation item"
               Text="Enable or disable the installed menu item."
@@ -141,6 +140,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Remove demo route"
               Text="Remove the route and its navigation item."
@@ -169,7 +169,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE74E;"
               Title="Enable cache"
               Text="Retain page instances for subsequent navigation."
@@ -179,7 +178,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE711;"
               Title="Disable cache"
               Text="Stop retaining page instances for this route."
@@ -189,7 +188,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Evict demo page"
               Text="Remove the demo instance while preserving its route."
@@ -199,6 +198,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Clear page cache"
               Text="Remove every active cached page instance."

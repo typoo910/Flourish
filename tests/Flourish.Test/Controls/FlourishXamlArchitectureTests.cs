@@ -680,6 +680,53 @@ public sealed class FlourishXamlArchitectureTests
     }
 
     [Fact]
+    public void GalleryListCardPeers_UseTheCompactSpacingToken()
+    {
+        const string compactMargin = "{DynamicResource FlourishListCardPeerMargin}";
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var listCard in document.Descendants().Where(element =>
+                    element.Name.LocalName == nameof(ListCard)
+                )
+            )
+            {
+                var previousPeer = listCard.ElementsBeforeSelf().LastOrDefault();
+                var followsListCard = previousPeer?.Name.LocalName == nameof(ListCard);
+                var margin = (string?)listCard.Attribute("Margin");
+
+                if (followsListCard && margin != compactMargin)
+                {
+                    violations.Add(
+                        $"{FormatViolation(path, listCard)} follows another ListCard without the compact peer margin"
+                    );
+                }
+                else if (!followsListCard && margin == compactMargin)
+                {
+                    violations.Add(
+                        $"{FormatViolation(path, listCard)} adds peer spacing before the first ListCard in its group"
+                    );
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Consecutive ListCards must use the compact ListCard-specific margin between rows only."
+        );
+    }
+
+    [Fact]
     public void GalleryListCards_DoNotAddApplyRows()
     {
         var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
@@ -722,6 +769,46 @@ public sealed class FlourishXamlArchitectureTests
         AssertNoArchitectureViolations(
             violations,
             "ListCard settings must apply as their value is committed; do not add a separate Apply row."
+        );
+    }
+
+    [Fact]
+    public void GalleryComboBoxes_UseSelectionOnlyInteraction()
+    {
+        var viewsRoot = Path.Combine(RepositoryRoot, "src", "Gallery", "Views");
+        var violations = new List<string>();
+
+        foreach (
+            var path in Directory.EnumerateFiles(
+                viewsRoot,
+                "*.xaml",
+                SearchOption.AllDirectories
+            )
+        )
+        {
+            var document = LoadXaml(path);
+            foreach (
+                var comboBox in document.Descendants().Where(element =>
+                    element.Name.LocalName is "ComboBox" or "FlourishComboBox"
+                )
+            )
+            {
+                if (
+                    string.Equals(
+                        (string?)comboBox.Attribute("IsEditable"),
+                        "True",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                {
+                    violations.Add(FormatViolation(path, comboBox));
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Gallery selection controls must open their choices directly instead of accepting free-form text. Use a separate text input when custom values are supported."
         );
     }
 

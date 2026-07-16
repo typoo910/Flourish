@@ -19,18 +19,14 @@
         <ControlTemplate TargetType="{x:Type controls:FlourishToolTip}">
           <Grid MaxWidth="344" Margin="12,10,12,14">
             <Border
-              Background="{DynamicResource FlourishNeutralForeground1Brush}"
-              CornerRadius="{DynamicResource FlourishControlCornerRadius}"
-              Effect="{DynamicResource FlourishElevation1Effect}"
-              IsHitTestVisible="False"
-            />
-            <Border
+              x:Name="SurfaceChrome"
               MaxWidth="320"
               Padding="{TemplateBinding Padding}"
               Background="{TemplateBinding Background}"
               BorderBrush="{TemplateBinding BorderBrush}"
               BorderThickness="{TemplateBinding BorderThickness}"
               CornerRadius="{DynamicResource FlourishControlCornerRadius}"
+              Effect="{DynamicResource FlourishElevation1Effect}"
               SnapsToDevicePixels="True"
             >
               <ContentPresenter

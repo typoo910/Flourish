@@ -23,7 +23,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE713;"
               Title="Theme"
               Text="Choose the requested application color mode."
@@ -33,6 +32,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72C;"
               Title="Cycle theme"
               Text="Move through System, Light, and Dark."
@@ -66,7 +66,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE8D2;"
               Title="Text font family"
               Text="Set the application-wide text family."
@@ -76,7 +75,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Base text size"
               Text="Set the base size used by typography roles."
@@ -86,6 +85,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8B9;"
               Title="Icon font family"
               Text="Set the font used for application glyphs."
@@ -114,7 +114,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE8D2;"
               Title="Page font family"
               Text="Override the text family on this page."
@@ -124,7 +123,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Page font size"
               Text="Leave empty to follow the global base size."
@@ -134,6 +133,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72C;"
               Title="Clear page override"
               Text="Restore the global application typography."
@@ -162,7 +162,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE823;"
               Title="Initial delay"
               Text="Set the delay before a tooltip appears."
@@ -172,7 +171,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE7C8;"
               Title="Spawn margin"
               Text="Set the separation from the tooltip target."
@@ -182,6 +181,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8BD;"
               Title="Tooltip availability"
               Text="Enable or disable Flourish tooltips."
@@ -210,7 +210,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE768;"
               Title="Page transition"
               Text="Choose the transition between pages."
@@ -220,7 +219,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE823;"
               Title="Page duration"
               Text="Set the page transition duration in milliseconds."
@@ -230,7 +229,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE700;"
               Title="Navigation transition"
               Text="Choose the navigation-panel transition."
@@ -240,7 +239,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE823;"
               Title="Navigation duration"
               Text="Set the panel transition duration in milliseconds."
@@ -250,7 +249,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE768;"
               Title="Motion"
               Text="Enable or disable application animation."
@@ -260,7 +259,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE706;"
               Title="Hover reveal"
               Text="Enable animated pointer feedback."
@@ -270,6 +269,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE776;"
               Title="Reduced motion"
               Text="Respect the system reduced-motion preference."
@@ -298,7 +298,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE7F4;"
               Title="Window material"
               Text="Choose the native shell backdrop."
@@ -308,6 +307,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE708;"
               Title="Immersive dark mode"
               Text="Request dark native window chrome."

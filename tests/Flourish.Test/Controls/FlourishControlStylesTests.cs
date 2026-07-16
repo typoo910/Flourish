@@ -256,6 +256,9 @@ public sealed class FlourishControlStylesTests
                 }
                 toolTip.ApplyTemplate();
                 Assert.NotNull(toolTip.Template);
+                var toolTipSurface = AssertTemplatePart<Border>(toolTip, "SurfaceChrome");
+                Assert.Same(toolTip.Background, toolTipSurface.Background);
+                Assert.NotNull(toolTipSurface.Effect);
 
                 AssertTemplatePart<FrameworkElement>(button, "HoverChrome");
                 AssertTemplatePart<ScaleTransform>(button, "HoverRevealScale");
@@ -931,6 +934,12 @@ public sealed class FlourishControlStylesTests
                 Assert.Equal(VerticalAlignment.Center, card.ContentVerticalAlignment);
                 Assert.Equal(new Thickness(16, 12, 16, 12), card.Padding);
                 Assert.Equal(72, card.MinHeight);
+                Assert.Equal(
+                    new Thickness(0, 4, 0, 0),
+                    Assert.IsType<Thickness>(
+                        card.TryFindResource("FlourishListCardPeerMargin")
+                    )
+                );
                 Assert.Same(
                     card.TryFindResource("FlourishCardBackgroundBrush"),
                     card.Background
@@ -1235,6 +1244,45 @@ public sealed class FlourishControlStylesTests
                 Assert.True(item.IsCommandItem);
                 Assert.False(item.IsEnabled);
                 Assert.Same(toolTip, item.ToolTip);
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void NavigationListBoxItem_FollowsTheSharedToolTipDelayPolicy()
+    {
+        RunInSta(() =>
+        {
+            var item = new FlourishListBoxItem { Content = "Item" };
+            var listBox = new FlourishListBox
+            {
+                Appearance = FlourishListBoxAppearance.Navigation,
+                Items = { item },
+            };
+            var resources = new ResourceDictionary
+            {
+                ["FlourishToolTipInitialShowDelay"] = int.MaxValue,
+            };
+            var window = CreateWindow(listBox);
+            window.Resources.MergedDictionaries.Add(resources);
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                Assert.Equal(
+                    int.MaxValue,
+                    ToolTipService.GetInitialShowDelay(item)
+                );
+
+                resources["FlourishToolTipInitialShowDelay"] = 275;
+
+                Assert.Equal(275, ToolTipService.GetInitialShowDelay(item));
             }
             finally
             {

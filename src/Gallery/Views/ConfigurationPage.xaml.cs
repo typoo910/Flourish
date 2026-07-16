@@ -110,32 +110,25 @@ public partial class ConfigurationPage : Page
         await ExecuteSettingUpdateAsync(() => settings.RemoveAsync(WriteKeyBox.Text).AsTask());
     }
 
-    private void ApplyLocale_Click(object sender, RoutedEventArgs e)
+    private void LocaleBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+        ApplySelectedLocale();
+
+    private void ApplySelectedLocale()
     {
+        if (!IsLoaded || isRefreshingLocale || LocaleBox.SelectedItem is not string locale)
+        {
+            return;
+        }
+
         try
         {
-            localization.SetLocale(LocaleBox.Text);
+            localization.SetLocale(locale);
             RefreshLocaleState();
         }
         catch (Exception error)
         {
             LocaleStatusText.Text = error.Message;
         }
-    }
-
-    private void LocaleBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
-        ApplySelectedLocale();
-
-    private void LocaleBox_LostFocus(object sender, RoutedEventArgs e) => ApplySelectedLocale();
-
-    private void ApplySelectedLocale()
-    {
-        if (!IsLoaded || isRefreshingLocale || string.IsNullOrWhiteSpace(LocaleBox.Text))
-        {
-            return;
-        }
-
-        ApplyLocale_Click(LocaleBox, new RoutedEventArgs());
     }
 
     private void RegisterLocaleFile_Click(object sender, RoutedEventArgs e)
@@ -244,7 +237,13 @@ public partial class ConfigurationPage : Page
                 }
             }
 
-            LocaleBox.Text = localization.CurrentLocale;
+            LocaleBox.SelectedItem = availableLocales.FirstOrDefault(locale =>
+                string.Equals(
+                    locale,
+                    localization.CurrentLocale,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            );
             LocaleStatusText.Text = $"Current locale: {localization.CurrentLocale}";
         }
         finally

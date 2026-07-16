@@ -161,7 +161,7 @@ Keep `Title` and `Text` concise. Each is limited to one line and overflows with 
 | `Body` | `object?` | `null` | Exactly one local interactive control displayed on the right. |
 | `Variant` | `Variant` | `Standard` | Inherited property that is always coerced to `Standard`; ListCard has no visual variants. |
 
-Stack related ListCards so every row fills its column, and use one row for one independent function. Do not mix `ListCard` with any other card type in that same column. Prefer a single-column `Chunk` containing only ListCards. When the section also needs output, another column in the same Chunk may hold a dedicated `Output` or `Result` Card; the complete ListCard column and adjacent Card must have the same overall height. A `UniformGrid` or another stretching parent can enforce this equality.
+Stack related ListCards so every row fills its column, and use the compact `FlourishListCardPeerMargin` between rows so they read as one related group without merging their surfaces. Use one row for one independent function. Do not mix `ListCard` with any other card type in that same column. Prefer a single-column `Chunk` containing only ListCards. When the section also needs output, another column in the same Chunk may hold a dedicated `Output` or `Result` Card; the complete ListCard column and adjacent Card must have the same overall height. A `UniformGrid` or another stretching parent can enforce this equality.
 
 Prefer `FlourishComboBox`, `FlourishCheckBox`, and `Button` in `Body`; use `FlourishTextBox` and `FlourishRadioButton` when the option requires them. Selections, toggles, and edits must apply immediately. Never add a separate Apply action to a ListCard.
 

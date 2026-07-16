@@ -23,7 +23,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE8D2;"
               Title="Window title"
               Text="Set the primary identity text shown by the shell."
@@ -33,7 +32,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Window subtitle"
               Text="Set the supporting identity text shown by the shell."
@@ -43,7 +42,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8B9;"
               Title="Logo path"
               Text="Optionally provide an image for the title-bar logo."
@@ -53,6 +52,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Logo fallback text"
               Text="Provide text to use when an image is unavailable."
@@ -76,7 +76,6 @@
       >
         <StackPanel>
           <flourish:ListCard
-            Margin="0,0,0,16"
             Presenter="&#xE713;"
             Title="Title-bar element"
             Text="Choose the element whose visibility will change."
@@ -86,7 +85,7 @@
             </flourish:ListCard.Body>
           </flourish:ListCard>
           <flourish:ListCard
-            Margin="0,0,0,16"
+            Margin="{DynamicResource FlourishListCardPeerMargin}"
             Presenter="&#xE7B3;"
             Title="Element visibility"
             Text="Show or hide the selected title-bar element."
@@ -102,6 +101,7 @@
             </flourish:ListCard.Body>
           </flourish:ListCard>
           <flourish:ListCard
+            Margin="{DynamicResource FlourishListCardPeerMargin}"
             Presenter="&#xE72A;"
             Title="Breadcrumb display"
             Text="Choose the breadcrumb visibility policy."
@@ -124,7 +124,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE721;"
               Title="Search query"
               Text="Set the text shared with the title-bar search box."
@@ -134,7 +133,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8A7;"
               Title="Search focus"
               Text="Move keyboard focus to the title-bar search box."
@@ -144,7 +143,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Clear query"
               Text="Remove the current title-bar search text."
@@ -154,7 +153,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Search placeholder"
               Text="Set the hint shown when the search box is empty."
@@ -164,6 +163,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE7B3;"
               Title="Search visibility"
               Text="Show or hide the title-bar search feature."
@@ -192,7 +192,6 @@
           </Grid.ColumnDefinitions>
           <StackPanel Grid.Column="0" Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE713;"
               Title="Shell feature"
               Text="Choose the complete shell surface to configure."
@@ -202,6 +201,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74E;"
               Title="Feature availability"
               Text="Enable or disable the selected shell surface."

@@ -15,7 +15,7 @@ builder.ConfigureShell(shell => shell.UseTips(delay: 200));
 
 `delay` 参数表示指针悬停后到提示显示前的时间，单位为毫秒。默认值为 `200`，且不能为负数。
 
-Flourish 会把这些提示保持在 Shell 边界内。不需要提示时，请省略 `UseTips`。
+Flourish 会把这些提示保持在 Shell 边界内。不需要提示时，请省略 `UseTips`。运行时更改 `ToolTips` 功能会统一应用于标题栏、导航栏、工具栏与状态栏控件。
 
 后台任务状态详情不受 `UseTips` 控制，仍可通过[后台任务](background-tasks.md)界面查看。
 

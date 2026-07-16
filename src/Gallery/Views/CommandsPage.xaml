@@ -19,7 +19,6 @@
         <UniformGrid VerticalAlignment="Stretch" Columns="2">
           <StackPanel Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE71B;"
               Title="Command key"
               Text="Identify the handler registered in the runtime command registry."
@@ -29,7 +28,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
               Title="Dispatch parameter"
               Text="Provide the value passed to the demo handler."
@@ -39,7 +38,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74E;"
               Title="Command availability"
               Text="Choose whether the registered handler can execute."
@@ -49,7 +48,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE710;"
               Title="Register command"
               Text="Register the handler or replace its existing definition."
@@ -59,7 +58,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72A;"
               Title="Execute command"
               Text="Dispatch the registered handler asynchronously."
@@ -69,6 +68,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Remove command"
               Text="Delete the handler from the runtime registry."
@@ -93,7 +93,6 @@
         <UniformGrid VerticalAlignment="Stretch" Columns="2">
           <StackPanel Margin="0,0,8,0" VerticalAlignment="Stretch">
             <flourish:ListCard
-              Margin="0,0,0,16"
               Presenter="&#xE710;"
               Title="Register Ctrl+Shift+G"
               Text="Bind the global shortcut to the runtime command."
@@ -103,7 +102,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="0,0,0,16"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE72A;"
               Title="Dispatch shortcut"
               Text="Invoke the same command API from this page."
@@ -113,6 +112,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Title="Remove shortcut"
               Text="Unregister the global Ctrl+Shift+G binding."

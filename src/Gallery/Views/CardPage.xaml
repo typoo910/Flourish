@@ -116,7 +116,7 @@
             </flourish:ListCard.Body>
           </flourish:ListCard>
           <flourish:ListCard
-            Margin="{DynamicResource FlourishPeerCardMargin}"
+            Margin="{DynamicResource FlourishListCardPeerMargin}"
             Presenter="&#xE838;"
             Text="Use a local button when the row represents one explicit operation."
             Title="Open configuration"
@@ -126,7 +126,7 @@
             </flourish:ListCard.Body>
           </flourish:ListCard>
           <flourish:ListCard
-            Margin="{DynamicResource FlourishPeerCardMargin}"
+            Margin="{DynamicResource FlourishListCardPeerMargin}"
             Presenter="&#xE8D2;"
             Text="Text input is appropriate when a setting requires a free-form value."
             Title="Configuration key"

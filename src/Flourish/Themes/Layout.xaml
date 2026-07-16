@@ -42,6 +42,7 @@
   <Thickness x:Key="FlourishListCardPadding">16,12</Thickness>
   <Thickness x:Key="FlourishListCardPresenterSpacing">8,0,24,0</Thickness>
   <Thickness x:Key="FlourishListCardBodySpacing">24,0,0,0</Thickness>
+  <Thickness x:Key="FlourishListCardPeerMargin">0,4,0,0</Thickness>
   <Thickness x:Key="FlourishInteractiveCardPadding">18</Thickness>
   <Thickness x:Key="FlourishChunkMargin">0,32,0,0</Thickness>
   <Thickness x:Key="FlourishChunkSpacing">0,12,0,0</Thickness>

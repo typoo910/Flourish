@@ -28,7 +28,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8F1;"
               Text="Queue work that returns a captured value."
               Title="Result task"
@@ -38,7 +38,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8FD;"
               Text="Queue four tasks to demonstrate bounded concurrency."
               Title="Task burst"
@@ -48,7 +48,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE711;"
               Text="Cancel the most recently submitted task."
               Title="Last task"
@@ -58,7 +58,7 @@
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
-              Margin="{DynamicResource FlourishPeerCardMargin}"
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE74D;"
               Text="Cancel the task selected in the live task list."
               Title="Selected task"

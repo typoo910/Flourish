@@ -58,7 +58,7 @@ Treat `ListCard` as a compact, non-interactive row for one independent setting. 
 
 Keep both `Title` and `Text` concise. Each is limited to one line and overflows with an ellipsis; rewrite copy that would depend on wrapping. Put exactly one interactive control in each `ListCard.Body`. Do not combine several inputs or actions in a panel inside one row.
 
-Stack related ListCards so each row fills its column. Do not mix `ListCard` with any other card type in that same column. Prefer a single-column chunk containing only ListCards. A chunk may still use multiple columns when another column has a different purpose, such as a dedicated `Output` or `Result` Card.
+Stack related ListCards so each row fills its column. Use `FlourishListCardPeerMargin` between consecutive rows to create a compact visual group while preserving distinct surfaces. Do not mix `ListCard` with any other card type in that same column. Prefer a single-column chunk containing only ListCards. A chunk may still use multiple columns when another column has a different purpose, such as a dedicated `Output` or `Result` Card.
 
 Prefer `FlourishComboBox`, `FlourishCheckBox`, or `Button` in `ListCard.Body`; use `FlourishTextBox` or `FlourishRadioButton` when the option genuinely needs them. Apply selections, toggles, and edits immediately. Never add a separate Apply action to a ListCard.
 
@@ -91,7 +91,7 @@ Prefer `FlourishComboBox`, `FlourishCheckBox`, or `Button` in `ListCard.Body`; u
         </flourish:ListCard.Body>
       </flourish:ListCard>
       <flourish:ListCard
-        Margin="{DynamicResource FlourishPeerCardMargin}"
+        Margin="{DynamicResource FlourishListCardPeerMargin}"
         Title="Refresh now"
         Text="Request a new synchronization pass."
       >
@@ -135,6 +135,7 @@ Prefer `FlourishComboBox`, `FlourishCheckBox`, or `Button` in `ListCard.Body`; u
 - Confirm each ListCard Title and Text is concise, limited to one line, and safe to trim with an ellipsis.
 - Confirm presenter spacing remains generous on both horizontal sides and local margins do not collapse it.
 - Confirm each ListCard Body contains exactly one interactive control.
+- Confirm consecutive ListCards use `FlourishListCardPeerMargin` between rows and do not add that margin before the first row.
 - Confirm a ListCard column contains only ListCards; place Output, Result, or other card types in a separate column.
 - Confirm ListCard selections, toggles, and edits apply immediately and no ListCard adds an Apply action.
 - Confirm a two-column ListCard-plus-Output/Result composition gives both columns the same overall height.

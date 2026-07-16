@@ -15,7 +15,7 @@ builder.ConfigureShell(shell => shell.UseTips(delay: 200));
 
 The `delay` argument is the time in milliseconds between pointer hover and display. It defaults to `200` and must be non-negative.
 
-Flourish keeps these tooltips within the shell boundary. Omit `UseTips` when they should remain disabled.
+Flourish keeps these tooltips within the shell boundary. Omit `UseTips` when they should remain disabled. Changing the `ToolTips` feature at runtime applies consistently to title-bar, navigation, toolbar, and status controls.
 
 Background-task status details are not controlled by `UseTips`. They remain available through [Background tasks](background-tasks.md).
 
