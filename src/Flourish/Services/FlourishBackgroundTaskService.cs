@@ -468,6 +468,11 @@ internal sealed class FlourishBackgroundTaskService : IBackgroundTaskService, IH
                     or FlourishBackgroundTaskState.Cancelling
             )
             {
+                if (operation.Progress == progress)
+                {
+                    return;
+                }
+
                 operation.Progress = progress;
                 didChange = true;
             }

@@ -338,6 +338,53 @@ public sealed class FlourishBackgroundTaskServiceTests
     }
 
     [Fact]
+    public async Task ReportProgress_RepeatedValueNotifiesOnceAndLaterValueStillCompletes()
+    {
+        var service = new FlourishBackgroundTaskService(maxConcurrency: 1);
+        var snapshots = new List<IReadOnlyList<FlourishBackgroundTaskInfo>>();
+        var eventGate = new object();
+        service.TasksChanged += (_, args) =>
+        {
+            lock (eventGate)
+            {
+                snapshots.Add(args.Tasks);
+            }
+        };
+        await service.StartAsync(CancellationToken.None);
+        var handle = service.AddTask(
+            new FlourishBackgroundTaskMetadata("Repeated progress"),
+            context =>
+            {
+                context.ReportProgress(0.25);
+                context.ReportProgress(0.25);
+                context.ReportProgress(0.25);
+                context.ReportProgress(0.75);
+                return ValueTask.CompletedTask;
+            }
+        );
+
+        var result = await handle.Completion.WaitAsync(Timeout);
+        await service.WaitForWorkersIdleAsync().WaitAsync(Timeout);
+        IReadOnlyList<IReadOnlyList<FlourishBackgroundTaskInfo>> captured;
+        lock (eventGate)
+        {
+            captured = snapshots.ToArray();
+        }
+
+        Assert.True(result.Succeeded);
+        Assert.Single(
+            captured,
+            tasks => tasks.Any(task => task.Id == handle.Id && task.Progress == 0.25)
+        );
+        Assert.Single(
+            captured,
+            tasks => tasks.Any(task => task.Id == handle.Id && task.Progress == 0.75)
+        );
+        Assert.Empty(captured[^1]);
+        await service.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
     public async Task TasksChanged_ReentrantCancellationDoesNotRegressLaterSubscribers()
     {
         var service = new FlourishBackgroundTaskService(maxConcurrency: 1);

@@ -751,12 +751,12 @@ public sealed class FlourishShellNavigationLayoutTests
             "private BackgroundTaskIconView CreateBackgroundTaskIconView("
         );
         Assert.Contains(
-            "queuedTasks.Length > 0 ? Visibility.Visible : Visibility.Collapsed",
+            "queuedTaskCount > 0 ? Visibility.Visible : Visibility.Collapsed",
             backgroundTasksBlock,
             StringComparison.Ordinal
         );
         Assert.Contains(
-            "BackgroundTaskQueueCountText.Text = queuedTasks.Length.ToString();",
+            "BackgroundTaskQueueCountText.Text = queuedTaskCount.ToString();",
             backgroundTasksBlock,
             StringComparison.Ordinal
         );
@@ -770,6 +770,77 @@ public sealed class FlourishShellNavigationLayoutTests
             backgroundTasksBlock,
             StringComparison.Ordinal
         );
+    }
+
+    [Fact]
+    public void BackgroundTaskRefreshHotPath_ReusesImmutableSnapshotsAndAvoidsLinqCopies()
+    {
+        var shellSource = File.ReadAllText(ShellCodePath);
+        var changedHandler = GetSourceBlock(
+            shellSource,
+            "private void BackgroundTaskService_TasksChanged(",
+            "private void BackgroundTaskRefreshTimer_Tick("
+        );
+        Assert.Contains(
+            "pendingBackgroundTasks = e.Tasks;",
+            changedHandler,
+            StringComparison.Ordinal
+        );
+        Assert.DoesNotContain("ToArray(", changedHandler, StringComparison.Ordinal);
+
+        var timerTick = GetSourceBlock(
+            shellSource,
+            "private void BackgroundTaskRefreshTimer_Tick(",
+            "private void StartBackgroundTaskRefreshTimer("
+        );
+        Assert.Contains(
+            "RefreshBackgroundTaskStatus(tasks);",
+            timerTick,
+            StringComparison.Ordinal
+        );
+        Assert.DoesNotContain("ActiveTasks", timerTick, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToArray(", timerTick, StringComparison.Ordinal);
+
+        var refresh = GetSourceBlock(
+            shellSource,
+            "private void RefreshBackgroundTaskStatus(",
+            "private BackgroundTaskIconView CreateBackgroundTaskIconView("
+        );
+        Assert.Contains("backgroundTasks = tasks;", refresh, StringComparison.Ordinal);
+        Assert.Contains("foreach (var task in backgroundTasks)", refresh, StringComparison.Ordinal);
+        Assert.Contains("queuedTaskCount++;", refresh, StringComparison.Ordinal);
+        foreach (
+            var allocationPattern in new[]
+            {
+                "ToArray(",
+                ".Where(",
+                ".Select(",
+                ".ToHashSet(",
+                ".Except(",
+            }
+        )
+        {
+            Assert.DoesNotContain(allocationPattern, refresh, StringComparison.Ordinal);
+        }
+
+        var flyoutRefresh = GetSourceBlock(
+            shellSource,
+            "private void BuildBackgroundTaskFlyoutContent()",
+            "private BackgroundTaskRowView CreateBackgroundTaskRowView("
+        );
+        Assert.DoesNotContain(".ToHashSet(", flyoutRefresh, StringComparison.Ordinal);
+        Assert.DoesNotContain(".Except(", flyoutRefresh, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToArray(", flyoutRefresh, StringComparison.Ordinal);
+
+        var staleRemoval = GetSourceBlock(
+            shellSource,
+            "private static void RemoveStaleBackgroundTaskViews<TView>(",
+            "private BackgroundTaskRowView CreateBackgroundTaskRowView("
+        );
+        Assert.Contains("List<Guid>? staleIds = null;", staleRemoval, StringComparison.Ordinal);
+        Assert.Contains("staleIds ??= []", staleRemoval, StringComparison.Ordinal);
+        Assert.DoesNotContain(".Except(", staleRemoval, StringComparison.Ordinal);
+        Assert.DoesNotContain("ToArray(", staleRemoval, StringComparison.Ordinal);
     }
 
     [Fact]

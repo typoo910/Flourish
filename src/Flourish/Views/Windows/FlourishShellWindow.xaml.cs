@@ -1515,7 +1515,9 @@ internal partial class FlourishShellWindow : Window
                 return;
             }
 
-            pendingBackgroundTasks = e.Tasks.ToArray();
+            // The background-task service serializes notifications through its
+            // notification gate, and the event args own an immutable snapshot.
+            pendingBackgroundTasks = e.Tasks;
             backgroundTaskRefreshPending = true;
             if (!backgroundTaskRefreshLoopActive)
             {
@@ -1567,9 +1569,7 @@ internal partial class FlourishShellWindow : Window
 
         if (tasks is not null)
         {
-            // Read the service again on the UI thread so an older cross-thread event can never
-            // overwrite a newer state after Dispatcher scheduling reorders notifications.
-            RefreshBackgroundTaskStatus(backgroundTaskService.ActiveTasks);
+            RefreshBackgroundTaskStatus(tasks);
         }
     }
 
@@ -1688,22 +1688,30 @@ internal partial class FlourishShellWindow : Window
 
     private void RefreshBackgroundTaskStatus(IReadOnlyList<FlourishBackgroundTaskInfo> tasks)
     {
-        backgroundTasks = tasks.ToArray();
-        var runningTasks = backgroundTasks
-            .Where(task =>
-                task.State
-                    is FlourishBackgroundTaskState.Running
-                        or FlourishBackgroundTaskState.Cancelling
-            )
-            .ToArray();
-        var queuedTasks = backgroundTasks
-            .Where(task => task.State == FlourishBackgroundTaskState.Queued)
-            .ToArray();
-
-        var runningTaskIds = runningTasks.Select(task => task.Id).ToHashSet();
-        var desiredTaskButtons = new List<UIElement>(runningTasks.Length);
-        foreach (var task in runningTasks)
+        backgroundTasks = tasks;
+        var runningTaskIds = new HashSet<Guid>(backgroundTasks.Count);
+        var desiredTaskButtons = new List<UIElement>(backgroundTasks.Count);
+        var queuedTaskCount = 0;
+        foreach (var task in backgroundTasks)
         {
+            if (task.State == FlourishBackgroundTaskState.Queued)
+            {
+                queuedTaskCount++;
+                continue;
+            }
+
+            if (
+                task.State
+                is not (
+                    FlourishBackgroundTaskState.Running
+                    or FlourishBackgroundTaskState.Cancelling
+                )
+            )
+            {
+                continue;
+            }
+
+            runningTaskIds.Add(task.Id);
             if (!backgroundTaskIconsById.TryGetValue(task.Id, out var iconView))
             {
                 iconView = CreateBackgroundTaskIconView(task);
@@ -1715,19 +1723,16 @@ internal partial class FlourishShellWindow : Window
         }
 
         SynchronizePanelChildren(BackgroundTaskItemsHost, desiredTaskButtons);
-        foreach (var taskId in backgroundTaskIconsById.Keys.Except(runningTaskIds).ToArray())
-        {
-            backgroundTaskIconsById.Remove(taskId);
-        }
+        RemoveStaleBackgroundTaskViews(backgroundTaskIconsById, runningTaskIds);
 
         BackgroundTaskQueueButton.Visibility =
-            queuedTasks.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-        BackgroundTaskQueueCountText.Text = queuedTasks.Length.ToString();
+            queuedTaskCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+        BackgroundTaskQueueCountText.Text = queuedTaskCount.ToString();
         AutomationProperties.SetName(
             BackgroundTaskQueueButton,
             localizationService.Format(
                 FlourishLocaleKeys.BackgroundTaskWaitingCount,
-                queuedTasks.Length
+                queuedTaskCount
             )
         );
 
@@ -1756,9 +1761,11 @@ internal partial class FlourishShellWindow : Window
         {
             statusFlyoutAnchorTaskId = null;
             statusFlyoutAnchor =
-                queuedTasks.Length > 0
+                queuedTaskCount > 0
                     ? BackgroundTaskQueueButton
-                    : desiredTaskButtons.OfType<FrameworkElement>().FirstOrDefault();
+                    : desiredTaskButtons.Count > 0
+                        ? (FrameworkElement)desiredTaskButtons[0]
+                        : null;
             if (statusFlyoutOpenedWithFocus)
             {
                 statusFlyoutRestoreFocusTarget = statusFlyoutAnchor;
@@ -1883,7 +1890,7 @@ internal partial class FlourishShellWindow : Window
         AutomationProperties.SetName(StatusFlyoutTitle, title);
         AutomationProperties.SetName(StatusFlyoutCard, title);
 
-        var activeTaskIds = backgroundTasks.Select(task => task.Id).ToHashSet();
+        var activeTaskIds = new HashSet<Guid>(backgroundTasks.Count);
         var desiredRows = new List<UIElement>(Math.Max(1, backgroundTasks.Count));
         if (backgroundTasks.Count == 0)
         {
@@ -1901,6 +1908,7 @@ internal partial class FlourishShellWindow : Window
         {
             foreach (var task in backgroundTasks)
             {
+                activeTaskIds.Add(task.Id);
                 if (!backgroundTaskRowsById.TryGetValue(task.Id, out var rowView))
                 {
                     rowView = CreateBackgroundTaskRowView(task);
@@ -1913,9 +1921,31 @@ internal partial class FlourishShellWindow : Window
         }
 
         SynchronizeItems(StatusFlyoutContentHost, desiredRows);
-        foreach (var taskId in backgroundTaskRowsById.Keys.Except(activeTaskIds).ToArray())
+        RemoveStaleBackgroundTaskViews(backgroundTaskRowsById, activeTaskIds);
+    }
+
+    private static void RemoveStaleBackgroundTaskViews<TView>(
+        Dictionary<Guid, TView> viewsById,
+        HashSet<Guid> activeIds
+    )
+    {
+        List<Guid>? staleIds = null;
+        foreach (var taskId in viewsById.Keys)
         {
-            backgroundTaskRowsById.Remove(taskId);
+            if (!activeIds.Contains(taskId))
+            {
+                (staleIds ??= []).Add(taskId);
+            }
+        }
+
+        if (staleIds is null)
+        {
+            return;
+        }
+
+        foreach (var taskId in staleIds)
+        {
+            viewsById.Remove(taskId);
         }
     }
 
