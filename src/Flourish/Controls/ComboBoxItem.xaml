@@ -13,7 +13,7 @@
     <Setter Property="BorderThickness" Value="{DynamicResource FlourishControlBorderThickness}" />
     <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     <Setter Property="controls:HoverReveal.OverrideColor" Value="{DynamicResource FlourishHoverRevealBrush}" />
     <Setter

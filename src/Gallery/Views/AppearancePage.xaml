@@ -77,11 +77,61 @@
             <flourish:ListCard
               Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
-              Title="Base text size"
-              Text="Set the base size used by typography roles."
+              Title="Small text size"
+              Text="Set the small typography tier."
             >
               <flourish:ListCard.Body>
-                <flourish:FlourishTextBox x:Name="FontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+                <flourish:FlourishTextBox x:Name="SmallFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Standard text size"
+              Text="Set the standard typography tier."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="StandardFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Icon size"
+              Text="Set the dedicated icon glyph size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="IconFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Large text size"
+              Text="Set the bold large typography tier."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="LargeFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Extra-large text size"
+              Text="Set the bold extra-large typography tier."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="ExtraLargeFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Header text size"
+              Text="Set the bold page-header typography tier."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="HeaderSizeFontSizeBox" Width="120" KeyDown="TypographyBox_KeyDown" LostFocus="TypographyBox_LostFocus" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard
@@ -125,11 +175,61 @@
             <flourish:ListCard
               Margin="{DynamicResource FlourishListCardPeerMargin}"
               Presenter="&#xE8D2;"
-              Title="Page font size"
-              Text="Leave empty to follow the global base size."
+              Title="Page small size"
+              Text="Leave empty to follow the global small size."
             >
               <flourish:ListCard.Body>
-                <flourish:FlourishTextBox x:Name="PageOverrideFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+                <flourish:FlourishTextBox x:Name="PageOverrideSmallFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Page standard size"
+              Text="Leave empty to follow the global standard size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="PageOverrideStandardFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Page icon size"
+              Text="Leave empty to follow the global icon size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="PageOverrideIconFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Page large size"
+              Text="Leave empty to follow the global large size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="PageOverrideLargeFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Page extra-large size"
+              Text="Leave empty to follow the global extra-large size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="PageOverrideExtraLargeFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
+              </flourish:ListCard.Body>
+            </flourish:ListCard>
+            <flourish:ListCard
+              Margin="{DynamicResource FlourishListCardPeerMargin}"
+              Presenter="&#xE8D2;"
+              Title="Page header size"
+              Text="Leave empty to follow the global header size."
+            >
+              <flourish:ListCard.Body>
+                <flourish:FlourishTextBox x:Name="PageOverrideHeaderSizeFontSizeBox" Width="120" KeyDown="PageOverrideBox_KeyDown" LostFocus="PageOverrideBox_LostFocus" />
               </flourish:ListCard.Body>
             </flourish:ListCard>
             <flourish:ListCard

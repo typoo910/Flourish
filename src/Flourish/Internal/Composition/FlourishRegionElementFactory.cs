@@ -24,7 +24,7 @@ internal static class FlourishRegionElementFactory
             MinHeight = 0,
             Padding = new Thickness(),
             Margin = new Thickness(2, 4, 2, 4),
-            Icon = CreateIconOrText(iconGlyph, displayName, "FlourishFontSizeTitlebarIcon"),
+            Icon = CreateIconOrText(iconGlyph, displayName, "FlourishFontSizeIcon"),
             Variant = ButtonVariant.Text,
             ToolTip = new FlourishToolTip { Content = displayName },
         };

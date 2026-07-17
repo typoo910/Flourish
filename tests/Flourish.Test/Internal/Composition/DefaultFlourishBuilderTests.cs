@@ -47,7 +47,7 @@ public sealed class DefaultFlourishBuilderTests
                     .UseNavigation()
                     .UseCenterContent(enabled: true, contentWidth: 900)
                     .UseTips(350)
-                    .UseGlobalFont("Arial", 15)
+                    .UseGlobalFont("Arial", 13, 15, 17, 19, 22, 28)
                     .UseMaterialEffect(MaterialEffect.None)
                     .UseStatusBar()
             )
@@ -93,7 +93,12 @@ public sealed class DefaultFlourishBuilderTests
         Assert.False(options.Motion.RespectSystemReducedMotion);
         Assert.True(options.WindowTopmost);
         Assert.Equal("Arial", options.FontFamily);
-        Assert.Equal(15, options.FontSize);
+        Assert.Equal(13, options.FontSizeSmall);
+        Assert.Equal(15, options.FontSizeStandard);
+        Assert.Equal(17, options.FontSizeIcon);
+        Assert.Equal(19, options.FontSizeLarge);
+        Assert.Equal(22, options.FontSizeExtraLarge);
+        Assert.Equal(28, options.FontSizeHeaderSize);
         Assert.Equal(MaterialEffect.None, options.MaterialEffect);
         Assert.False(options.IsMaterialEffectEnabled);
         Assert.Equal(FlourishTheme.Dark, options.DefaultTheme);

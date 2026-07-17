@@ -1,7 +1,10 @@
 using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Xml;
 using System.Xml.Linq;
+using ArkheideSystem.Flourish.Abstract;
 using ArkheideSystem.Flourish.Controls;
 using FlourishButton = ArkheideSystem.Flourish.Controls.Button;
 
@@ -18,6 +21,53 @@ public sealed class FlourishXamlArchitectureTests
         RepositoryRoot,
         "src",
         "Flourish"
+    );
+    private static readonly string GalleryRoot = Path.Combine(
+        RepositoryRoot,
+        "src",
+        "Gallery"
+    );
+    private static readonly string[] CanonicalFontSizeResourceNames =
+    [
+        "FlourishFontSizeSmall",
+        "FlourishFontSizeStandard",
+        "FlourishFontSizeIcon",
+        "FlourishFontSizeLarge",
+        "FlourishFontSizeExtraLarge",
+        "FlourishFontSizeHeaderSize",
+    ];
+
+    private static readonly string[] CanonicalTextFontSizeResourceNames =
+    [
+        "FlourishFontSizeSmall",
+        "FlourishFontSizeStandard",
+        "FlourishFontSizeLarge",
+        "FlourishFontSizeExtraLarge",
+        "FlourishFontSizeHeaderSize",
+    ];
+    private static readonly IReadOnlyDictionary<string, double> ContextualIconFontSizes =
+        new Dictionary<string, double>(StringComparer.Ordinal)
+        {
+            ["FlourishIconFontSizeNavigation"] = 18d,
+            ["FlourishIconFontSizeTitlebar"] = 16d,
+            ["FlourishIconFontSizeWindowCaption"] = 12d,
+            ["FlourishIconFontSizeTitlebarSearch"] = 14d,
+            ["FlourishIconFontSizeStatusBar"] = 14d,
+            ["FlourishIconFontSizeStatusBarBackgroundTask"] = 12d,
+            ["FlourishIconFontSizeBackgroundTaskView"] = 16d,
+            ["FlourishIconFontSizeSystemStatusView"] = 16d,
+        };
+    private static readonly Regex FontSizeResourceNamePattern = new(
+        @"\bFlourishFontSize[A-Za-z0-9_]*\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
+    );
+    private static readonly Regex LiteralFontSizeAssignmentPattern = new(
+        @"\bFontSize\s*=\s*[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[dDfFmM])?\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
+    );
+    private static readonly Regex RetiredFontApiPattern = new(
+        @"\b(?:FlourishFontGap|FontGap|SetFontFamily|SetFontSize|SetFontGap)\b",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
     );
 
     [Fact]
@@ -1002,6 +1052,787 @@ public sealed class FlourishXamlArchitectureTests
     }
 
     [Fact]
+    public void GalleryOutputAndResultCards_UseTheSmallStatusRoleForTextResults()
+    {
+        var responseCards = EnumerateXamlFiles(Path.Combine(GalleryRoot, "Views"))
+            .SelectMany(path =>
+            {
+                var document = LoadXaml(path);
+                return document
+                    .Descendants()
+                    .Where(element =>
+                        element.Name.LocalName == nameof(Card)
+                        && (string?)element.Attribute("Title") is "Output" or "Result"
+                    )
+                    .Select(element => (Path: path, Card: element));
+            })
+            .ToArray();
+        var violations = responseCards
+            .SelectMany(item =>
+                item.Card
+                    .Descendants()
+                    .Where(element => element.Name.LocalName == "FlourishTextBlock")
+                    .Where(element => (string?)element.Attribute("Role") != "Status")
+                    .Select(element => FormatViolation(item.Path, element))
+            )
+            .ToArray();
+
+        Assert.NotEmpty(responseCards);
+        AssertNoArchitectureViolations(
+            violations,
+            "Text results inside Gallery Output and Result cards must use the small Status role."
+        );
+    }
+
+    [Fact]
+    public void ProductTypography_DeclaresOnlyTheCanonicalIncreasingDefaultFontScale()
+    {
+        var typography = LoadXaml(
+            Path.Combine(FlourishRoot, "Themes", "Typography.xaml")
+        );
+        var typographySizeResources = typography
+            .Descendants()
+            .Select(element => new
+            {
+                Element = element,
+                Name = (string?)element.Attribute(XName.Get("Key", XamlNamespace)),
+            })
+            .Where(resource =>
+                resource.Name?.StartsWith("FlourishFontSize", StringComparison.Ordinal)
+                == true
+            )
+            .ToArray();
+
+        Assert.Equal(
+            CanonicalFontSizeResourceNames,
+            typographySizeResources.Select(resource => resource.Name)
+        );
+
+        var actualSizes = typographySizeResources.ToDictionary(
+            resource => resource.Name!,
+            resource => XmlConvert.ToDouble(resource.Element.Value.Trim()),
+            StringComparer.Ordinal
+        );
+        Assert.Equal(12d, actualSizes["FlourishFontSizeSmall"]);
+        Assert.Equal(14d, actualSizes["FlourishFontSizeStandard"]);
+        Assert.Equal(16d, actualSizes["FlourishFontSizeIcon"]);
+        Assert.Equal(16d, actualSizes["FlourishFontSizeLarge"]);
+        Assert.Equal(24d, actualSizes["FlourishFontSizeExtraLarge"]);
+        Assert.Equal(32d, actualSizes["FlourishFontSizeHeaderSize"]);
+
+        var allowedNames = CanonicalFontSizeResourceNames.ToHashSet(
+            StringComparer.Ordinal
+        );
+        var violations = new List<string>();
+
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (var file in EnumerateProductSourceFiles(root))
+            {
+                var lineNumber = 0;
+                foreach (var line in File.ReadLines(file))
+                {
+                    lineNumber++;
+                    foreach (Match match in FontSizeResourceNamePattern.Matches(line))
+                    {
+                        if (!allowedNames.Contains(match.Value))
+                        {
+                            violations.Add(
+                                $"{RelativePath(file)}:{lineNumber} ({match.Value})"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Product source may only reference the four text tiers and the dedicated Icon font-size resource."
+        );
+
+        var contextualIconSizes = typographySizeResources.First().Element.Parent!
+            .Elements()
+            .Where(element =>
+                ((string?)element.Attribute(XName.Get("Key", XamlNamespace)))?.StartsWith(
+                    "FlourishIconFontSize",
+                    StringComparison.Ordinal
+                ) == true
+            )
+            .ToDictionary(
+                element => (string)element.Attribute(XName.Get("Key", XamlNamespace))!,
+                element => XmlConvert.ToDouble(element.Value.Trim()),
+                StringComparer.Ordinal
+            );
+        Assert.Equal(ContextualIconFontSizes.Count, contextualIconSizes.Count);
+        foreach (var expected in ContextualIconFontSizes)
+        {
+            Assert.Equal(expected.Value, contextualIconSizes[expected.Key]);
+        }
+    }
+
+    [Fact]
+    public void ProductTypography_DeclaresTieredLineHeightsAndBottomSpaces()
+    {
+        var typography = LoadXaml(
+            Path.Combine(FlourishRoot, "Themes", "Typography.xaml")
+        );
+        var keyName = XName.Get("Key", XamlNamespace);
+        var resources = typography
+            .Descendants()
+            .Where(element => element.Attribute(keyName) is not null)
+            .ToDictionary(
+                element => (string)element.Attribute(keyName)!,
+                StringComparer.Ordinal
+            );
+
+        (string Tier, double FontSize, double LineHeight, Thickness BottomSpace)[] tiers =
+        [
+            ("Small", 12, 14, new Thickness(0, 0, 0, 1)),
+            ("Standard", 14, 16, new Thickness(0, 0, 0, 1)),
+            ("Large", 16, 20, new Thickness(0, 0, 0, 2)),
+            ("ExtraLarge", 24, 29, new Thickness(0, 0, 0, 3)),
+            ("HeaderSize", 32, 37, new Thickness(0, 0, 0, 4)),
+        ];
+
+        foreach (var (tier, fontSize, lineHeight, bottomSpace) in tiers)
+        {
+            Assert.Equal(
+                fontSize,
+                XmlConvert.ToDouble(resources[$"FlourishFontSize{tier}"].Value.Trim())
+            );
+            Assert.Equal(
+                lineHeight,
+                XmlConvert.ToDouble(resources[$"FlourishLineHeight{tier}"].Value.Trim())
+            );
+            Assert.Equal(
+                bottomSpace,
+                ParseThickness(
+                    resources[$"FlourishTypographyBottomSpace{tier}"].Value.Trim()
+                )
+            );
+            Assert.True(lineHeight >= fontSize);
+        }
+
+        Assert.Equal(
+            16d,
+            XmlConvert.ToDouble(resources["FlourishFontSizeIcon"].Value.Trim())
+        );
+        Assert.Equal(
+            16d,
+            XmlConvert.ToDouble(resources["FlourishLineHeightIcon"].Value.Trim())
+        );
+        Assert.Equal(
+            new Thickness(),
+            ParseThickness(resources["FlourishTypographyBottomSpaceIcon"].Value.Trim())
+        );
+    }
+
+    [Fact]
+    public void FontApis_ExposeOnlyTheExplicitTextAndIconScaleContract()
+    {
+        Type[] explicitScaleTypes =
+        [
+            typeof(string),
+            typeof(double),
+            typeof(double),
+            typeof(double),
+            typeof(double),
+            typeof(double),
+            typeof(double),
+        ];
+        string[] explicitScaleNames =
+        [
+            "fontFamily",
+            "smallFontSize",
+            "standardFontSize",
+            "iconFontSize",
+            "largeFontSize",
+            "extraLargeFontSize",
+            "headerSizeFontSize",
+        ];
+        Type[] nullableScaleTypes =
+        [
+            typeof(string),
+            typeof(double?),
+            typeof(double?),
+            typeof(double?),
+            typeof(double?),
+            typeof(double?),
+            typeof(double?),
+        ];
+
+        var builderGlobalFont = Assert.Single(
+            typeof(IFlourishShellBuilder).GetMethods(),
+            method => method.Name == nameof(IFlourishShellBuilder.UseGlobalFont)
+        );
+        AssertParameterContract(builderGlobalFont, explicitScaleTypes, explicitScaleNames);
+
+        var serviceSetFont = Assert.Single(
+            typeof(IFontService).GetMethods(),
+            method => method.Name == nameof(IFontService.SetFont)
+        );
+        AssertParameterContract(serviceSetFont, explicitScaleTypes, explicitScaleNames);
+
+        var builderPageOverride = Assert.Single(
+            typeof(IFlourishShellBuilder).GetMethods(),
+            method => method.Name == nameof(IFlourishShellBuilder.SetOverrideFont)
+        );
+        Assert.True(builderPageOverride.IsGenericMethodDefinition);
+        AssertParameterContract(builderPageOverride, nullableScaleTypes, explicitScaleNames);
+
+        var servicePageOverrides = typeof(IFontService)
+            .GetMethods()
+            .Where(method => method.Name == nameof(IFontService.SetOverrideFont))
+            .ToArray();
+        Assert.Equal(2, servicePageOverrides.Length);
+        var genericServicePageOverride = Assert.Single(
+            servicePageOverrides,
+            method => method.IsGenericMethodDefinition
+        );
+        AssertParameterContract(
+            genericServicePageOverride,
+            nullableScaleTypes,
+            explicitScaleNames
+        );
+        var runtimeServicePageOverride = Assert.Single(
+            servicePageOverrides,
+            method => !method.IsGenericMethod
+        );
+        AssertParameterContract(
+            runtimeServicePageOverride,
+            [typeof(Type), .. nullableScaleTypes],
+            ["pageType", .. explicitScaleNames]
+        );
+
+        var pageOverrideConstructor = Assert.Single(
+            typeof(FlourishPageFontOverride).GetConstructors()
+        );
+        AssertParameterContract(
+            pageOverrideConstructor,
+            nullableScaleTypes,
+            explicitScaleNames
+        );
+
+        var fontAssemblyApiMethods = typeof(IFontService)
+            .Assembly
+            .GetTypes()
+            .SelectMany(type =>
+                type.GetMethods(
+                    BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.Instance
+                        | BindingFlags.Static
+                        | BindingFlags.DeclaredOnly
+                )
+            )
+            .Where(method =>
+                method.Name
+                    is nameof(IFlourishShellBuilder.UseGlobalFont)
+                        or nameof(IFontService.SetFont)
+                        or nameof(IFontService.SetOverrideFont)
+            )
+            .ToArray();
+
+        Assert.Equal(
+            2,
+            fontAssemblyApiMethods.Count(method =>
+                method.Name == nameof(IFlourishShellBuilder.UseGlobalFont)
+            )
+        );
+        Assert.Equal(
+            2,
+            fontAssemblyApiMethods.Count(method => method.Name == nameof(IFontService.SetFont))
+        );
+        Assert.Equal(
+            6,
+            fontAssemblyApiMethods.Count(method =>
+                method.Name == nameof(IFontService.SetOverrideFont)
+            )
+        );
+        Assert.All(
+            fontAssemblyApiMethods.Where(method =>
+                method.Name == nameof(IFlourishShellBuilder.UseGlobalFont)
+                    || method.Name == nameof(IFontService.SetFont)
+            ),
+            method =>
+                AssertParameterContract(method, explicitScaleTypes, explicitScaleNames)
+        );
+        Assert.All(
+            fontAssemblyApiMethods.Where(method =>
+                method.Name == nameof(IFontService.SetOverrideFont)
+            ),
+            method =>
+            {
+                if (method.IsGenericMethodDefinition)
+                {
+                    AssertParameterContract(
+                        method,
+                        nullableScaleTypes,
+                        explicitScaleNames
+                    );
+                    return;
+                }
+
+                AssertParameterContract(
+                    method,
+                    [typeof(Type), .. nullableScaleTypes],
+                    ["pageType", .. explicitScaleNames]
+                );
+            }
+        );
+
+        var violations = new List<string>();
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (var file in EnumerateProductSourceFiles(root))
+            {
+                var lineNumber = 0;
+                foreach (var line in File.ReadLines(file))
+                {
+                    lineNumber++;
+                    foreach (Match match in RetiredFontApiPattern.Matches(line))
+                    {
+                        violations.Add(
+                            $"{RelativePath(file)}:{lineNumber} ({match.Value})"
+                        );
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "The explicit text and icon font contract must not retain gap-based resources, mutators, or compatibility APIs."
+        );
+    }
+
+    [Fact]
+    public void ProductXaml_FontSizesUseCanonicalResourcesOrTemplateBindings()
+    {
+        var allowedValues = CanonicalFontSizeResourceNames
+            .Concat(ContextualIconFontSizes.Keys)
+            .Select(name => $"{{DynamicResource {name}}}")
+            .Append("{TemplateBinding FontSize}")
+            .ToHashSet(StringComparer.Ordinal);
+        var violations = new List<string>();
+
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (
+                var file in EnumerateProductSourceFiles(root).Where(file =>
+                    Path.GetExtension(file) == ".xaml"
+                )
+            )
+            {
+                var document = LoadXaml(file);
+
+                foreach (
+                    var attribute in document
+                        .Root!
+                        .DescendantsAndSelf()
+                        .SelectMany(element => element.Attributes())
+                        .Where(attribute => IsFontSizePropertyName(attribute.Name.LocalName))
+                )
+                {
+                    if (!allowedValues.Contains(attribute.Value))
+                    {
+                        violations.Add(
+                            $"{FormatViolation(file, attribute)} ({attribute.Value})"
+                        );
+                    }
+                }
+
+                foreach (
+                    var setter in document.Descendants().Where(element =>
+                        element.Name.LocalName == "Setter"
+                        && IsFontSizePropertyName(
+                            (string?)element.Attribute("Property") ?? string.Empty
+                        )
+                    )
+                )
+                {
+                    var value = (string?)setter.Attribute("Value") ?? setter.Value.Trim();
+                    if (!allowedValues.Contains(value))
+                    {
+                        violations.Add(
+                            $"{FormatViolation(file, setter)} ({value})"
+                        );
+                    }
+                }
+
+                foreach (
+                    var propertyElement in document
+                        .Descendants()
+                        .Where(element => IsFontSizePropertyName(element.Name.LocalName))
+                )
+                {
+                    var value = propertyElement.Value.Trim();
+                    if (!allowedValues.Contains(value))
+                    {
+                        violations.Add(
+                            $"{FormatViolation(file, propertyElement)} ({value})"
+                        );
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "FontSize values must use a canonical text or icon dynamic resource; control templates may forward FontSize with TemplateBinding."
+        );
+    }
+
+    [Fact]
+    public void ProductXaml_AllFontGlyphEntryPointsUseTheIconFamilyAndIconSize()
+    {
+        const string iconFamily = "{DynamicResource FlourishIconFontFamily}";
+        var allowedIconSizes = ContextualIconFontSizes.Keys
+            .Prepend("FlourishFontSizeIcon")
+            .Select(name => $"{{DynamicResource {name}}}")
+            .ToHashSet(StringComparer.Ordinal);
+        var violations = new List<string>();
+        var iconEntryCount = 0;
+
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (var file in EnumerateXamlFiles(root))
+            {
+                var document = LoadXaml(file);
+                foreach (var element in document.Root!.DescendantsAndSelf())
+                {
+                    foreach (
+                        var familyAttribute in element.Attributes().Where(attribute =>
+                            attribute.Name.LocalName
+                                is "FontFamily" or "TextElement.FontFamily"
+                            && attribute.Value == iconFamily
+                        )
+                    )
+                    {
+                        iconEntryCount++;
+                        var sizeProperty = familyAttribute.Name.LocalName.Replace(
+                            "FontFamily",
+                            "FontSize",
+                            StringComparison.Ordinal
+                        );
+                        var sizeValue = element
+                            .Attributes()
+                            .SingleOrDefault(attribute =>
+                                attribute.Name.LocalName == sizeProperty
+                            )
+                            ?.Value;
+                        if (sizeValue is null || !allowedIconSizes.Contains(sizeValue))
+                        {
+                            violations.Add(
+                                $"{FormatViolation(file, element)} ({sizeProperty}={sizeValue ?? "<missing>"})"
+                            );
+                        }
+
+                        if (
+                            element.Name.LocalName == "FlourishTextBlock"
+                            && (string?)element.Attribute("Role") != "Icon"
+                        )
+                        {
+                            violations.Add(
+                                $"{FormatViolation(file, element)} (FlourishTextBlock icon glyph is missing Role=Icon)"
+                            );
+                        }
+                    }
+
+                    if ((string?)element.Attribute("Role") == "Icon")
+                    {
+                        iconEntryCount++;
+                        var explicitSize = (string?)element.Attribute("FontSize");
+                        var explicitPadding = (string?)element.Attribute("Padding");
+                        if (explicitSize is not null && !allowedIconSizes.Contains(explicitSize))
+                        {
+                            violations.Add(
+                                $"{FormatViolation(file, element)} (FontSize={explicitSize})"
+                            );
+                        }
+                        if (
+                            explicitPadding is not null
+                            && explicitPadding
+                                != "{DynamicResource FlourishTypographyBottomSpaceIcon}"
+                            && explicitPadding != "0"
+                        )
+                        {
+                            violations.Add(
+                                $"{FormatViolation(file, element)} (Padding={explicitPadding})"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        Assert.True(iconEntryCount > 0);
+        AssertNoArchitectureViolations(
+            violations,
+            "Every font-glyph entry point must resolve the icon family, an approved default or contextual icon size, and zero-bottom-space Icon role."
+        );
+
+        var shellSource = File.ReadAllText(
+            Path.Combine(FlourishRoot, "Views", "Windows", "FlourishShellWindow.xaml.cs")
+        );
+        var iconBindingCalls = Regex.Matches(
+            shellSource,
+            "BindIconTypography\\(\\s*[^,\\r\\n]+\\s*,\\s*\"(?<key>[^\"]+)\"\\s*\\)",
+            RegexOptions.CultureInvariant
+        );
+        Assert.NotEmpty(iconBindingCalls.Cast<Match>());
+        var allowedBindingKeys = ContextualIconFontSizes.Keys
+            .Prepend("FlourishFontSizeIcon")
+            .ToHashSet(StringComparer.Ordinal);
+        Assert.All(iconBindingCalls.Cast<Match>(), match =>
+            Assert.Contains(match.Groups["key"].Value, allowedBindingKeys)
+        );
+
+        Assert.Contains(
+            "textBlock.TextAlignment = System.Windows.TextAlignment.Center;",
+            shellSource,
+            StringComparison.Ordinal
+        );
+        Assert.Contains(
+            "textBlock.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;",
+            shellSource,
+            StringComparison.Ordinal
+        );
+        Assert.Contains(
+            "textBlock.SetResourceReference(TextBlock.LineHeightProperty, sizeResourceKey);",
+            shellSource,
+            StringComparison.Ordinal
+        );
+    }
+
+    [Fact]
+    public void ProductXaml_ReservesTheDedicatedIconSizeForFontGlyphEntryPoints()
+    {
+        const string iconFamily = "{DynamicResource FlourishIconFontFamily}";
+        var iconSizes = ContextualIconFontSizes.Keys
+            .Prepend("FlourishFontSizeIcon")
+            .Select(name => $"{{DynamicResource {name}}}")
+            .ToHashSet(StringComparer.Ordinal);
+        var violations = new List<string>();
+
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (var file in EnumerateXamlFiles(root))
+            {
+                var document = LoadXaml(file);
+                foreach (var element in document.Root!.DescendantsAndSelf())
+                {
+                    foreach (
+                        var sizeAttribute in element.Attributes().Where(attribute =>
+                            IsFontSizePropertyName(attribute.Name.LocalName)
+                            && iconSizes.Contains(attribute.Value)
+                        )
+                    )
+                    {
+                        var matchingFamilyProperty = sizeAttribute.Name.LocalName.Replace(
+                            "FontSize",
+                            "FontFamily",
+                            StringComparison.Ordinal
+                        );
+                        var isDirectIconEntry =
+                            (string?)element.Attribute("Role") == "Icon"
+                            || element.Attributes().Any(attribute =>
+                                attribute.Name.LocalName == matchingFamilyProperty
+                                && attribute.Value == iconFamily
+                            );
+                        var isIconRoleSetter =
+                            element.Name.LocalName == "Setter"
+                            && (string?)element.Attribute("Property") == "FontSize"
+                            && element.Parent is { } trigger
+                            && trigger.Name.LocalName == "Trigger"
+                            && (string?)trigger.Attribute("Property") == "Role"
+                            && (string?)trigger.Attribute("Value") == "Icon"
+                            && trigger.Elements().Any(sibling =>
+                                sibling.Name.LocalName == "Setter"
+                                && (string?)sibling.Attribute("Property") == "FontFamily"
+                                && (string?)sibling.Attribute("Value") == iconFamily
+                            );
+
+                        if (!isDirectIconEntry && !isIconRoleSetter)
+                        {
+                            violations.Add(FormatViolation(file, sizeAttribute));
+                        }
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Default and contextual icon font-size resources are reserved for glyph entry points; text must use one of the four text tiers."
+        );
+    }
+
+    [Fact]
+    public void ProductCode_DoesNotAssignLiteralFontSizes()
+    {
+        var violations = new List<string>();
+
+        foreach (var root in new[] { FlourishRoot, GalleryRoot })
+        {
+            foreach (
+                var file in EnumerateProductSourceFiles(root).Where(file =>
+                    Path.GetExtension(file) == ".cs"
+                )
+            )
+            {
+                var lineNumber = 0;
+                foreach (var line in File.ReadLines(file))
+                {
+                    lineNumber++;
+                    if (LiteralFontSizeAssignmentPattern.IsMatch(line))
+                    {
+                        violations.Add($"{RelativePath(file)}:{lineNumber} ({line.Trim()})");
+                    }
+                }
+            }
+        }
+
+        AssertNoArchitectureViolations(
+            violations,
+            "Product code must bind UI font sizes to the canonical typography resources instead of assigning numeric literals."
+        );
+    }
+
+    [Fact]
+    public void TextRoles_MapToCanonicalSizeLineHeightBottomSpaceAndWeightMetrics()
+    {
+        var document = LoadXaml(
+            Path.Combine(FlourishRoot, "Controls", "TextBlock.xaml")
+        );
+        var style = document
+            .Descendants()
+            .Single(element =>
+                element.Name.LocalName == "Style"
+                && (string?)element.Attribute("TargetType")
+                    == "{x:Type controls:FlourishTextBlock}"
+            );
+        static string? SetterValue(XElement owner, string property)
+        {
+            return owner
+                .Elements()
+                .SingleOrDefault(element =>
+                    element.Name.LocalName == "Setter"
+                    && (string?)element.Attribute("Property") == property
+                )
+                ?.Attribute("Value")
+                ?.Value;
+        }
+
+        var baseFontFamily = SetterValue(style, "FontFamily");
+        var baseFontSize = SetterValue(style, "FontSize");
+        var baseFontWeight = SetterValue(style, "FontWeight");
+        var baseLineHeight = SetterValue(style, "LineHeight");
+        var baseBottomSpace = SetterValue(style, "Padding");
+
+        Assert.Equal("{DynamicResource FlourishFontFamily}", baseFontFamily);
+        Assert.Equal("{DynamicResource FlourishFontSizeStandard}", baseFontSize);
+        Assert.Equal("Regular", baseFontWeight);
+        Assert.Equal("{DynamicResource FlourishLineHeightStandard}", baseLineHeight);
+        Assert.Equal(
+            "{DynamicResource FlourishTypographyBottomSpaceStandard}",
+            baseBottomSpace
+        );
+        Assert.Equal("BlockLineHeight", SetterValue(style, "LineStackingStrategy"));
+
+        var roleTriggers = style
+            .Descendants()
+            .Where(element =>
+                element.Name.LocalName == "Trigger"
+                && (string?)element.Attribute("Property") == "Role"
+            )
+            .ToDictionary(
+                element => (string)element.Attribute("Value")!,
+                StringComparer.Ordinal
+            );
+
+        foreach (var role in Enum.GetValues<FlourishTextRole>())
+        {
+            var expectedTier = role switch
+            {
+                FlourishTextRole.Caption or FlourishTextRole.Status => "Small",
+                FlourishTextRole.Icon => "Icon",
+                FlourishTextRole.CardTitle => "Large",
+                FlourishTextRole.SectionTitle => "ExtraLarge",
+                FlourishTextRole.PageTitle => "HeaderSize",
+                _ => "Standard",
+            };
+            var actualFamily = baseFontFamily;
+            var actualSize = baseFontSize;
+            var actualWeight = baseFontWeight;
+            var actualLineHeight = baseLineHeight;
+            var actualBottomSpace = baseBottomSpace;
+
+            if (roleTriggers.TryGetValue(role.ToString(), out var trigger))
+            {
+                actualFamily = SetterValue(trigger, "FontFamily") ?? actualFamily;
+                actualSize = SetterValue(trigger, "FontSize") ?? actualSize;
+                actualWeight = SetterValue(trigger, "FontWeight") ?? actualWeight;
+                actualLineHeight = SetterValue(trigger, "LineHeight") ?? actualLineHeight;
+                actualBottomSpace = SetterValue(trigger, "Padding") ?? actualBottomSpace;
+            }
+
+            Assert.Equal(
+                $"{{DynamicResource FlourishFontSize{expectedTier}}}",
+                actualSize
+            );
+            Assert.Equal(
+                $"{{DynamicResource FlourishLineHeight{expectedTier}}}",
+                actualLineHeight
+            );
+            Assert.Equal(
+                $"{{DynamicResource FlourishTypographyBottomSpace{expectedTier}}}",
+                actualBottomSpace
+            );
+            Assert.Equal(
+                expectedTier is "Large" or "ExtraLarge" or "HeaderSize" ? "Bold" : "Regular",
+                actualWeight
+            );
+            Assert.Equal(
+                role == FlourishTextRole.Icon
+                    ? "{DynamicResource FlourishIconFontFamily}"
+                    : "{DynamicResource FlourishFontFamily}",
+                actualFamily
+            );
+        }
+    }
+
+    [Fact]
+    public void CardAndChunkTitleHosts_UseTheirCanonicalHeadingRoles()
+    {
+        (string FileName, string ExpectedRole)[] expectations =
+        [
+            ("Card.xaml", "CardTitle"),
+            ("CardButton.xaml", "CardTitle"),
+            ("IconCard.xaml", "CardTitle"),
+            ("ListCard.xaml", "CardTitle"),
+            ("Chunk.xaml", "SectionTitle"),
+            ("ChunkHero.xaml", "PageTitle"),
+        ];
+
+        foreach (var (fileName, expectedRole) in expectations)
+        {
+            var document = LoadXaml(
+                Path.Combine(FlourishRoot, "Controls", fileName)
+            );
+            var titleHost = document
+                .Descendants()
+                .Single(element =>
+                    (string?)element.Attribute(XName.Get("Name", XamlNamespace))
+                    == "TitleHost"
+                );
+
+            Assert.Equal(expectedRole, (string?)titleHost.Attribute("Role"));
+        }
+    }
+
+    [Fact]
     public void ShellTypography_UsesRootPixelAlignmentAndWpfTextRenderingDefaults()
     {
         var shell = LoadXaml(
@@ -1223,6 +2054,66 @@ public sealed class FlourishXamlArchitectureTests
     private static IEnumerable<string> EnumerateXamlFiles(string directory)
     {
         return Directory.EnumerateFiles(directory, "*.xaml", SearchOption.AllDirectories);
+    }
+
+    private static IEnumerable<string> EnumerateProductSourceFiles(string directory)
+    {
+        return Directory
+            .EnumerateFiles(directory, "*", SearchOption.AllDirectories)
+            .Where(file =>
+                Path.GetExtension(file) is ".cs" or ".xaml"
+                && !NormalizePath(Path.GetRelativePath(directory, file))
+                    .Split('/')
+                    .Any(segment => segment is "bin" or "obj")
+            );
+    }
+
+    private static bool IsFontSizePropertyName(string propertyName)
+    {
+        return propertyName == "FontSize"
+            || propertyName.EndsWith(".FontSize", StringComparison.Ordinal);
+    }
+
+    private static bool IsFontSizeSetter(XElement element)
+    {
+        return element.Name.LocalName == "Setter"
+            && IsFontSizePropertyName(
+                (string?)element.Attribute("Property") ?? string.Empty
+            );
+    }
+
+    private static bool IsFontWeightSetter(XElement element)
+    {
+        return element.Name.LocalName == "Setter"
+            && (string?)element.Attribute("Property") == "FontWeight";
+    }
+
+    private static Thickness ParseThickness(string value)
+    {
+        var values = value
+            .Split(',')
+            .Select(part => XmlConvert.ToDouble(part.Trim()))
+            .ToArray();
+        return values.Length switch
+        {
+            1 => new Thickness(values[0]),
+            2 => new Thickness(values[0], values[1], values[0], values[1]),
+            4 => new Thickness(values[0], values[1], values[2], values[3]),
+            _ => throw new InvalidDataException($"'{value}' is not a WPF Thickness."),
+        };
+    }
+
+    private static void AssertParameterContract(
+        MethodBase method,
+        IReadOnlyList<Type> expectedTypes,
+        IReadOnlyList<string> expectedNames
+    )
+    {
+        var parameters = method.GetParameters();
+        Assert.Equal(expectedTypes.Count, parameters.Length);
+        Assert.Equal(expectedTypes, parameters.Select(parameter => parameter.ParameterType));
+        Assert.Equal(expectedNames, parameters.Select(parameter => parameter.Name));
+        Assert.All(parameters, parameter => Assert.False(parameter.IsOptional));
     }
 
     private static string FormatViolation(string file, XObject node)

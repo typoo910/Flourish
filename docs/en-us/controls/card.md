@@ -179,7 +179,7 @@ Prefer `FlourishComboBox`, `FlourishCheckBox`, and `Button` in `Body`; use `Flou
     <TextBlock
       AutomationProperties.Name="Reports"
       FontFamily="Segoe Fluent Icons"
-      FontSize="32"
+      FontSize="{DynamicResource FlourishFontSizeStandard}"
       Text="&#xE8A5;" />
   </flourish:IconCard.Presenter>
   <flourish:IconCard.Body>

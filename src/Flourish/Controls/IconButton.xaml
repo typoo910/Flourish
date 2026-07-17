@@ -14,7 +14,7 @@
         VerticalAlignment="Center"
         Content="{Binding Icon, RelativeSource={RelativeSource AncestorType={x:Type controls:IconButton}}}"
         TextElement.FontFamily="{DynamicResource FlourishIconFontFamily}"
-        TextElement.FontSize="{DynamicResource FlourishFontSizeCaption}"
+        TextElement.FontSize="{DynamicResource FlourishFontSizeIcon}"
       />
       <ContentPresenter
         x:Name="LabelHost"
@@ -94,7 +94,7 @@
           Content="{TemplateBinding Icon}"
           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
           TextElement.FontFamily="{DynamicResource FlourishIconFontFamily}"
-          TextElement.FontSize="{DynamicResource FlourishFontSizeCaption}"
+          TextElement.FontSize="{DynamicResource FlourishFontSizeIcon}"
         />
       </Grid>
     </Grid>

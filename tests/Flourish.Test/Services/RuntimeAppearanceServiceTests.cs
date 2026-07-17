@@ -23,14 +23,25 @@ public sealed class RuntimeAppearanceServiceTests
         FlourishFontChangedEventArgs? change = null;
         sut.Changed += (_, args) => change = args;
 
-        sut.SetFont("Arial", 16);
+        sut.SetFont("Arial", 13, 16, 18, 21, 24, 30);
         sut.SetIconFontFamily("Segoe Fluent Icons");
 
         Assert.Equal("Arial", sut.FontFamily);
-        Assert.Equal(16, sut.FontSize);
+        Assert.Equal(13, sut.SmallFontSize);
+        Assert.Equal(16, sut.StandardFontSize);
+        Assert.Equal(18, sut.IconFontSize);
+        Assert.Equal(21, sut.LargeFontSize);
+        Assert.Equal(24, sut.ExtraLargeFontSize);
+        Assert.Equal(30, sut.HeaderSizeFontSize);
         Assert.Equal("Segoe Fluent Icons", sut.IconFontFamily);
         Assert.NotNull(change);
         Assert.Equal("Segoe Fluent Icons", change.IconFontFamily);
+        Assert.Equal(13, change.SmallFontSize);
+        Assert.Equal(16, change.StandardFontSize);
+        Assert.Equal(18, change.IconFontSize);
+        Assert.Equal(21, change.LargeFontSize);
+        Assert.Equal(24, change.ExtraLargeFontSize);
+        Assert.Equal(30, change.HeaderSizeFontSize);
     }
 
     [Theory]
@@ -38,11 +49,43 @@ public sealed class RuntimeAppearanceServiceTests
     [InlineData(-1)]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
-    public void FontService_InvalidSize_Throws(double size)
+    public void FontService_InvalidTier_Throws(double size)
     {
         IFontService sut = new FontService(new FlourishShellOptions());
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => sut.SetFontSize(size));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", size, 14, 16, 18, 20, 24)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", 12, size, 16, 18, 20, 24)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", 12, 14, size, 18, 20, 24)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", 12, 14, 16, size, 20, 24)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", 12, 14, 16, 18, size, 24)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetFont("Arial", 12, 14, 16, 18, 20, size)
+        );
+    }
+
+    [Fact]
+    public void FontService_IndependentPositiveTiers_AcceptsEqualAndUnorderedSizes()
+    {
+        IFontService sut = new FontService(new FlourishShellOptions());
+
+        sut.SetFont("Arial", 30, 14, 16, 16, 12, 10);
+
+        Assert.Equal(30, sut.SmallFontSize);
+        Assert.Equal(14, sut.StandardFontSize);
+        Assert.Equal(16, sut.IconFontSize);
+        Assert.Equal(16, sut.LargeFontSize);
+        Assert.Equal(12, sut.ExtraLargeFontSize);
+        Assert.Equal(10, sut.HeaderSizeFontSize);
     }
 
     [Fact]
@@ -52,24 +95,39 @@ public sealed class RuntimeAppearanceServiceTests
         var changes = 0;
         sut.Changed += (_, _) => changes++;
 
-        sut.SetOverrideFont<RuntimeFontPage>("Consolas");
+        sut.SetOverrideFont<RuntimeFontPage>("Consolas", null, null, null, null, null, null);
         var firstSnapshot = sut.PageOverrides;
-        sut.SetOverrideFont<RuntimeFontPage>("Consolas");
+        sut.SetOverrideFont<RuntimeFontPage>("Consolas", null, null, null, null, null, null);
 
         Assert.Equal(1, changes);
         var pageOverride = Assert.Single(firstSnapshot);
         Assert.Equal(typeof(RuntimeFontPage), pageOverride.Key);
-        Assert.Equal(new FlourishPageFontOverride("Consolas", null), pageOverride.Value);
+        Assert.Equal(
+            new FlourishPageFontOverride("Consolas", null, null, null, null, null, null),
+            pageOverride.Value
+        );
+        Assert.Null(pageOverride.Value.SmallFontSize);
+        Assert.Null(pageOverride.Value.StandardFontSize);
+        Assert.Null(pageOverride.Value.IconFontSize);
+        Assert.Null(pageOverride.Value.LargeFontSize);
+        Assert.Null(pageOverride.Value.ExtraLargeFontSize);
+        Assert.Null(pageOverride.Value.HeaderSizeFontSize);
         Assert.Throws<NotSupportedException>(() =>
             ((IDictionary<Type, FlourishPageFontOverride>)firstSnapshot).Add(
                 typeof(SecondRuntimeFontPage),
-                new FlourishPageFontOverride("Arial", 15)
+                new FlourishPageFontOverride("Arial", 13, 15, 17, 19, 22, 28)
             )
         );
 
-        sut.SetOverrideFont(typeof(RuntimeFontPage), "Arial", 16);
+        sut.SetOverrideFont(typeof(RuntimeFontPage), "Arial", 13, 16, 18, 21, 24, 30);
         Assert.Equal(2, changes);
-        Assert.Equal(16, sut.PageOverrides[typeof(RuntimeFontPage)].FontSize);
+        var current = sut.PageOverrides[typeof(RuntimeFontPage)];
+        Assert.Equal(13, current.SmallFontSize);
+        Assert.Equal(16, current.StandardFontSize);
+        Assert.Equal(18, current.IconFontSize);
+        Assert.Equal(21, current.LargeFontSize);
+        Assert.Equal(24, current.ExtraLargeFontSize);
+        Assert.Equal(30, current.HeaderSizeFontSize);
         Assert.True(sut.ClearOverrideFont<RuntimeFontPage>());
         Assert.False(sut.ClearOverrideFont(typeof(RuntimeFontPage)));
         Assert.Equal(3, changes);
@@ -85,7 +143,7 @@ public sealed class RuntimeAppearanceServiceTests
         IFontService sut = new FontService(new FlourishShellOptions());
 
         Assert.Throws<ArgumentException>(() =>
-            sut.SetOverrideFont<RuntimeFontPage>(fontFamily!)
+            sut.SetOverrideFont<RuntimeFontPage>(fontFamily!, null, null, null, null, null, null)
         );
     }
 
@@ -94,12 +152,48 @@ public sealed class RuntimeAppearanceServiceTests
     [InlineData(-1)]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
-    public void FontService_PageOverrideRejectsInvalidSize(double fontSize)
+    public void FontService_PageOverrideRejectsInvalidTier(double size)
     {
         IFontService sut = new FontService(new FlourishShellOptions());
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            sut.SetOverrideFont<RuntimeFontPage>("Arial", fontSize)
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", size, null, null, null, null, null)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", null, size, null, null, null, null)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", null, null, size, null, null, null)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", null, null, null, size, null, null)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", null, null, null, null, size, null)
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            sut.SetOverrideFont<RuntimeFontPage>("Arial", null, null, null, null, null, size)
+        );
+    }
+
+    [Fact]
+    public void FontService_PageOverrideAcceptsEqualAndUnorderedPositiveTiers()
+    {
+        IFontService sut = new FontService(new FlourishShellOptions());
+
+        sut.SetOverrideFont<RuntimeFontPage>(
+            "Arial",
+            30,
+            14,
+            16,
+            16,
+            12,
+            10
+        );
+
+        Assert.Equal(
+            new FlourishPageFontOverride("Arial", 30, 14, 16, 16, 12, 10),
+            sut.PageOverrides[typeof(RuntimeFontPage)]
         );
     }
 
@@ -109,13 +203,22 @@ public sealed class RuntimeAppearanceServiceTests
         IFontService sut = new FontService(new FlourishShellOptions());
 
         Assert.Throws<ArgumentNullException>(() =>
-            sut.SetOverrideFont(null!, "Arial")
+            sut.SetOverrideFont(null!, "Arial", null, null, null, null, null, null)
         );
         Assert.Throws<ArgumentException>(() =>
-            sut.SetOverrideFont(typeof(string), "Arial")
+            sut.SetOverrideFont(typeof(string), "Arial", null, null, null, null, null, null)
         );
         Assert.Throws<ArgumentException>(() =>
-            sut.SetOverrideFont(typeof(AbstractRuntimeFontPage), "Arial")
+            sut.SetOverrideFont(
+                typeof(AbstractRuntimeFontPage),
+                "Arial",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
         );
     }
 

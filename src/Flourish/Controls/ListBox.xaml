@@ -11,7 +11,7 @@
     <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
     <Setter Property="Padding" Value="2" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="ScrollViewer.CanContentScroll" Value="True" />

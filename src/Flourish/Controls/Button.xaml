@@ -169,7 +169,7 @@
     <Setter Property="BorderThickness" Value="{DynamicResource FlourishControlBorderThickness}" />
     <Setter Property="Foreground" Value="{DynamicResource FlourishPrimaryForegroundBrush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisualStyle}" />
     <Setter Property="SnapsToDevicePixels" Value="True" />

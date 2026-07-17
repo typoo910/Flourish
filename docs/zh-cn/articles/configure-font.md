@@ -1,51 +1,83 @@
 ---
 title: 排版
-description: 配置 Flourish Shell 与应用页面使用的全局字体，并按页面提供可选覆盖。
+description: 配置 Flourish Shell 与应用页面使用的全局字体、五档文字字号、Icon 字号及可选的页面覆盖。
 ---
 
 # 排版
 
-`UseGlobalFont` 设置 Shell 区域、已导航的应用页面和 Profile 页面使用的字体系列与基础字号。
+在 `ConfigureShell` 中调用 `UseGlobalFont`，可以同时设置 Shell 区域、已导航页面和 Profile 页面使用的字体系列、五档文字字号与独立 Icon 字号。
 
-## 最小配置
+## 配置全局字体
 
 ```csharp
 builder.ConfigureShell(shell =>
-    shell.UseGlobalFont("Microsoft YaHei UI", 14));
+    shell.UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32));
 ```
 
-只需更改字体系列时可以省略字号，基础字号默认为 `14`。
+七个参数依次是字体系列、Small、Standard、Icon、Large、ExtraLarge 与 HeaderSize。每个字号都必须是有限正数，各档彼此独立，可以使用相同数值；Flourish 不限制它们的相对大小。未调用 `UseGlobalFont` 时，Flourish 默认使用 `Segoe UI` 与 `12`、`14`、`16`、`16`、`24`、`32` DIP。
 
-## 字体覆盖范围
+内置控件将普通文字设为 Standard，导航分组与状态/输出文字使用 Small，图标字形使用 Icon，卡片标题使用 `Bold` 的 Large，Chunk 标题使用 `Bold` 的 ExtraLarge，ChunkHero 标题使用 `Bold` 的 HeaderSize。Small 与 Standard 使用紧凑行高和最小下方空间，Large、ExtraLarge 与 HeaderSize 逐级增大，Icon 不增加下方空间。
 
-所选字体应覆盖应用显示的全部语言，并提供 `Regular` 与 `Bold` 字形。包含中文与拉丁文字的界面应选择同时提供这些字形的字体；缺少字形时，WPF 会使用字体回退，实际外观可能与 Shell 的其他文字不同。
+Icon 是默认图标字号。由于 Segoe MDL2 的不同字形拥有不同的天然边界，Flourish 会进行固定的视觉校正：导航栏 `18`、标题栏命令 `16`、窗口标题按钮 `12`、搜索图标 `14`、状态栏项目 `14`、状态栏后台任务 `12`、后台任务详情 `16`、系统状态详情 `16` DIP。这些场景校正不会改变配置的默认 Icon 值。
 
-主内容区域与 Profile 中显示的页面会继承已配置的全局字体。明确设置了局部字体的子控件仍保留自己的值，例如使用 `Consolas` 的代码段或使用图标字体的图标。
+字体系列应覆盖应用显示的全部语言，并提供 `Regular` 与 `Bold` 字形。
+
+主内容区域与 Profile 中显示的页面都会继承全局字体。显式设置了本地字体的子控件会按照 WPF 属性优先级保留本地值；图标槽位使用图标字体是有意的字形字体通道。
 
 ## 覆盖单个页面
 
-当某个页面需要不同的文字字体时，使用 `SetOverrideFont<TPage>`。省略可选字号后，该页面仍会跟随全局基础字号。
+`SetOverrideFont<TPage>` 可以覆盖指定页面的字体系列或字号。某一档传入 `null` 时，该档继续跟随全局值。
 
 ```csharp
 builder.ConfigureShell(shell =>
     shell
-        .UseGlobalFont("Microsoft YaHei UI", 14)
-        .SetOverrideFont<CodeEditorPage>("Cascadia Mono"));
+        .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32)
+        .SetOverrideFont<CodeEditorPage>(
+            "Cascadia Mono",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
+
+shell.SetOverrideFont<PresentationPage>(
+    "Microsoft YaHei UI",
+    14,
+    16,
+    19,
+    22,
+    26,
+    32);
 ```
 
-如果页面还需要独立的排版比例，可以同时指定字号：
+页面覆盖中提供的每一档都必须是有限正数；除此之外各档彼此独立，包括通过 `null` 继承的值。
+
+## 在运行时修改
+
+`IFontService` 在应用启动后提供相同的原子七参数模型。页面覆盖会按配置时的页面类型匹配，并在缓存页面或动态注册页面显示时重新应用。
 
 ```csharp
-shell.SetOverrideFont<PresentationPage>("Microsoft YaHei UI", 16);
-```
+fontService.SetFont("Segoe UI", 12, 14, 16, 16, 24, 32);
 
-## 运行时修改覆盖
+fontService.SetOverrideFont<CodeEditorPage>(
+    "Cascadia Mono",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null);
 
-`IFontService` 在启动后提供相同模型。覆盖按配置的页面类型匹配，并会在缓存页面或动态注册页面再次显示时重新应用。
-
-```csharp
-fontService.SetOverrideFont<CodeEditorPage>("Cascadia Mono");
-fontService.SetOverrideFont(typeof(DiagnosticsPage), "Microsoft YaHei UI", 15);
+fontService.SetOverrideFont(
+    typeof(DiagnosticsPage),
+    "Segoe UI",
+    11,
+    14,
+    16,
+    19,
+    22,
+    28);
 
 IReadOnlyDictionary<Type, FlourishPageFontOverride> overrides =
     fontService.PageOverrides;
@@ -53,14 +85,10 @@ IReadOnlyDictionary<Type, FlourishPageFontOverride> overrides =
 fontService.ClearOverrideFont<CodeEditorPage>();
 ```
 
-清除覆盖后，当前页面会立即返回最新的全局字体。覆盖字号为 `null` 时，页面会继续跟随后续的全局字号变化。
-
-## 字号约束
-
-字号必须是有限正数。Flourish 会从基础字号派生多个文本尺寸，因此调整该值会同时改变不同 Shell 区域和页面控件的文字比例。
+清除覆盖后，当前页面会立即返回最新的全局字体。页面覆盖中的 `null` 档位会继续跟随后续全局变化。
 
 ## 相关功能
 
-- [窗口](configure-window.md)定义排版需要适配的可用尺寸。
-- [标题栏](configure-title-bar.md)、[导航](navigation.md)和[状态栏](status-bar.md)会显示受全局排版影响的 Shell 文本。
-- [主题](configure-themes.md)提供与文字颜色和背景相关的资源。
+- [窗口](configure-window.md)定义排版需要适配的可用空间。
+- [标题栏](configure-title-bar.md)、[导航](navigation.md)与[状态栏](status-bar.md)会显示受全局排版影响的 Shell 文字。
+- [主题](configure-themes.md)提供文字与背景颜色资源。

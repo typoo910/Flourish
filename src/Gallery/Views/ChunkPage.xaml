@@ -46,8 +46,9 @@
               <flourish:FlourishTextBlock
                 HorizontalAlignment="Center"
                 FontFamily="{DynamicResource FlourishIconFontFamily}"
-                FontSize="48"
+                FontSize="{DynamicResource FlourishFontSizeIcon}"
                 Foreground="{DynamicResource FlourishPrimaryForegroundBrush}"
+                Role="Icon"
                 Text="&#xE7C8;"
               />
               <flourish:FlourishTextBlock
@@ -81,8 +82,9 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource FlourishIconFontFamily}"
-                FontSize="28"
+                FontSize="{DynamicResource FlourishFontSizeIcon}"
                 Foreground="{DynamicResource FlourishAccentForegroundBrush}"
+                Role="Icon"
                 Text="&#xE8A5;"
                 TextAlignment="Center"
               />

@@ -6,57 +6,54 @@
   <FontFamily x:Key="FlourishIconFontFamily">Segoe MDL2 Assets</FontFamily>
 
   <sys:Double x:Key="FlourishFontSizeSmall" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    10
-  </sys:Double>
-  <sys:Double x:Key="FlourishFontSizeCaption" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     12
   </sys:Double>
-  <sys:Double x:Key="FlourishFontSizeDescription" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    13
-  </sys:Double>
-  <sys:Double x:Key="FlourishFontSizeBase" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <sys:Double x:Key="FlourishFontSizeStandard" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     14
   </sys:Double>
-  <sys:Double x:Key="FlourishFontSizeSubtitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <sys:Double x:Key="FlourishFontSizeIcon" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     16
   </sys:Double>
-  <sys:Double
-    x:Key="FlourishFontSizeSectionTitle"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  >
-    20
+  <sys:Double x:Key="FlourishIconFontSizeNavigation" xmlns:sys="clr-namespace:System;assembly=mscorlib">18</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeTitlebar" xmlns:sys="clr-namespace:System;assembly=mscorlib">16</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeWindowCaption" xmlns:sys="clr-namespace:System;assembly=mscorlib">12</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeTitlebarSearch" xmlns:sys="clr-namespace:System;assembly=mscorlib">14</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeStatusBar" xmlns:sys="clr-namespace:System;assembly=mscorlib">14</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeStatusBarBackgroundTask" xmlns:sys="clr-namespace:System;assembly=mscorlib">12</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeBackgroundTaskView" xmlns:sys="clr-namespace:System;assembly=mscorlib">16</sys:Double>
+  <sys:Double x:Key="FlourishIconFontSizeSystemStatusView" xmlns:sys="clr-namespace:System;assembly=mscorlib">16</sys:Double>
+  <sys:Double x:Key="FlourishFontSizeLarge" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    16
   </sys:Double>
-  <sys:Double x:Key="FlourishFontSizePageTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    32
-  </sys:Double>
-  <sys:Double x:Key="FlourishFontSizeTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    14
-  </sys:Double>
-  <sys:Double x:Key="FlourishLineHeightBody" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    21
-  </sys:Double>
-  <sys:Double x:Key="FlourishLineHeightDescription" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    18
-  </sys:Double>
-  <sys:Double x:Key="FlourishLineHeightSubtitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <sys:Double x:Key="FlourishFontSizeExtraLarge" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     24
   </sys:Double>
-  <sys:Double
-    x:Key="FlourishFontSizeTitlebarIcon"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  >
+  <sys:Double x:Key="FlourishFontSizeHeaderSize" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    32
+  </sys:Double>
+  <sys:Double x:Key="FlourishLineHeightSmall" xmlns:sys="clr-namespace:System;assembly=mscorlib">
     14
   </sys:Double>
-  <sys:Double
-    x:Key="FlourishFontSizeNavigationIcon"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  >
-    14
+  <sys:Double x:Key="FlourishLineHeightStandard" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    16
   </sys:Double>
-  <sys:Double
-    x:Key="FlourishFontSizeWindowButtonIcon"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  >
-    11
+  <sys:Double x:Key="FlourishLineHeightIcon" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    16
   </sys:Double>
+  <sys:Double x:Key="FlourishLineHeightLarge" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    20
+  </sys:Double>
+  <sys:Double x:Key="FlourishLineHeightExtraLarge" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    29
+  </sys:Double>
+  <sys:Double x:Key="FlourishLineHeightHeaderSize" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    37
+  </sys:Double>
+
+  <Thickness x:Key="FlourishTypographyBottomSpaceSmall">0,0,0,1</Thickness>
+  <Thickness x:Key="FlourishTypographyBottomSpaceStandard">0,0,0,1</Thickness>
+  <Thickness x:Key="FlourishTypographyBottomSpaceIcon">0</Thickness>
+  <Thickness x:Key="FlourishTypographyBottomSpaceLarge">0,0,0,2</Thickness>
+  <Thickness x:Key="FlourishTypographyBottomSpaceExtraLarge">0,0,0,3</Thickness>
+  <Thickness x:Key="FlourishTypographyBottomSpaceHeaderSize">0,0,0,4</Thickness>
 </ResourceDictionary>

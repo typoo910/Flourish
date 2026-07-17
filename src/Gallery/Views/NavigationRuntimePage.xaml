@@ -152,7 +152,7 @@
           </StackPanel>
           <flourish:Card Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Output">
             <flourish:Card.Body>
-              <flourish:FlourishTextBlock x:Name="RouteStateText" FontFamily="Consolas" Role="Status" />
+              <flourish:FlourishTextBlock x:Name="RouteStateText" Role="Status" />
             </flourish:Card.Body>
           </flourish:Card>
         </Grid>
@@ -210,7 +210,7 @@
           </StackPanel>
           <flourish:Card Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Stretch" Title="Output">
             <flourish:Card.Body>
-              <flourish:FlourishTextBlock x:Name="CacheStateText" FontFamily="Consolas" Role="Status" />
+              <flourish:FlourishTextBlock x:Name="CacheStateText" Role="Status" />
             </flourish:Card.Body>
           </flourish:Card>
         </Grid>

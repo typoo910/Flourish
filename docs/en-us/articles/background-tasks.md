@@ -35,7 +35,7 @@ public sealed class ExportViewModel(IBackgroundTaskService backgroundTasks)
 
 Every submission requires `FlourishBackgroundTaskMetadata`. `Name` must contain text; `Description` and `IconGlyph` are optional. Supply user-facing metadata before submitting the task because the Shell uses it for tooltips, task rows, automation names, and status icons.
 
-While work is active, the left side of the status bar shows one icon for each running or cancelling task. Hovering an icon shows its metadata, state, and reported progress; clicking it opens the background-task flyout. If all execution slots are occupied, later submissions remain queued and a queue icon displays their count. The queue provides cancellation actions for queued or running work.
+While work is active, the left side of the status bar shows one icon for each running or cancelling task. Hovering an icon shows its metadata, state, and reported progress; clicking it opens the background-task flyout. If all execution slots are occupied, later submissions remain queued and a plain number displays the waiting count without an icon or badge. The queue provides cancellation actions for queued or running work.
 
 Task status and queue details remain available when the application omits `UseTips()`. The task and queue buttons support pointer and keyboard interaction.
 

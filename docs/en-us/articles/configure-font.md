@@ -5,47 +5,79 @@ description: Set the global font used by Flourish shell surfaces and application
 
 # Typography
 
-Use `UseGlobalFont` inside `ConfigureShell` to set the font family and base size for shell surfaces, navigated application pages, and the Profile page.
+Use `UseGlobalFont` inside `ConfigureShell` to set the font family, five text sizes, and the dedicated icon size for shell surfaces, navigated application pages, and the Profile page.
 
 ## Configure shell typography
 
 ```csharp
 builder.ConfigureShell(shell =>
-    shell.UseGlobalFont("Segoe UI", 14));
+    shell.UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32));
 ```
 
-When only the font family is supplied, `UseGlobalFont` uses a base size of `14`.
+The seven parameters are the font family followed by Small, Standard, Icon, Large, ExtraLarge, and HeaderSize. Each size must be positive and finite. The tiers are independent and may use equal values; Flourish does not impose a relative size order. When `UseGlobalFont` is not called, Flourish uses `Segoe UI` with `12`, `14`, `16`, `16`, `24`, and `32` DIP.
 
-Choose a font family that supports every language displayed by the application and provides `Regular` and `Bold` faces. The base size must be positive and finite.
+Built-in controls use Standard for ordinary text, Small for navigation group labels and status/output text, Icon for glyphs, Large with `Bold` for card titles, ExtraLarge with `Bold` for Chunk titles, and HeaderSize with `Bold` for ChunkHero titles. Small and Standard have compact line spacing and bottom space; Large, ExtraLarge, and HeaderSize progressively add more, while Icon adds none.
 
-Flourish derives several text sizes from the base value, so changing it affects multiple shell regions and page controls. Verify the result at the window sizes the application supports.
+Icon is the default glyph size. Flourish applies fixed visual corrections where the Segoe MDL2 glyph bounds differ substantially: navigation `18`, title-bar commands `16`, window captions `12`, search `14`, status-bar items `14`, status-bar background tasks `12`, background-task detail rows `16`, and system-status detail rows `16` DIP. These contextual corrections do not change the configured default Icon value.
+
+Choose a font family that supports every language displayed by the application and provides `Regular` and `Bold` faces.
 
 Pages displayed in the main content frame or Profile inherit the configured global font. A child control with an explicit local font, such as a code sample using `Consolas` or an icon using the icon font, keeps that local value.
 
 ## Override one page
 
-Use `SetOverrideFont<TPage>` when one page needs a different text family. Omit the optional size to keep following the global base size.
+Use `SetOverrideFont<TPage>` when one page needs a different text family or size scale. Pass `null` for any tier that should continue following its global value.
 
 ```csharp
 builder.ConfigureShell(shell =>
     shell
-        .UseGlobalFont("Segoe UI", 14)
-        .SetOverrideFont<CodeEditorPage>("Cascadia Mono"));
+        .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32)
+        .SetOverrideFont<CodeEditorPage>(
+            "Cascadia Mono",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
+
+shell.SetOverrideFont<PresentationPage>(
+    "Aptos Display",
+    14,
+    16,
+    19,
+    22,
+    26,
+    32);
 ```
 
-Pass a size when the page should also have an independent typography scale.
+Every supplied page tier must be positive and finite. Tiers are otherwise independent, including values inherited through `null`.
+
+## Change typography at runtime
+
+`IFontService` applies the same atomic seven-value model after startup. Overrides are matched by configured page type and are reapplied when cached or dynamically registered pages are displayed.
 
 ```csharp
-shell.SetOverrideFont<PresentationPage>("Aptos Display", 16);
-```
+fontService.SetFont("Segoe UI", 12, 14, 16, 16, 24, 32);
 
-## Change overrides at runtime
+fontService.SetOverrideFont<CodeEditorPage>(
+    "Cascadia Mono",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null);
 
-`IFontService` applies the same model after startup. Overrides are matched by configured page type and are reapplied when cached or dynamically registered pages are displayed.
-
-```csharp
-fontService.SetOverrideFont<CodeEditorPage>("Cascadia Mono");
-fontService.SetOverrideFont(typeof(DiagnosticsPage), "Segoe UI", 15);
+fontService.SetOverrideFont(
+    typeof(DiagnosticsPage),
+    "Segoe UI",
+    11,
+    14,
+    16,
+    19,
+    22,
+    28);
 
 IReadOnlyDictionary<Type, FlourishPageFontOverride> overrides =
     fontService.PageOverrides;
@@ -53,7 +85,7 @@ IReadOnlyDictionary<Type, FlourishPageFontOverride> overrides =
 fontService.ClearOverrideFont<CodeEditorPage>();
 ```
 
-Clearing an override immediately returns the active page to the latest global font. A `null` override size continues to follow later global size changes.
+Clearing an override immediately returns the active page to the latest global font. A `null` override tier continues to follow later global changes.
 
 ## Related features
 

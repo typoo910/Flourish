@@ -360,8 +360,9 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource FlourishIconFontFamily}"
-                FontSize="64"
+                FontSize="{DynamicResource FlourishFontSizeIcon}"
                 Foreground="#80FFFFFF"
+                Role="Icon"
                 Text="&#xE8A5;"
               />
             </Border>

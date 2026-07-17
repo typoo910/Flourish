@@ -196,6 +196,93 @@ public sealed class FlourishShellNavigationLayoutTests
     }
 
     [Fact]
+    public void NavigationGroupHeader_DeclaresTheSmallTypographyTier()
+    {
+        var shell = XDocument.Load(ShellXamlPath);
+        var groupHeader = FindNamedElement(shell, "NavigationGroupHeader");
+
+        Assert.Equal(
+            "{DynamicResource FlourishFontSizeSmall}",
+            (string?)groupHeader.Attribute("FontSize")
+        );
+        Assert.Equal(
+            "{DynamicResource FlourishLineHeightSmall}",
+            (string?)groupHeader.Attribute("LineHeight")
+        );
+        Assert.Equal(
+            "{DynamicResource FlourishTypographyBottomSpaceSmall}",
+            (string?)groupHeader.Attribute("Padding")
+        );
+        Assert.Equal("Bold", (string?)groupHeader.Attribute("FontWeight"));
+    }
+
+    [Fact]
+    public void NavigationGroupHeader_ResolvesSmallMetricsAndReplacesTheItemLayoutAtRuntime()
+    {
+        RunInSta(() =>
+        {
+            var item = new NavigationLayoutItem(
+                new Thickness(),
+                isGroupHeader: true
+            );
+            var listBox = new FlourishListBox
+            {
+                Width = 240,
+                Height = 64,
+                Appearance = FlourishListBoxAppearance.Navigation,
+                ItemTemplate = LoadNavigationItemTemplate(),
+                ItemsSource = new[] { item },
+            };
+            var window = new Window
+            {
+                Width = 280,
+                Height = 120,
+                Left = -10000,
+                Top = -10000,
+                ShowActivated = false,
+                ShowInTaskbar = false,
+                Content = listBox,
+            };
+            window.Resources.MergedDictionaries.Add(
+                LoadResourceDictionary(GenericThemeSource)
+            );
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                var container = Assert.IsType<FlourishListBoxItem>(
+                    listBox.ItemContainerGenerator.ContainerFromItem(item)
+                );
+                container.ApplyTemplate();
+                window.UpdateLayout();
+                var groupHeader = Assert.IsType<FlourishTextBlock>(
+                    FindVisualDescendant(container, "NavigationGroupHeader")
+                );
+                var itemLayout = Assert.IsType<Grid>(
+                    FindVisualDescendant(container, "NavigationItemLayout")
+                );
+
+                Assert.Equal(Visibility.Visible, groupHeader.Visibility);
+                Assert.Equal(Visibility.Collapsed, itemLayout.Visibility);
+                Assert.Equal(12d, groupHeader.FontSize);
+                Assert.Equal(14d, groupHeader.LineHeight);
+                Assert.Equal(new Thickness(0, 0, 0, 1), groupHeader.Padding);
+                Assert.Equal(FontWeights.Bold, groupHeader.FontWeight);
+                Assert.Equal(
+                    LineStackingStrategy.BlockLineHeight,
+                    groupHeader.LineStackingStrategy
+                );
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
     public void ShellChromeInsets_ComposeOneAlignedWindowEdgeBaseline()
     {
         var keyName = XName.Get("Key", XamlNamespace);
@@ -524,7 +611,165 @@ public sealed class FlourishShellNavigationLayoutTests
         Assert.Equal(12, geometry.Left);
         Assert.Equal(38, geometry.Width);
         Assert.Equal(32, geometry.Height);
-        Assert.Equal("{DynamicResource FlourishFontSizeNavigationIcon}", geometry.IconFontSize);
+        Assert.Equal("{DynamicResource FlourishIconFontSizeTitlebar}", geometry.IconFontSize);
+    }
+
+    [Fact]
+    public void ShellIconContextsUseDedicatedSizesAndCenterStatusHosts()
+    {
+        var titlebar = XDocument.Load(TitlebarXamlPath);
+        var shell = XDocument.Load(ShellXamlPath);
+
+        foreach (var name in new[] { "BackButton", "ForwardButton", "NavigationToggleButton" })
+        {
+            var icon = FindNamedElement(titlebar, name)
+                .Descendants()
+                .Single(element => element.Name.LocalName == "FlourishTextBlock");
+            AssertIconTypography(icon, "FlourishIconFontSizeTitlebar");
+        }
+
+        AssertIconTypography(
+            FindNamedElement(titlebar, "MaximizeButtonIcon"),
+            "FlourishIconFontSizeWindowCaption"
+        );
+        AssertIconTypography(
+            FindNamedElement(shell, "NavigationItemIcon"),
+            "FlourishIconFontSizeNavigation"
+        );
+        AssertIconTypography(
+            FindNamedElement(shell, "NavigationItemExpander"),
+            "FlourishIconFontSizeNavigation"
+        );
+
+        var queueButton = FindNamedElement(shell, "BackgroundTaskQueueButton");
+        Assert.Equal("Center", (string?)queueButton.Attribute("VerticalAlignment"));
+        var queueCount = FindNamedElement(shell, "BackgroundTaskQueueCountText");
+        Assert.Equal("Status", (string?)queueCount.Attribute("Role"));
+        Assert.Null(queueCount.Attribute("FontFamily"));
+        Assert.DoesNotContain(
+            queueButton.Descendants(),
+            element =>
+                element.Name.LocalName is "Grid" or "Border"
+                || ((string?)element.Attribute("Margin"))?.Contains('-') == true
+        );
+
+        var systemButton = FindNamedElement(shell, "SystemStatusButton");
+        Assert.Equal("Center", (string?)systemButton.Attribute("VerticalAlignment"));
+        AssertIconTypography(
+            systemButton.Descendants().Single(element =>
+                element.Name.LocalName == "FlourishTextBlock"
+            ),
+            "FlourishIconFontSizeStatusBar"
+        );
+
+        var controlsRoot = Path.Combine(RepositoryRoot, "src", "Flourish", "Controls");
+        var caption = XDocument.Load(Path.Combine(controlsRoot, "WindowCaptionButton.xaml"));
+        var captionHost = caption.Descendants().Single(element =>
+            element.Name.LocalName == "ContentPresenter"
+            && (string?)element.Attribute("TextElement.FontFamily")
+                == "{DynamicResource FlourishIconFontFamily}"
+        );
+        Assert.Equal(
+            "{DynamicResource FlourishIconFontSizeWindowCaption}",
+            (string?)captionHost.Attribute("TextElement.FontSize")
+        );
+        Assert.Equal(
+            "{DynamicResource FlourishIconFontSizeWindowCaption}",
+            (string?)captionHost.Attribute("TextBlock.LineHeight")
+        );
+
+        var search = XDocument.Load(Path.Combine(controlsRoot, "SearchBox.xaml"));
+        var searchIcon = search.Descendants().Single(element =>
+            element.Name.LocalName == "TextBlock"
+            && (string?)element.Attribute("FontFamily")
+                == "{DynamicResource FlourishIconFontFamily}"
+        );
+        AssertIconTypography(searchIcon, "FlourishIconFontSizeTitlebarSearch");
+
+        var shellSource = File.ReadAllText(ShellCodePath);
+        foreach (
+            var expectedCall in new[]
+            {
+                "BindIconTypography(icon, \"FlourishIconFontSizeStatusBarBackgroundTask\");",
+                "BindIconTypography(icon, \"FlourishIconFontSizeBackgroundTaskView\");",
+                "BindIconTypography(icon, \"FlourishIconFontSizeSystemStatusView\");",
+                "BindIconTypography(iconText, \"FlourishIconFontSizeStatusBar\");",
+            }
+        )
+        {
+            Assert.Contains(expectedCall, shellSource, StringComparison.Ordinal);
+        }
+
+        AssertSourceBlockCentersVertically(
+            shellSource,
+            "var status = new StackPanel",
+            "var iconText"
+        );
+        AssertSourceBlockCentersVertically(
+            shellSource,
+            "var button = new IconButton",
+            "button.Click"
+        );
+    }
+
+    [Fact]
+    public void StatusBarConfiguredLabelsUseSmallTextAndQueuedTasksUseAPlainCount()
+    {
+        var shell = XDocument.Load(ShellXamlPath);
+        var queueButton = FindNamedElement(shell, "BackgroundTaskQueueButton");
+        var queueCount = FindNamedElement(shell, "BackgroundTaskQueueCountText");
+
+        Assert.Equal("Collapsed", (string?)queueButton.Attribute("Visibility"));
+        Assert.Equal("Center", (string?)queueCount.Attribute("HorizontalAlignment"));
+        Assert.Equal("Center", (string?)queueCount.Attribute("VerticalAlignment"));
+        Assert.Equal("Center", (string?)queueCount.Attribute("TextAlignment"));
+        Assert.Equal("Status", (string?)queueCount.Attribute("Role"));
+        Assert.DoesNotContain(
+            queueButton.Descendants(),
+            element =>
+                element.Name.LocalName == "Border"
+                || (string?)element.Attribute("FontFamily")
+                    == "{DynamicResource FlourishIconFontFamily}"
+                || ((string?)element.Attribute("Margin"))?.Contains('-') == true
+        );
+
+        var shellSource = File.ReadAllText(ShellCodePath);
+        var statusItemsBlock = GetSourceBlock(
+            shellSource,
+            "private void BuildStatusItems()",
+            "private void BuildNotifications("
+        );
+        Assert.Contains(
+            "BindTextSize(labelText, \"FlourishFontSizeSmall\");",
+            statusItemsBlock,
+            StringComparison.Ordinal
+        );
+
+        var backgroundTasksBlock = GetSourceBlock(
+            shellSource,
+            "private void RefreshBackgroundTaskStatus(",
+            "private BackgroundTaskIconView CreateBackgroundTaskIconView("
+        );
+        Assert.Contains(
+            "queuedTasks.Length > 0 ? Visibility.Visible : Visibility.Collapsed",
+            backgroundTasksBlock,
+            StringComparison.Ordinal
+        );
+        Assert.Contains(
+            "BackgroundTaskQueueCountText.Text = queuedTasks.Length.ToString();",
+            backgroundTasksBlock,
+            StringComparison.Ordinal
+        );
+        Assert.Contains(
+            "AutomationProperties.SetName(",
+            backgroundTasksBlock,
+            StringComparison.Ordinal
+        );
+        Assert.Contains(
+            "FlourishLocaleKeys.BackgroundTaskWaitingCount",
+            backgroundTasksBlock,
+            StringComparison.Ordinal
+        );
     }
 
     [Fact]
@@ -909,6 +1154,37 @@ public sealed class FlourishShellNavigationLayoutTests
             );
     }
 
+    private static void AssertIconTypography(XElement element, string sizeResourceName)
+    {
+        var expected = $"{{DynamicResource {sizeResourceName}}}";
+        Assert.Equal(expected, (string?)element.Attribute("FontSize"));
+        Assert.Equal(expected, (string?)element.Attribute("LineHeight"));
+    }
+
+    private static void AssertSourceBlockCentersVertically(
+        string source,
+        string startMarker,
+        string endMarker
+    )
+    {
+        var start = source.IndexOf(startMarker, StringComparison.Ordinal);
+        var end = source.IndexOf(endMarker, start, StringComparison.Ordinal);
+        Assert.True(start >= 0 && end > start);
+        Assert.Contains(
+            "VerticalAlignment = VerticalAlignment.Center",
+            source[start..end],
+            StringComparison.Ordinal
+        );
+    }
+
+    private static string GetSourceBlock(string source, string startMarker, string endMarker)
+    {
+        var start = source.IndexOf(startMarker, StringComparison.Ordinal);
+        var end = source.IndexOf(endMarker, start, StringComparison.Ordinal);
+        Assert.True(start >= 0 && end > start);
+        return source[start..end];
+    }
+
     private static XElement FindNamedElement(XDocument document, string name)
     {
         var nameName = XName.Get("Name", XamlNamespace);
@@ -1252,7 +1528,10 @@ public sealed class FlourishShellNavigationLayoutTests
         );
     }
 
-    private sealed class NavigationLayoutItem(Thickness indentMargin)
+    private sealed class NavigationLayoutItem(
+        Thickness indentMargin,
+        bool isGroupHeader = false
+    )
     {
         public string Label { get; } = "Navigation item";
 
@@ -1262,7 +1541,7 @@ public sealed class FlourishShellNavigationLayoutTests
 
         public Thickness IndentMargin { get; } = indentMargin;
 
-        public bool IsGroupHeader { get; } = false;
+        public bool IsGroupHeader { get; } = isGroupHeader;
 
         public bool IsActiveChildParent { get; } = false;
 

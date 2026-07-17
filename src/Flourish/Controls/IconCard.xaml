@@ -51,7 +51,7 @@
             Content="{TemplateBinding Presenter}"
             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
             TextElement.FontFamily="{DynamicResource FlourishIconFontFamily}"
-            TextElement.FontSize="{DynamicResource FlourishFontSizeSectionTitle}"
+            TextElement.FontSize="{DynamicResource FlourishFontSizeIcon}"
             TextElement.Foreground="{TemplateBinding Foreground}"
           />
           <Border

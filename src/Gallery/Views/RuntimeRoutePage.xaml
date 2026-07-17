@@ -20,9 +20,9 @@
         <flourish:Card.Body>
           <StackPanel>
             <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,22,0,0" Text="PAGE INSTANCE" />
-            <flourish:FlourishTextBlock x:Name="InstanceText" FontFamily="Consolas" FontSize="16" Foreground="{DynamicResource FlourishPrimaryForegroundBrush}" TextWrapping="Wrap" />
+            <flourish:FlourishTextBlock x:Name="InstanceText" FontSize="{DynamicResource FlourishFontSizeStandard}" Foreground="{DynamicResource FlourishPrimaryForegroundBrush}" TextWrapping="Wrap" />
             <flourish:FlourishTextBlock Role="FieldLabel" Margin="0,18,0,0" Text="NAVIGATION PARAMETER" />
-            <flourish:FlourishTextBlock x:Name="ParameterText" FontFamily="Consolas" Foreground="{DynamicResource FlourishNeutralForeground1Brush}" TextWrapping="Wrap" />
+            <flourish:FlourishTextBlock x:Name="ParameterText" Foreground="{DynamicResource FlourishNeutralForeground1Brush}" TextWrapping="Wrap" />
           </StackPanel>
         </flourish:Card.Body>
       </flourish:Card>

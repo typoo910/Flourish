@@ -179,7 +179,7 @@ description: 使用 Card、ListCard 与 IconCard，在适配主题的非交互�
     <TextBlock
       AutomationProperties.Name="报告"
       FontFamily="Segoe Fluent Icons"
-      FontSize="32"
+      FontSize="{DynamicResource FlourishFontSizeStandard}"
       Text="&#xE8A5;" />
   </flourish:IconCard.Presenter>
   <flourish:IconCard.Body>

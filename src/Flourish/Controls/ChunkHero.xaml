@@ -44,6 +44,8 @@
           <StackPanel VerticalAlignment="Center">
             <controls:FlourishTextBlock
               x:Name="TitleHost"
+              FontSize="{DynamicResource FlourishFontSizeHeaderSize}"
+              FontWeight="Bold"
               Role="PageTitle"
               Text="{TemplateBinding ChunkHeroTitle}"
               TextWrapping="Wrap"

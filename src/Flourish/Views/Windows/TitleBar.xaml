@@ -46,7 +46,8 @@
         <controls:IconButton.Icon>
           <controls:FlourishTextBlock
             FontFamily="{DynamicResource FlourishIconFontFamily}"
-            FontSize="{DynamicResource FlourishFontSizeTitlebarIcon}"
+            FontSize="{DynamicResource FlourishIconFontSizeTitlebar}"
+            LineHeight="{DynamicResource FlourishIconFontSizeTitlebar}"
             Role="Icon"
             Text="&#xE72B;"
           />
@@ -68,7 +69,8 @@
         <controls:IconButton.Icon>
           <controls:FlourishTextBlock
             FontFamily="{DynamicResource FlourishIconFontFamily}"
-            FontSize="{DynamicResource FlourishFontSizeTitlebarIcon}"
+            FontSize="{DynamicResource FlourishIconFontSizeTitlebar}"
+            LineHeight="{DynamicResource FlourishIconFontSizeTitlebar}"
             Role="Icon"
             Text="&#xE72A;"
           />
@@ -91,7 +93,8 @@
       <controls:IconButton.Icon>
         <controls:FlourishTextBlock
           FontFamily="{DynamicResource FlourishIconFontFamily}"
-          FontSize="{DynamicResource FlourishFontSizeNavigationIcon}"
+          FontSize="{DynamicResource FlourishIconFontSizeTitlebar}"
+          LineHeight="{DynamicResource FlourishIconFontSizeTitlebar}"
           Role="Icon"
           Text="&#xE700;"
         />
@@ -129,7 +132,7 @@
             x:Name="LogoFallback"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            FontSize="{DynamicResource FlourishFontSizeTitle}"
+            FontSize="{DynamicResource FlourishFontSizeStandard}"
             FontWeight="Regular"
             Foreground="{DynamicResource FlourishPrimaryForegroundBrush}"
           />
@@ -144,7 +147,7 @@
         <controls:FlourishTextBlock
           x:Name="TitleText"
           VerticalAlignment="Center"
-          FontSize="{DynamicResource FlourishFontSizeTitle}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           FontWeight="Bold"
           Foreground="{DynamicResource FlourishNeutralForeground1Brush}"
         />
@@ -152,7 +155,7 @@
           x:Name="SubtitleText"
           Margin="8,1,0,0"
           VerticalAlignment="Center"
-          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
         />
       </StackPanel>
@@ -237,7 +240,7 @@
               x:Name="ProfileInitialsText"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
-              FontSize="{DynamicResource FlourishFontSizeCaption}"
+              FontSize="{DynamicResource FlourishFontSizeStandard}"
               FontWeight="Regular"
               Foreground="{DynamicResource FlourishProfileForegroundBrush}"
             />
@@ -279,7 +282,8 @@
         <controls:FlourishTextBlock
           x:Name="MaximizeButtonIcon"
           FontFamily="{DynamicResource FlourishIconFontFamily}"
-          FontSize="{DynamicResource FlourishFontSizeWindowButtonIcon}"
+          FontSize="{DynamicResource FlourishIconFontSizeWindowCaption}"
+          LineHeight="{DynamicResource FlourishIconFontSizeWindowCaption}"
           Role="Icon"
           Text="&#xE922;"
         />

@@ -28,8 +28,8 @@ Use `AddStatusItem` for non-interactive text-and-icon state. Use a [custom foote
 - each running or cancelling task receives its own icon
 - hovering a running icon shows the name, optional description, state, and progress
 - clicking a running icon opens the background-task flyout
-- queued tasks share one queue icon with a count badge
-- hovering or clicking the queue icon opens the waiting list and its cancellation controls
+- queued tasks share one plain numeric count without an icon or badge
+- hovering or clicking the queue count opens the waiting list and its cancellation controls
 
 The Shell takes task names, descriptions, and glyphs from `FlourishBackgroundTaskMetadata`. A task that has not supplied an icon uses the built-in task glyph.
 
@@ -37,7 +37,7 @@ Active work temporarily shows the status bar even when `UseStatusBar()` was omit
 
 ## Custom status items
 
-`AddStatusItem` adds a compact, non-interactive item with display text and an icon glyph. Items appear in registration order before the system-status icon.
+`AddStatusItem` adds a compact, non-interactive item with Small display text and an icon glyph. Items appear in registration order before the system-status icon.
 
 ```csharp
 statusBar.AddStatusItem("Online", "\uE774");

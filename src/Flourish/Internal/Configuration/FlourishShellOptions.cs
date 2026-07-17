@@ -21,7 +21,17 @@ internal sealed class FlourishShellOptions
 
     public string IconFontFamily { get; set; } = "Segoe MDL2 Assets";
 
-    public double FontSize { get; set; } = 14;
+    public double FontSizeSmall { get; set; } = 12;
+
+    public double FontSizeStandard { get; set; } = 14;
+
+    public double FontSizeIcon { get; set; } = 16;
+
+    public double FontSizeLarge { get; set; } = 16;
+
+    public double FontSizeExtraLarge { get; set; } = 24;
+
+    public double FontSizeHeaderSize { get; set; } = 32;
 
     public FlourishThemeColors? ThemeColors { get; set; }
 

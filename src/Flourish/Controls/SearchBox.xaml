@@ -16,7 +16,7 @@
     <Setter Property="CaretBrush" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
     <Setter Property="SelectionBrush" Value="{DynamicResource FlourishSelectionBackgroundBrush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     <Setter Property="Template">
       <Setter.Value>
@@ -39,7 +39,8 @@
                 Width="16"
                 VerticalAlignment="Center"
                 FontFamily="{DynamicResource FlourishIconFontFamily}"
-                FontSize="{DynamicResource FlourishFontSizeTitlebarIcon}"
+                FontSize="{DynamicResource FlourishIconFontSizeTitlebarSearch}"
+                LineHeight="{DynamicResource FlourishIconFontSizeTitlebarSearch}"
                 Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
                 IsHitTestVisible="False"
                 Text="&#xE721;"

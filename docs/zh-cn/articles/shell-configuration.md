@@ -18,7 +18,7 @@ builder.ConfigureShell(shell =>
         .UseTips(delay: 200)
         .UseMotion()
         .UseMaterialEffect(MaterialEffect.Mica)
-        .UseGlobalFont("Microsoft YaHei UI", 14)
+        .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32)
         .UseStatusBar();
 });
 
@@ -40,7 +40,7 @@ builder.ConfigureNavigation(navigation =>
 | `UseMaterialEffect` | 选择并启用窗口材质；`None` 会禁用材质。 | [材质特效](configure-material-effect.md) |
 | `UseThemeColors` | 设置主要色、辅助色和强调色。 | [主题](configure-themes.md) |
 | `UseCornerRadius` | 设置控件与表面共用的圆角。 | [主题](configure-themes.md) |
-| `UseGlobalFont` | 设置全局文字字体与基础字号。 | [排版](configure-font.md) |
+| `UseGlobalFont` | 设置全局字体及显式的 Small、Standard、Icon、Large、ExtraLarge、HeaderSize 字号。 | [排版](configure-font.md) |
 | `UseStatusBar` | 启用常驻状态栏。 | [状态栏](status-bar.md) |
 
 [窗口](configure-window.md)不需要 Shell 功能开关，通过 `ConfigureWindow` 直接配置。

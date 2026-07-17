@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
@@ -77,7 +78,7 @@ public sealed class FlourishControlStylesTests
     }
 
     [Fact]
-    public void TextRoles_UseRegularBodyWeightsAndBoldHeadingWeights()
+    public void TextRoles_ResolveCanonicalSizeLineHeightBottomSpaceAndWeightMetrics()
     {
         RunInSta(() =>
         {
@@ -98,14 +99,139 @@ public sealed class FlourishControlStylesTests
 
                 foreach (var textBlock in textBlocks)
                 {
-                    var expected = textBlock.Role is
-                        FlourishTextRole.CardTitle
-                        or FlourishTextRole.SectionTitle
-                        or FlourishTextRole.PageTitle
-                        ? FontWeights.Bold
-                        : FontWeights.Regular;
-                    Assert.Equal(expected, textBlock.FontWeight);
+                    var (expectedSize, expectedLineHeight, expectedBottomSpace, expectedWeight) =
+                        textBlock.Role switch
+                    {
+                        FlourishTextRole.Caption or FlourishTextRole.Status =>
+                            (12d, 14d, 1d, FontWeights.Regular),
+                        FlourishTextRole.Icon =>
+                            (16d, 16d, 0d, FontWeights.Regular),
+                        FlourishTextRole.CardTitle =>
+                            (16d, 20d, 2d, FontWeights.Bold),
+                        FlourishTextRole.SectionTitle =>
+                            (24d, 29d, 3d, FontWeights.Bold),
+                        FlourishTextRole.PageTitle =>
+                            (32d, 37d, 4d, FontWeights.Bold),
+                        _ => (14d, 16d, 1d, FontWeights.Regular),
+                    };
+                    Assert.Equal(expectedSize, textBlock.FontSize);
+                    Assert.Equal(expectedLineHeight, textBlock.LineHeight);
+                    Assert.Equal(new Thickness(0, 0, 0, expectedBottomSpace), textBlock.Padding);
+                    Assert.Equal(expectedWeight, textBlock.FontWeight);
+                    Assert.Equal(LineStackingStrategy.BlockLineHeight, textBlock.LineStackingStrategy);
+                    Assert.Equal(
+                        textBlock.Role == FlourishTextRole.Icon
+                            ? "Segoe MDL2 Assets"
+                            : "Segoe UI",
+                        textBlock.FontFamily.Source
+                    );
+                    Assert.Equal(
+                        expectedLineHeight + expectedBottomSpace,
+                        textBlock.ActualHeight,
+                        precision: 3
+                    );
                 }
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void IconGlyphHosts_ResolveTheDedicatedIconFamilyAndSizeAtRuntime()
+    {
+        RunInSta(() =>
+        {
+            var iconText = new FlourishTextBlock
+            {
+                Role = FlourishTextRole.Icon,
+                Text = "\uE10F",
+            };
+            var iconButton = new IconButton { Icon = "\uE10F" };
+            var iconCard = new IconCard { Title = "Icon card", Presenter = "\uE8A5" };
+            var listCard = new ListCard { Title = "List card", Presenter = "\uE8A5" };
+            var panel = new StackPanel();
+            panel.Children.Add(iconText);
+            panel.Children.Add(iconButton);
+            panel.Children.Add(iconCard);
+            panel.Children.Add(listCard);
+
+            var window = CreateWindow(panel);
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                Assert.Equal("Segoe MDL2 Assets", iconText.FontFamily.Source);
+                Assert.Equal(16d, iconText.FontSize);
+                Assert.Equal(16d, iconText.LineHeight);
+                Assert.Equal(new Thickness(), iconText.Padding);
+
+                foreach (var (control, partName) in new (WpfControl Control, string PartName)[]
+                {
+                    (iconButton, "IconHost"),
+                    (iconCard, "PresenterHost"),
+                    (listCard, "PresenterHost"),
+                })
+                {
+                    control.ApplyTemplate();
+                    var host = AssertTemplatePart<ContentPresenter>(control, partName);
+                    var fontFamily = Assert.IsType<FontFamily>(
+                        host.GetValue(TextElement.FontFamilyProperty)
+                    );
+                    var fontSize = Assert.IsType<double>(
+                        host.GetValue(TextElement.FontSizeProperty)
+                    );
+                    Assert.Equal("Segoe MDL2 Assets", fontFamily.Source);
+                    Assert.Equal(16d, fontSize);
+                }
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
+    [Fact]
+    public void CardChunkAndChunkHero_TitleHostsUseTheirExplicitHeadingTiers()
+    {
+        RunInSta(() =>
+        {
+            WpfControl[] controls =
+            [
+                new Card { Title = "Card" },
+                new Chunk { ChunkTitle = "Section" },
+                new ChunkHero { ChunkHeroTitle = "Hero" },
+            ];
+            var panel = new StackPanel();
+            foreach (var control in controls)
+            {
+                panel.Children.Add(control);
+            }
+
+            var window = CreateWindow(panel);
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                controls[0].ApplyTemplate();
+                var cardTitle = AssertTemplatePart<FlourishTextBlock>(controls[0], "TitleHost");
+                Assert.Equal(16d, cardTitle.FontSize);
+                Assert.Equal(FontWeights.Bold, cardTitle.FontWeight);
+
+                controls[1].ApplyTemplate();
+                var chunkTitle = AssertTemplatePart<FlourishTextBlock>(controls[1], "TitleHost");
+                Assert.Equal(24d, chunkTitle.FontSize);
+                Assert.Equal(FontWeights.Bold, chunkTitle.FontWeight);
+
+                controls[2].ApplyTemplate();
+                var heroTitle = AssertTemplatePart<FlourishTextBlock>(controls[2], "TitleHost");
+                Assert.Equal(32d, heroTitle.FontSize);
+                Assert.Equal(FontWeights.Bold, heroTitle.FontWeight);
             }
             finally
             {

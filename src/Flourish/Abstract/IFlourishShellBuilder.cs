@@ -16,7 +16,7 @@ namespace ArkheideSystem.Flourish.Abstract;
 ///          .UseTips(200)
 ///          .UseMotion()
 ///          .UseMaterialEffect(MaterialEffect.Mica)
-///          .UseGlobalFont("Segoe UI", 14)
+///          .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32)
 ///          .UseStatusBar();
 /// });
 /// ]]></code>
@@ -96,23 +96,47 @@ public interface IFlourishShellBuilder
     IFlourishShellBuilder UseCornerRadius(double radius);
 
     /// <summary>
-    /// Configures the global font used by Flourish shell UI and application pages.
+    /// Configures the global font and its explicit text and icon size scale.
     /// </summary>
     /// <param name="fontFamily">The font family name.</param>
-    /// <param name="fontSize">The base font size.</param>
+    /// <param name="smallFontSize">The small font size.</param>
+    /// <param name="standardFontSize">The standard font size.</param>
+    /// <param name="iconFontSize">The icon font size.</param>
+    /// <param name="largeFontSize">The large font size.</param>
+    /// <param name="extraLargeFontSize">The extra-large font size.</param>
+    /// <param name="headerSizeFontSize">The header-size font size.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishShellBuilder UseGlobalFont(string fontFamily, double fontSize = 14);
+    IFlourishShellBuilder UseGlobalFont(
+        string fontFamily,
+        double smallFontSize,
+        double standardFontSize,
+        double iconFontSize,
+        double largeFontSize,
+        double extraLargeFontSize,
+        double headerSizeFontSize
+    );
 
     /// <summary>
     /// Overrides the font used by one page type while leaving all other pages on the global font.
     /// </summary>
     /// <typeparam name="TPage">The WPF page type that receives the override.</typeparam>
     /// <param name="fontFamily">The page-specific font family name.</param>
-    /// <param name="fontSize">
-    /// The page-specific base font size, or <see langword="null"/> to continue following the global size.
-    /// </param>
+    /// <param name="smallFontSize">The page-specific small size, or <see langword="null"/> to follow the global size.</param>
+    /// <param name="standardFontSize">The page-specific standard size, or <see langword="null"/> to follow the global size.</param>
+    /// <param name="iconFontSize">The page-specific icon size, or <see langword="null"/> to follow the global size.</param>
+    /// <param name="largeFontSize">The page-specific large size, or <see langword="null"/> to follow the global size.</param>
+    /// <param name="extraLargeFontSize">The page-specific extra-large size, or <see langword="null"/> to follow the global size.</param>
+    /// <param name="headerSizeFontSize">The page-specific header size, or <see langword="null"/> to follow the global size.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishShellBuilder SetOverrideFont<TPage>(string fontFamily, double? fontSize = null)
+    IFlourishShellBuilder SetOverrideFont<TPage>(
+        string fontFamily,
+        double? smallFontSize,
+        double? standardFontSize,
+        double? iconFontSize,
+        double? largeFontSize,
+        double? extraLargeFontSize,
+        double? headerSizeFontSize
+    )
         where TPage : Page;
 
     /// <summary>

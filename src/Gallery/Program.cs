@@ -48,7 +48,7 @@ internal static class Program
                     .UseStatusBar()
                     .UseTips()
                     .UseMaterialEffect()
-                    .UseGlobalFont("Microsoft YaHei", 14);
+                    .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32);
             })
             .ConfigureTitleBar(titlebar =>
             {

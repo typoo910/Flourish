@@ -10,7 +10,7 @@
     <Setter Property="BorderThickness" Value="{DynamicResource FlourishSurfaceBorderThickness}" />
     <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground1Brush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="Padding" Value="8,5" />
     <Setter Property="Placement" Value="Custom" />
     <Setter Property="HasDropShadow" Value="False" />

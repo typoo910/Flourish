@@ -81,29 +81,73 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
         return this;
     }
 
-    public IFlourishShellBuilder UseGlobalFont(string fontFamily, double fontSize = 14)
+    public IFlourishShellBuilder UseGlobalFont(
+        string fontFamily,
+        double smallFontSize,
+        double standardFontSize,
+        double iconFontSize,
+        double largeFontSize,
+        double extraLargeFontSize,
+        double headerSizeFontSize
+    )
     {
-        options.FontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
-        ValidatePositiveFinite(fontSize, nameof(fontSize));
-        options.FontSize = fontSize;
+        fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
+        ValidateFontScale(
+            smallFontSize,
+            standardFontSize,
+            iconFontSize,
+            largeFontSize,
+            extraLargeFontSize,
+            headerSizeFontSize
+        );
+        options.FontFamily = fontFamily;
+        options.FontSizeSmall = smallFontSize;
+        options.FontSizeStandard = standardFontSize;
+        options.FontSizeIcon = iconFontSize;
+        options.FontSizeLarge = largeFontSize;
+        options.FontSizeExtraLarge = extraLargeFontSize;
+        options.FontSizeHeaderSize = headerSizeFontSize;
         return this;
     }
 
     public IFlourishShellBuilder SetOverrideFont<TPage>(
         string fontFamily,
-        double? fontSize = null
+        double? smallFontSize,
+        double? standardFontSize,
+        double? iconFontSize,
+        double? largeFontSize,
+        double? extraLargeFontSize,
+        double? headerSizeFontSize
     )
         where TPage : Page
     {
         ValidatePageType(typeof(TPage), nameof(TPage));
         fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));
-        if (fontSize is { } size)
-        {
-            ValidatePositiveFinite(size, nameof(fontSize));
-        }
+        ValidateNullableSize(smallFontSize, nameof(smallFontSize));
+        ValidateNullableSize(standardFontSize, nameof(standardFontSize));
+        ValidateNullableSize(iconFontSize, nameof(iconFontSize));
+        ValidateNullableSize(largeFontSize, nameof(largeFontSize));
+        ValidateNullableSize(extraLargeFontSize, nameof(extraLargeFontSize));
+        ValidateNullableSize(headerSizeFontSize, nameof(headerSizeFontSize));
+        ValidateFontScale(
+            smallFontSize ?? options.FontSizeSmall,
+            standardFontSize ?? options.FontSizeStandard,
+            iconFontSize ?? options.FontSizeIcon,
+            largeFontSize ?? options.FontSizeLarge,
+            extraLargeFontSize ?? options.FontSizeExtraLarge,
+            headerSizeFontSize ?? options.FontSizeHeaderSize
+        );
 
         options.PageFontOverridesByPageType[typeof(TPage)] =
-            new FlourishPageFontOverride(fontFamily, fontSize);
+            new FlourishPageFontOverride(
+                fontFamily,
+                smallFontSize,
+                standardFontSize,
+                iconFontSize,
+                largeFontSize,
+                extraLargeFontSize,
+                headerSizeFontSize
+            );
         return this;
     }
 
@@ -145,6 +189,31 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
                 "Value must be finite and non-negative."
             );
         }
+    }
+
+    private static void ValidateNullableSize(double? value, string parameterName)
+    {
+        if (value is { } size)
+        {
+            ValidatePositiveFinite(size, parameterName);
+        }
+    }
+
+    private static void ValidateFontScale(
+        double smallFontSize,
+        double standardFontSize,
+        double iconFontSize,
+        double largeFontSize,
+        double extraLargeFontSize,
+        double headerSizeFontSize
+    )
+    {
+        ValidatePositiveFinite(smallFontSize, nameof(smallFontSize));
+        ValidatePositiveFinite(standardFontSize, nameof(standardFontSize));
+        ValidatePositiveFinite(iconFontSize, nameof(iconFontSize));
+        ValidatePositiveFinite(largeFontSize, nameof(largeFontSize));
+        ValidatePositiveFinite(extraLargeFontSize, nameof(extraLargeFontSize));
+        ValidatePositiveFinite(headerSizeFontSize, nameof(headerSizeFontSize));
     }
 
     private static void ValidateEnum<TEnum>(TEnum value, string parameterName)

@@ -18,7 +18,7 @@ builder.ConfigureShell(shell =>
         .UseTips(delay: 200)
         .UseMotion()
         .UseMaterialEffect(MaterialEffect.Mica)
-        .UseGlobalFont("Segoe UI", 14)
+        .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32)
         .UseStatusBar();
 });
 
@@ -40,7 +40,7 @@ builder.ConfigureNavigation(navigation =>
 | `UseMaterialEffect` | Selects and enables the window material; `None` disables it. | [Material effects](configure-material-effect.md) |
 | `UseThemeColors` | Sets the primary, secondary, and accent colors. | [Themes](configure-themes.md) |
 | `UseCornerRadius` | Sets the shared control and surface corner radius. | [Themes](configure-themes.md) |
-| `UseGlobalFont` | Sets the global text family and base size. | [Typography](configure-font.md) |
+| `UseGlobalFont` | Sets the global text family and explicit Small, Standard, Icon, Large, ExtraLarge, and HeaderSize sizes. | [Typography](configure-font.md) |
 | `UseStatusBar` | Enables the persistent status bar. | [Status bar](status-bar.md) |
 
 [Window](configure-window.md) does not require a Shell feature switch and is configured through `ConfigureWindow`.

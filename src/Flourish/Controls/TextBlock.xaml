@@ -6,64 +6,73 @@
 
   <Style TargetType="{x:Type controls:FlourishTextBlock}">
     <Setter Property="FontFamily" Value="{DynamicResource FlourishFontFamily}" />
-    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeBase}" />
+    <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
     <Setter Property="FontWeight" Value="Regular" />
+    <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightStandard}" />
+    <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+    <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceStandard}" />
     <Style.Triggers>
       <Trigger Property="Role" Value="Paragraph">
-        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightBody}" />
-        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Trigger>
       <Trigger Property="Role" Value="Caption">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeSmall}" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightSmall}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceSmall}" />
       </Trigger>
       <Trigger Property="Role" Value="Muted">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground2Brush}" />
       </Trigger>
       <Trigger Property="Role" Value="FieldLabel">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground2Brush}" />
       </Trigger>
       <Trigger Property="Role" Value="Subtitle">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeSubtitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground2Brush}" />
-        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightSubtitle}" />
-        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Trigger>
       <Trigger Property="Role" Value="Description">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeDescription}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeStandard}" />
         <Setter Property="FontWeight" Value="Regular" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishNeutralForeground2Brush}" />
-        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightDescription}" />
-        <Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Trigger>
       <Trigger Property="Role" Value="CardTitle">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeSubtitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeLarge}" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightLarge}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceLarge}" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Trigger>
       <Trigger Property="Role" Value="SectionTitle">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeSectionTitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeExtraLarge}" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightExtraLarge}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceExtraLarge}" />
       </Trigger>
       <Trigger Property="Role" Value="PageTitle">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizePageTitle}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeHeaderSize}" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightHeaderSize}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceHeaderSize}" />
       </Trigger>
       <Trigger Property="Role" Value="Status">
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeCaption}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeSmall}" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightSmall}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceSmall}" />
         <Setter Property="Foreground" Value="{DynamicResource FlourishPrimaryForegroundBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
       </Trigger>
       <Trigger Property="Role" Value="Icon">
         <Setter Property="FontFamily" Value="{DynamicResource FlourishIconFontFamily}" />
-        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeTitlebarIcon}" />
+        <Setter Property="FontSize" Value="{DynamicResource FlourishFontSizeIcon}" />
+        <Setter Property="LineHeight" Value="{DynamicResource FlourishLineHeightIcon}" />
+        <Setter Property="Padding" Value="{DynamicResource FlourishTypographyBottomSpaceIcon}" />
         <Setter Property="TextAlignment" Value="Center" />
       </Trigger>
     </Style.Triggers>

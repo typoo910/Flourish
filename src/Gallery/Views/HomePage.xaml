@@ -19,8 +19,9 @@
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
               FontFamily="{DynamicResource FlourishIconFontFamily}"
-              FontSize="48"
+              FontSize="{DynamicResource FlourishFontSizeIcon}"
               Foreground="{DynamicResource FlourishAccentForegroundBrush}"
+              Role="Icon"
               Text="&#xE950;"
             />
           </Border>

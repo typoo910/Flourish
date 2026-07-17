@@ -26,7 +26,7 @@
         x:Name="AvatarInitials"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        FontSize="18"
+        FontSize="{DynamicResource FlourishFontSizeStandard}"
         FontWeight="Regular"
         Foreground="{DynamicResource FlourishProfileForegroundBrush}"
       />
@@ -37,7 +37,7 @@
         x:Name="DisplayNameText"
         HorizontalAlignment="Center"
         FontFamily="{DynamicResource FlourishFontFamily}"
-        FontSize="16"
+        FontSize="{DynamicResource FlourishFontSizeStandard}"
         FontWeight="Bold"
         Foreground="{DynamicResource FlourishNeutralForeground1Brush}"
         TextTrimming="CharacterEllipsis"
@@ -47,7 +47,7 @@
         Margin="0,2,0,0"
         HorizontalAlignment="Center"
         FontFamily="{DynamicResource FlourishFontFamily}"
-        FontSize="{DynamicResource FlourishFontSizeSmall}"
+        FontSize="{DynamicResource FlourishFontSizeStandard}"
         Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
       />
     </StackPanel>
@@ -72,7 +72,7 @@
             <flourish:FlourishTextBlock
               x:Name="FirstNameLabel"
               Margin="0,0,0,4"
-              FontSize="{DynamicResource FlourishFontSizeSmall}"
+              FontSize="{DynamicResource FlourishFontSizeStandard}"
               Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
             />
             <flourish:FlourishTextBox
@@ -85,7 +85,7 @@
             <flourish:FlourishTextBlock
               x:Name="LastNameLabel"
               Margin="0,0,0,4"
-              FontSize="{DynamicResource FlourishFontSizeSmall}"
+              FontSize="{DynamicResource FlourishFontSizeStandard}"
               Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
             />
             <flourish:FlourishTextBox
@@ -98,7 +98,7 @@
         <flourish:FlourishTextBlock
           x:Name="ProfileImageLabel"
           Margin="0,9,0,4"
-          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
         />
         <Button
@@ -141,7 +141,7 @@
                 <flourish:FlourishTextBlock
                   Margin="0,0,7,0"
                   FontFamily="{DynamicResource FlourishIconFontFamily}"
-                  FontSize="15"
+                  FontSize="{DynamicResource FlourishFontSizeIcon}"
                   Foreground="White"
                   Role="Icon"
                   Text="&#xE73E;"
@@ -160,7 +160,7 @@
         <flourish:FlourishTextBlock
           x:Name="PasswordLabel"
           Margin="0,9,0,4"
-          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           Foreground="{DynamicResource FlourishNeutralForeground2Brush}"
         />
         <flourish:FlourishPasswordBox x:Name="PasswordInput" />
@@ -169,7 +169,7 @@
           x:Name="ErrorText"
           MinHeight="16"
           Margin="0,6,0,0"
-          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           Foreground="{DynamicResource FlourishDangerForegroundBrush}"
           TextWrapping="Wrap"
         />
@@ -207,7 +207,7 @@
           x:Name="SignedInErrorText"
           Margin="0,8,0,0"
           HorizontalAlignment="Center"
-          FontSize="{DynamicResource FlourishFontSizeSmall}"
+          FontSize="{DynamicResource FlourishFontSizeStandard}"
           Foreground="{DynamicResource FlourishDangerForegroundBrush}"
           TextAlignment="Center"
           TextWrapping="Wrap"

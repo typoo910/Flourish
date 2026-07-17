@@ -92,8 +92,15 @@ public partial class AppearancePage : Page
         Execute(
             () =>
             {
-                var size = ParseDouble(FontSizeBox.Text, "base font size");
-                font.SetFont(FontFamilyBox.Text, size);
+                font.SetFont(
+                    FontFamilyBox.Text,
+                    ParseDouble(SmallFontSizeBox.Text, "small font size"),
+                    ParseDouble(StandardFontSizeBox.Text, "standard font size"),
+                    ParseDouble(IconFontSizeBox.Text, "icon font size"),
+                    ParseDouble(LargeFontSizeBox.Text, "large font size"),
+                    ParseDouble(ExtraLargeFontSizeBox.Text, "extra-large font size"),
+                    ParseDouble(HeaderSizeFontSizeBox.Text, "header font size")
+                );
                 font.SetIconFontFamily(IconFontFamilyBox.Text);
             },
             FontStatusText
@@ -118,12 +125,32 @@ public partial class AppearancePage : Page
         Execute(
             () =>
             {
-                double? fontSize = string.IsNullOrWhiteSpace(PageOverrideFontSizeBox.Text)
-                    ? null
-                    : ParseDouble(PageOverrideFontSizeBox.Text, "page override font size");
                 font.SetOverrideFont<AppearancePage>(
                     PageOverrideFontFamilyBox.Text,
-                    fontSize
+                    ParseNullableDouble(
+                        PageOverrideSmallFontSizeBox.Text,
+                        "page override small font size"
+                    ),
+                    ParseNullableDouble(
+                        PageOverrideStandardFontSizeBox.Text,
+                        "page override standard font size"
+                    ),
+                    ParseNullableDouble(
+                        PageOverrideIconFontSizeBox.Text,
+                        "page override icon font size"
+                    ),
+                    ParseNullableDouble(
+                        PageOverrideLargeFontSizeBox.Text,
+                        "page override large font size"
+                    ),
+                    ParseNullableDouble(
+                        PageOverrideExtraLargeFontSizeBox.Text,
+                        "page override extra-large font size"
+                    ),
+                    ParseNullableDouble(
+                        PageOverrideHeaderSizeFontSizeBox.Text,
+                        "page override header font size"
+                    )
                 );
             },
             PageFontOverrideStatusText
@@ -347,63 +374,113 @@ public partial class AppearancePage : Page
             ThemeStatusText.Text =
                 $"Requested: {theme.CurrentTheme}  |  Effective: {theme.EffectiveTheme}  |  Dark: {theme.IsDark}";
 
-        FontFamilyBox.Text = font.FontFamily;
-        FontSizeBox.Text = font.FontSize.ToString("0.##", CultureInfo.CurrentCulture);
-        IconFontFamilyBox.Text = font.IconFontFamily;
-        FontStatusText.Text =
-            $"Text: {font.FontFamily}, {font.FontSize:0.##} pt  |  Icons: {font.IconFontFamily}";
-
-        if (font.PageOverrides.TryGetValue(typeof(AppearancePage), out var pageOverride))
-        {
-            PageOverrideFontFamilyBox.Text = pageOverride.FontFamily;
-            PageOverrideFontSizeBox.Text = pageOverride.FontSize?.ToString(
+            FontFamilyBox.Text = font.FontFamily;
+            SmallFontSizeBox.Text = font.SmallFontSize.ToString(
                 "0.##",
                 CultureInfo.CurrentCulture
-            ) ?? string.Empty;
-            PageFontOverrideStatusText.Text = pageOverride.FontSize is { } overrideSize
-                ? $"AppearancePage override: {pageOverride.FontFamily}, {overrideSize:0.##} pt."
-                : $"AppearancePage override: {pageOverride.FontFamily}; size follows global {font.FontSize:0.##} pt.";
-        }
-        else
-        {
-            PageFontOverrideStatusText.Text =
-                $"No page override. AppearancePage follows {font.FontFamily}, {font.FontSize:0.##} pt.";
-        }
+            );
+            StandardFontSizeBox.Text = font.StandardFontSize.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            IconFontSizeBox.Text = font.IconFontSize.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            LargeFontSizeBox.Text = font.LargeFontSize.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            ExtraLargeFontSizeBox.Text = font.ExtraLargeFontSize.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            HeaderSizeFontSizeBox.Text = font.HeaderSizeFontSize.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            IconFontFamilyBox.Text = font.IconFontFamily;
+            FontStatusText.Text =
+                $"Text: {font.FontFamily}, {FormatScale(font.SmallFontSize, font.StandardFontSize, font.IconFontSize, font.LargeFontSize, font.ExtraLargeFontSize, font.HeaderSizeFontSize)}  |  Icons: {font.IconFontFamily}";
 
-        var currentToolTips = toolTips.Current;
-        ToolTipDelayBox.Text = currentToolTips.InitialShowDelayMilliseconds.ToString(
-            CultureInfo.CurrentCulture
-        );
-        ToolTipMarginBox.Text = currentToolTips.SpawnableMargin.ToString(
-            "0.##",
-            CultureInfo.CurrentCulture
-        );
-        ToggleToolTipButton.Content = currentToolTips.IsEnabled
-            ? "Disable tooltips"
-            : "Enable tooltips";
-        ToolTipStatusText.Text =
-            $"Enabled: {currentToolTips.IsEnabled}  |  Delay: {currentToolTips.InitialShowDelayMilliseconds} ms  |  Margin: {currentToolTips.SpawnableMargin:0.##}";
+            if (font.PageOverrides.TryGetValue(typeof(AppearancePage), out var pageOverride))
+            {
+                PageOverrideFontFamilyBox.Text = pageOverride.FontFamily;
+                PageOverrideSmallFontSizeBox.Text = pageOverride.SmallFontSize?.ToString(
+                    "0.##",
+                    CultureInfo.CurrentCulture
+                ) ?? string.Empty;
+                PageOverrideStandardFontSizeBox.Text = pageOverride.StandardFontSize?.ToString(
+                    "0.##",
+                    CultureInfo.CurrentCulture
+                ) ?? string.Empty;
+                PageOverrideIconFontSizeBox.Text = pageOverride.IconFontSize?.ToString(
+                    "0.##",
+                    CultureInfo.CurrentCulture
+                ) ?? string.Empty;
+                PageOverrideLargeFontSizeBox.Text = pageOverride.LargeFontSize?.ToString(
+                    "0.##",
+                    CultureInfo.CurrentCulture
+                ) ?? string.Empty;
+                PageOverrideExtraLargeFontSizeBox.Text =
+                    pageOverride.ExtraLargeFontSize?.ToString(
+                        "0.##",
+                        CultureInfo.CurrentCulture
+                    ) ?? string.Empty;
+                PageOverrideHeaderSizeFontSizeBox.Text =
+                    pageOverride.HeaderSizeFontSize?.ToString(
+                        "0.##",
+                        CultureInfo.CurrentCulture
+                    ) ?? string.Empty;
+                PageFontOverrideStatusText.Text =
+                    $"AppearancePage override: {pageOverride.FontFamily}, {FormatScale(pageOverride.SmallFontSize ?? font.SmallFontSize, pageOverride.StandardFontSize ?? font.StandardFontSize, pageOverride.IconFontSize ?? font.IconFontSize, pageOverride.LargeFontSize ?? font.LargeFontSize, pageOverride.ExtraLargeFontSize ?? font.ExtraLargeFontSize, pageOverride.HeaderSizeFontSize ?? font.HeaderSizeFontSize)}.";
+            }
+            else
+            {
+                PageOverrideSmallFontSizeBox.Text = string.Empty;
+                PageOverrideStandardFontSizeBox.Text = string.Empty;
+                PageOverrideIconFontSizeBox.Text = string.Empty;
+                PageOverrideLargeFontSizeBox.Text = string.Empty;
+                PageOverrideExtraLargeFontSizeBox.Text = string.Empty;
+                PageOverrideHeaderSizeFontSizeBox.Text = string.Empty;
+                PageFontOverrideStatusText.Text =
+                    $"No page override. AppearancePage follows {font.FontFamily}, {FormatScale(font.SmallFontSize, font.StandardFontSize, font.IconFontSize, font.LargeFontSize, font.ExtraLargeFontSize, font.HeaderSizeFontSize)}.";
+            }
 
-        var currentMotion = motion.Current;
-        MotionEnabledBox.IsChecked = currentMotion.IsEnabled;
-        PageTransitionBox.SelectedItem = currentMotion.PageTransition;
-        PageDurationBox.Text = currentMotion.PageTransitionDuration.TotalMilliseconds.ToString(
-            "0",
-            CultureInfo.CurrentCulture
-        );
-        NavigationTransitionBox.SelectedItem = currentMotion.NavigationPanelTransition;
-        NavigationDurationBox.Text =
-            currentMotion.NavigationPanelTransitionDuration.TotalMilliseconds.ToString(
+            var currentToolTips = toolTips.Current;
+            ToolTipDelayBox.Text = currentToolTips.InitialShowDelayMilliseconds.ToString(
+                CultureInfo.CurrentCulture
+            );
+            ToolTipMarginBox.Text = currentToolTips.SpawnableMargin.ToString(
+                "0.##",
+                CultureInfo.CurrentCulture
+            );
+            ToggleToolTipButton.Content = currentToolTips.IsEnabled
+                ? "Disable tooltips"
+                : "Enable tooltips";
+            ToolTipStatusText.Text =
+                $"Enabled: {currentToolTips.IsEnabled}  |  Delay: {currentToolTips.InitialShowDelayMilliseconds} ms  |  Margin: {currentToolTips.SpawnableMargin:0.##}";
+
+            var currentMotion = motion.Current;
+            MotionEnabledBox.IsChecked = currentMotion.IsEnabled;
+            PageTransitionBox.SelectedItem = currentMotion.PageTransition;
+            PageDurationBox.Text = currentMotion.PageTransitionDuration.TotalMilliseconds.ToString(
                 "0",
                 CultureInfo.CurrentCulture
             );
-        HoverRevealBox.IsChecked = currentMotion.IsHoverRevealEnabled;
-        ReducedMotionBox.IsChecked = currentMotion.RespectSystemReducedMotion;
-        MotionStatusText.Text =
-            $"Animation allowed now: {motion.CanAnimate}  |  Hover duration: {currentMotion.HoverRevealAnimationDuration.TotalMilliseconds:0} ms";
+            NavigationTransitionBox.SelectedItem = currentMotion.NavigationPanelTransition;
+            NavigationDurationBox.Text =
+                currentMotion.NavigationPanelTransitionDuration.TotalMilliseconds.ToString(
+                    "0",
+                    CultureInfo.CurrentCulture
+                );
+            HoverRevealBox.IsChecked = currentMotion.IsHoverRevealEnabled;
+            ReducedMotionBox.IsChecked = currentMotion.RespectSystemReducedMotion;
+            MotionStatusText.Text =
+                $"Animation allowed now: {motion.CanAnimate}  |  Hover duration: {currentMotion.HoverRevealAnimationDuration.TotalMilliseconds:0} ms";
 
-        MaterialBox.SelectedItem = material.CurrentEffect;
-        MaterialDarkModeBox.IsChecked = material.IsDarkMode;
+            MaterialBox.SelectedItem = material.CurrentEffect;
+            MaterialDarkModeBox.IsChecked = material.IsDarkMode;
             MaterialStatusText.Text =
                 $"Requested: {material.CurrentEffect}  |  Supported: {material.IsSupported(material.CurrentEffect)}  |  Applied: {material.IsApplied}";
         }
@@ -421,6 +498,23 @@ public partial class AppearancePage : Page
         }
 
         return value;
+    }
+
+    private static double? ParseNullableDouble(string text, string name)
+    {
+        return string.IsNullOrWhiteSpace(text) ? null : ParseDouble(text, name);
+    }
+
+    private static string FormatScale(
+        double smallFontSize,
+        double standardFontSize,
+        double iconFontSize,
+        double largeFontSize,
+        double extraLargeFontSize,
+        double headerSizeFontSize
+    )
+    {
+        return $"small {smallFontSize:0.##}, standard {standardFontSize:0.##}, icon {iconFontSize:0.##}, large {largeFontSize:0.##}, extra-large {extraLargeFontSize:0.##}, header {headerSizeFontSize:0.##} DIP";
     }
 
     private static int ParseInt(string text, string name)

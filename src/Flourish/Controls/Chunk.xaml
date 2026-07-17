@@ -11,6 +11,8 @@
       <StackPanel>
         <controls:FlourishTextBlock
           x:Name="TitleHost"
+          FontSize="{DynamicResource FlourishFontSizeExtraLarge}"
+          FontWeight="Bold"
           Role="SectionTitle"
           Text="{TemplateBinding ChunkTitle}"
           TextWrapping="Wrap"
