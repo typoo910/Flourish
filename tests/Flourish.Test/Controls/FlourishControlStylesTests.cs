@@ -1651,6 +1651,54 @@ public sealed class FlourishControlStylesTests
         });
     }
 
+    [Fact]
+    public void GridSplitter_NavigationPaneProvidesAVisibleDragPreview()
+    {
+        RunInSta(() =>
+        {
+            var host = new StackPanel();
+            var splitter = new FlourishGridSplitter
+            {
+                Height = 80,
+                Variant = FlourishGridSplitterVariant.NavigationPane,
+            };
+            host.Children.Add(splitter);
+            var window = CreateWindow(host);
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+
+                Assert.True(splitter.ShowsPreview);
+                var previewStyle = Assert.IsType<Style>(splitter.PreviewStyle);
+                Assert.Equal(typeof(WpfControl), previewStyle.TargetType);
+
+                var preview = new WpfControl
+                {
+                    Width = splitter.ActualWidth,
+                    Height = splitter.ActualHeight,
+                    Style = previewStyle,
+                };
+                host.Children.Add(preview);
+                window.UpdateLayout();
+                preview.ApplyTemplate();
+
+                var indicator = Assert.IsType<Border>(
+                    preview.Template.FindName("PreviewIndicator", preview)
+                );
+                Assert.NotNull(indicator.Background);
+                Assert.True(indicator.Opacity > 0);
+                Assert.True(indicator.ActualWidth > 0);
+                Assert.True(indicator.ActualHeight > 0);
+            }
+            finally
+            {
+                window.Close();
+            }
+        });
+    }
+
     private static Type[] GetPublicFlourishControlTypes()
     {
         return typeof(FlourishButton)
