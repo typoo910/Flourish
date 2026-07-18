@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ArkheideSystem.Flourish.Views.Windows;
@@ -6,6 +7,16 @@ namespace ArkheideSystem.Flourish.Test.Windows;
 
 public sealed class FlourishShellWindowShortcutTests
 {
+    private static readonly string RepositoryRoot = FindRepositoryRoot();
+    private static readonly string ShellCodePath = Path.Combine(
+        RepositoryRoot,
+        "src",
+        "Flourish",
+        "Views",
+        "Windows",
+        "FlourishShellWindow.xaml.cs"
+    );
+
     [Theory]
     [InlineData(Key.None)]
     [InlineData(Key.System)]
@@ -90,6 +101,74 @@ public sealed class FlourishShellWindowShortcutTests
             );
             Assert.False(FlourishShellWindow.IsTextInputTarget(null));
         });
+    }
+
+    [Fact]
+    public void PreviewKeyDown_ResolvesOnceAndHandlesBeforeExecutingAcceptedSnapshot()
+    {
+        var source = File.ReadAllText(ShellCodePath);
+        var start = source.IndexOf(
+            "private async void ShellWindow_PreviewKeyDown(",
+            StringComparison.Ordinal
+        );
+        var end = source.IndexOf(
+            "internal static bool ShouldIgnoreShortcutInput(",
+            start,
+            StringComparison.Ordinal
+        );
+        Assert.True(start >= 0 && end > start);
+        var handler = source[start..end];
+
+        Assert.Equal(
+            1,
+            handler.Split("shortcutService.TryResolve(", StringSplitOptions.None).Length - 1
+        );
+        Assert.Contains(
+            "await shortcutService.ExecuteResolvedAsync(registration);",
+            handler,
+            StringComparison.Ordinal
+        );
+        Assert.DoesNotContain(
+            "shortcutService.ExecuteAsync(registration.Gesture",
+            handler,
+            StringComparison.Ordinal
+        );
+
+        var executeIndex = handler.IndexOf(
+            "await shortcutService.ExecuteResolvedAsync(registration);",
+            StringComparison.Ordinal
+        );
+        var resolveIndex = handler.LastIndexOf(
+            "shortcutService.TryResolve(",
+            executeIndex,
+            StringComparison.Ordinal
+        );
+        var handledIndex = handler.LastIndexOf(
+            "e.Handled = true;",
+            executeIndex,
+            StringComparison.Ordinal
+        );
+        Assert.True(resolveIndex >= 0 && resolveIndex < handledIndex);
+        Assert.True(handledIndex < executeIndex);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null)
+        {
+            if (
+                Directory.Exists(Path.Combine(directory.FullName, "src", "Flourish"))
+                && Directory.Exists(Path.Combine(directory.FullName, "tests", "Flourish.Test"))
+            )
+            {
+                return directory.FullName;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the Flourish repository root.");
     }
 
     private static void RunInSta(Action action)

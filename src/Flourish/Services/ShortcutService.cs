@@ -144,9 +144,32 @@ internal sealed class ShortcutService(ICommandDispatcher commandDispatcher) : IS
             return ValueTask.FromResult(CommandResult.NotHandled);
         }
 
+        return DispatchAsync(entry.CommandKey, entry.Parameter, cancellationToken);
+    }
+
+    internal ValueTask<CommandResult> ExecuteResolvedAsync(
+        ShortcutRegistrationInfo registration,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ArgumentNullException.ThrowIfNull(registration);
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return ValueTask.FromResult(CommandResult.Canceled);
+        }
+
+        return DispatchAsync(registration.CommandKey, registration.Parameter, cancellationToken);
+    }
+
+    private ValueTask<CommandResult> DispatchAsync(
+        string commandKey,
+        object? parameter,
+        CancellationToken cancellationToken
+    )
+    {
         return commandDispatcher.ExecuteAsync(
-            entry.CommandKey,
-            entry.Parameter,
+            commandKey,
+            parameter,
             CommandSource.Shortcut,
             cancellationToken
         );

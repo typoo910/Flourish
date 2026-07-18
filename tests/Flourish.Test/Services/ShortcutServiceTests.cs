@@ -276,6 +276,105 @@ public sealed class ShortcutServiceTests
         Assert.True(registration.AllowWhenTextInputFocused);
     }
 
+    [Fact]
+    public async Task ExecuteResolvedAsync_TextInputWinnerDispatchesWithoutResolvingAgain()
+    {
+        var dispatcher = new RecordingCommandDispatcher();
+        var sut = new ShortcutService(dispatcher);
+        var gesture = Gesture(Key.S, ModifierKeys.Control);
+        sut.Register(
+            gesture,
+            "editor.format",
+            options: new ShortcutRegistrationOptions { Priority = 100 }
+        );
+        var parameter = new object();
+        sut.Register(
+            gesture,
+            "document.save",
+            parameter,
+            new ShortcutRegistrationOptions
+            {
+                ConflictPolicy = ShortcutConflictPolicy.Append,
+                AllowWhenTextInputFocused = true,
+            }
+        );
+
+        Assert.True(
+            sut.TryResolve(
+                Key.S,
+                ModifierKeys.Control,
+                context: null,
+                isTextInputFocused: true,
+                out var registration
+            )
+        );
+
+        var result = await sut.ExecuteResolvedAsync(registration!);
+
+        Assert.True(result.IsHandled);
+        var invocation = Assert.Single(dispatcher.Invocations);
+        Assert.Equal("document.save", invocation.CommandKey);
+        Assert.Same(parameter, invocation.Parameter);
+        Assert.Equal(CommandSource.Shortcut, invocation.Source);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ExecuteResolvedAsync_AfterRemovalOrReplacement_UsesAcceptedSnapshot(
+        bool replace
+    )
+    {
+        var dispatcher = new RecordingCommandDispatcher();
+        var sut = new ShortcutService(dispatcher);
+        var gesture = Gesture(Key.F5);
+        var parameter = new object();
+        var original = sut.Register(gesture, "document.refresh", parameter);
+        Assert.True(sut.TryResolve(gesture, context: null, out var accepted));
+
+        if (replace)
+        {
+            sut.Register(
+                gesture,
+                "document.reload",
+                options: new ShortcutRegistrationOptions
+                {
+                    ConflictPolicy = ShortcutConflictPolicy.Replace,
+                }
+            );
+        }
+        else
+        {
+            original.Dispose();
+        }
+
+        Assert.False(original.IsRegistered);
+        var result = await sut.ExecuteResolvedAsync(accepted!);
+
+        Assert.True(result.IsHandled);
+        var invocation = Assert.Single(dispatcher.Invocations);
+        Assert.Equal("document.refresh", invocation.CommandKey);
+        Assert.Same(parameter, invocation.Parameter);
+        Assert.Equal(CommandSource.Shortcut, invocation.Source);
+    }
+
+    [Fact]
+    public async Task ExecuteResolvedAsync_WithPreCanceledToken_DoesNotDispatch()
+    {
+        var dispatcher = new RecordingCommandDispatcher();
+        var sut = new ShortcutService(dispatcher);
+        var gesture = Gesture(Key.F5);
+        sut.Register(gesture, "document.refresh");
+        Assert.True(sut.TryResolve(gesture, context: null, out var registration));
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        var result = await sut.ExecuteResolvedAsync(registration!, cancellation.Token);
+
+        Assert.Equal(CommandExecutionStatus.Canceled, result.Status);
+        Assert.Empty(dispatcher.Invocations);
+    }
+
     private static KeyGesture Gesture(
         Key key,
         ModifierKeys modifiers = ModifierKeys.None

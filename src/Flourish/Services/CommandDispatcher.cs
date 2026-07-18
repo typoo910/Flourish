@@ -10,6 +10,9 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
     private readonly Dictionary<string, List<RegistrationEntry>> registrationsByKey = new(
         StringComparer.Ordinal
     );
+    private readonly Dictionary<string, RegistrationEntry[]> dispatchEntriesByKey = new(
+        StringComparer.Ordinal
+    );
     private long nextSequence;
     private long version;
 
@@ -87,6 +90,7 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
                 nextSequence++
             );
             existing.Add(entry);
+            UpdateDispatchEntriesLocked(commandKey, existing);
             changed = CreateChangedEventArgsLocked(changeKind, commandKey);
         }
 
@@ -240,16 +244,9 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
     {
         lock (gate)
         {
-            if (!registrationsByKey.TryGetValue(commandKey, out var entries))
-            {
-                return [];
-            }
-
-            return entries
-                .Where(entry => entry.IsRegistered)
-                .OrderByDescending(entry => entry.Priority)
-                .ThenBy(entry => entry.Sequence)
-                .ToArray();
+            return dispatchEntriesByKey.TryGetValue(commandKey, out var entries)
+                ? entries
+                : Array.Empty<RegistrationEntry>();
         }
     }
 
@@ -272,6 +269,11 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
             if (entries.Count == 0)
             {
                 registrationsByKey.Remove(entry.CommandKey);
+                dispatchEntriesByKey.Remove(entry.CommandKey);
+            }
+            else
+            {
+                UpdateDispatchEntriesLocked(entry.CommandKey, entries);
             }
 
             changed = CreateChangedEventArgsLocked(
@@ -281,6 +283,18 @@ internal sealed class CommandDispatcher : ICommandRegistry, ICommandDispatcher
         }
 
         RaiseChanged(changed);
+    }
+
+    private void UpdateDispatchEntriesLocked(
+        string commandKey,
+        IReadOnlyList<RegistrationEntry> entries
+    )
+    {
+        dispatchEntriesByKey[commandKey] = entries
+            .Where(entry => entry.IsRegistered)
+            .OrderByDescending(entry => entry.Priority)
+            .ThenBy(entry => entry.Sequence)
+            .ToArray();
     }
 
     private ReadOnlyCollection<CommandRegistrationInfo> CreateRegistrationSnapshotLocked()

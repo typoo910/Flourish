@@ -740,7 +740,7 @@ internal partial class FlourishShellWindow : Window
         }
 
         e.Handled = true;
-        await shortcutService.ExecuteAsync(registration.Gesture, context);
+        await shortcutService.ExecuteResolvedAsync(registration);
     }
 
     internal static bool ShouldIgnoreShortcutInput(
