@@ -2579,9 +2579,13 @@ internal partial class FlourishShellWindow : Window
 
     private void ApplyNavigationPaneColumnConstraints(bool isOpen)
     {
-        var paneColumn = GetNavigationPaneColumn();
-        paneColumn.MinWidth = isOpen ? options.NavigationPaneMinWidth : 0;
-        paneColumn.MaxWidth = isOpen ? options.NavigationPaneMaxWidth : double.PositiveInfinity;
+        NavigationPaneColumnLayout.ApplyConstraints(
+            GetNavigationPaneColumn(),
+            GetContentColumn(),
+            isOpen,
+            options.NavigationPaneMinWidth,
+            options.NavigationPaneMaxWidth
+        );
     }
 
     private void UpdateNavigationPaneSplitterState()

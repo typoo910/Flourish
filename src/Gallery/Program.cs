@@ -61,7 +61,7 @@ internal static class Program
                     .SetLogo()
                     .SetApplicationTitle("Flourish Gallery")
                     .SetApplicationSubTitle("Playground")
-                    .SetUnnamedProjectPlaceholder("Unnamed gallery project")
+                    .SetUnnamedProjectPlaceholder("Unnamed project")
                     .SetProfile(NameOrder.FirstLast)
                     .SetThemeToggle(FlourishTheme.System)
                     .SetSearch("Type here to search", (_, _) => { });
@@ -70,13 +70,12 @@ internal static class Program
             {
                 custom.Add(
                     FlourishRegion.TitlebarApplicationInfo,
-                    _ =>
-                        new ArkheideSystem.Flourish.Controls.FlourishTextBlock
-                        {
-                            Role = ArkheideSystem.Flourish.Controls.FlourishTextRole.Description,
-                            Text = "This Body is supplied by the Gallery application.",
-                            TextWrapping = System.Windows.TextWrapping.Wrap,
-                        }
+                    _ => new ArkheideSystem.Flourish.Controls.FlourishTextBlock
+                    {
+                        Role = ArkheideSystem.Flourish.Controls.FlourishTextRole.Description,
+                        Text = "This Body is supplied by the Gallery application.",
+                        TextWrapping = System.Windows.TextWrapping.Wrap,
+                    }
                 );
             })
             .ConfigureNavigation(nav =>
