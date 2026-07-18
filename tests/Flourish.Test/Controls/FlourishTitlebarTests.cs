@@ -110,4 +110,53 @@ public sealed class FlourishTitlebarTests
         Assert.True(TitleBarVisualAssets.SunIconGeometry.IsFrozen);
         Assert.True(TitleBarVisualAssets.MoonIconGeometry.IsFrozen);
     }
+
+    [Fact]
+    public void SearchText_ProgrammaticUpdatesDoNotPublishOrResetAnUnchangedSelection()
+    {
+        RunInSta(() =>
+        {
+            var sut = new FlourishTitlebar();
+            var queries = new List<string>();
+            sut.SearchTextChanged += (_, text) => queries.Add(text);
+
+            sut.SetSearchText("runtime");
+
+            Assert.Empty(queries);
+            var searchBox = Assert.IsType<FlourishSearchBox>(sut.FindName("SearchBox"));
+            searchBox.Text = "typed";
+            Assert.Equal(["typed"], queries);
+
+            searchBox.Select(start: 1, length: 2);
+            sut.SetSearchText("typed");
+
+            Assert.Equal(1, searchBox.SelectionStart);
+            Assert.Equal(2, searchBox.SelectionLength);
+            Assert.Equal(["typed"], queries);
+        });
+    }
+
+    private static void RunInSta(Action action)
+    {
+        Exception? error = null;
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                error = exception;
+            }
+        });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        thread.Join();
+
+        if (error is not null)
+        {
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(error).Throw();
+        }
+    }
 }

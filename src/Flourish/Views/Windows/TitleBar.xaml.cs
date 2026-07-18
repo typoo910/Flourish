@@ -20,6 +20,7 @@ internal partial class FlourishTitlebar : UserControl
     private readonly ProfileImageBrushCache profileImageCache = new();
     private FlourishLocalizationService? localizationService;
     private bool hasProfileRegionContent;
+    private bool isApplyingSearchText;
     private bool isProfileEnabled;
 
     public FlourishTitlebar()
@@ -103,8 +104,22 @@ internal partial class FlourishTitlebar : UserControl
 
     public void SetSearchText(string text)
     {
-        SearchBox.Text = text ?? string.Empty;
-        SearchBox.CaretIndex = SearchBox.Text.Length;
+        text ??= string.Empty;
+        if (string.Equals(SearchBox.Text, text, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        isApplyingSearchText = true;
+        try
+        {
+            SearchBox.Text = text;
+            SearchBox.CaretIndex = text.Length;
+        }
+        finally
+        {
+            isApplyingSearchText = false;
+        }
     }
 
     public void FocusSearchBox()
@@ -332,7 +347,10 @@ internal partial class FlourishTitlebar : UserControl
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        SearchTextChanged?.Invoke(this, SearchBox.Text);
+        if (!isApplyingSearchText)
+        {
+            SearchTextChanged?.Invoke(this, SearchBox.Text);
+        }
     }
 
     private void Titlebar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

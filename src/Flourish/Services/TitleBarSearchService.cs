@@ -15,13 +15,16 @@ internal sealed class TitleBarSearchService(
         Guid,
         Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>
     > handlers = [];
-    private CancellationTokenSource queryCancellation = new();
+    private QueryDispatch? activeQueryDispatch;
     private string text = string.Empty;
     private bool focusRequested;
     private long version;
     private bool isDisposed;
 
     public event EventHandler<FlourishTitleBarSearchStateChangedEventArgs>? StateChanged;
+
+    internal event EventHandler<FlourishTitleBarSearchStateChangedEventArgs>?
+        ProgrammaticStateChanged;
 
     public event EventHandler<FlourishTitleBarSearchChangedEventArgs>? QueryChanged;
 
@@ -82,10 +85,16 @@ internal sealed class TitleBarSearchService(
     internal void PublishFromView(string value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>[] subscribers;
-        FlourishTitleBarSearchChangedEventArgs args;
-        FlourishTitleBarSearchState state;
-        CancellationToken token;
+        Func<
+            FlourishTitleBarSearchChangedEventArgs,
+            CancellationToken,
+            ValueTask
+        >[]? subscribers;
+        EventHandler<FlourishTitleBarSearchStateChangedEventArgs>? stateChanged;
+        FlourishTitleBarSearchState? state;
+        QueryDispatch? dispatch = null;
+        QueryDispatch? previousDispatch;
+        long sequence;
         lock (gate)
         {
             if (isDisposed)
@@ -96,14 +105,25 @@ internal sealed class TitleBarSearchService(
             text = value;
             focusRequested = false;
             version++;
-            queryCancellation.Cancel();
-            queryCancellation.Dispose();
-            queryCancellation = new CancellationTokenSource();
-            token = queryCancellation.Token;
-            subscribers = handlers.Values.ToArray();
-            args = new FlourishTitleBarSearchChangedEventArgs(value, version);
-            state = CreateSnapshot();
+            sequence = version;
+            previousDispatch = activeQueryDispatch;
+            if (handlers.Count == 0)
+            {
+                activeQueryDispatch = null;
+                subscribers = null;
+            }
+            else
+            {
+                dispatch = new QueryDispatch();
+                activeQueryDispatch = dispatch;
+                subscribers = handlers.Values.ToArray();
+            }
+
+            stateChanged = StateChanged;
+            state = stateChanged is null ? null : CreateSnapshot();
         }
+
+        CancelDispatch(previousDispatch);
 
         try
         {
@@ -114,9 +134,36 @@ internal sealed class TitleBarSearchService(
             logger.LogError(error, "The configured title bar search handler failed.");
         }
 
-        StateChanged?.Invoke(this, new FlourishTitleBarSearchStateChangedEventArgs(state));
-        QueryChanged?.Invoke(this, args);
-        _ = DispatchAsync(subscribers, args, token);
+        var queryChanged = QueryChanged;
+        var args = queryChanged is null && subscribers is null
+            ? null
+            : new FlourishTitleBarSearchChangedEventArgs(value, sequence);
+        try
+        {
+            if (stateChanged is not null)
+            {
+                stateChanged(
+                    this,
+                    new FlourishTitleBarSearchStateChangedEventArgs(state!)
+                );
+            }
+
+            queryChanged?.Invoke(this, args!);
+        }
+        catch
+        {
+            if (dispatch is not null)
+            {
+                CompleteDispatch(dispatch);
+            }
+
+            throw;
+        }
+
+        if (subscribers is not null)
+        {
+            _ = DispatchAsync(subscribers, args!, dispatch!);
+        }
     }
 
     internal void AcknowledgeFocusRequest()
@@ -127,8 +174,17 @@ internal sealed class TitleBarSearchService(
         }
     }
 
+    internal bool IsCurrentVersion(long candidateVersion)
+    {
+        lock (gate)
+        {
+            return version == candidateVersion;
+        }
+    }
+
     public void Dispose()
     {
+        QueryDispatch? dispatch;
         lock (gate)
         {
             if (isDisposed)
@@ -138,9 +194,11 @@ internal sealed class TitleBarSearchService(
 
             isDisposed = true;
             handlers.Clear();
-            queryCancellation.Cancel();
-            queryCancellation.Dispose();
+            dispatch = activeQueryDispatch;
+            activeQueryDispatch = null;
         }
+
+        CancelDispatch(dispatch);
     }
 
     private async Task DispatchAsync(
@@ -148,46 +206,109 @@ internal sealed class TitleBarSearchService(
             Func<FlourishTitleBarSearchChangedEventArgs, CancellationToken, ValueTask>
         > subscribers,
         FlourishTitleBarSearchChangedEventArgs args,
-        CancellationToken cancellationToken
+        QueryDispatch dispatch
     )
     {
-        foreach (var subscriber in subscribers)
+        var cancellationToken = dispatch.Token;
+        try
         {
-            try
+            foreach (var subscriber in subscribers)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                await subscriber(args, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await subscriber(args, cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                    when (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                catch (Exception error)
+                {
+                    logger.LogError(error, "A runtime title bar search handler failed.");
+                }
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-            catch (Exception error)
-            {
-                logger.LogError(error, "A runtime title bar search handler failed.");
-            }
+        }
+        finally
+        {
+            CompleteDispatch(dispatch);
         }
     }
 
     private void UpdateState(Action update)
     {
-        FlourishTitleBarSearchState state;
+        EventHandler<FlourishTitleBarSearchStateChangedEventArgs>? programmaticStateChanged;
+        EventHandler<FlourishTitleBarSearchStateChangedEventArgs>? stateChanged;
+        FlourishTitleBarSearchState? state;
         lock (gate)
         {
             ObjectDisposedException.ThrowIf(isDisposed, this);
-            var previous = CreateSnapshot();
+            var previousText = text;
+            var previousPlaceholder = options.SearchPlaceholder;
+            var wasVisible = options.IsTitlebarSearchEnabled;
+            var wasFocusRequested = focusRequested;
             update();
-            var candidate = CreateSnapshot();
-            if (candidate == previous)
+            if (
+                string.Equals(previousText, text, StringComparison.Ordinal)
+                && string.Equals(
+                    previousPlaceholder,
+                    options.SearchPlaceholder,
+                    StringComparison.Ordinal
+                )
+                && wasVisible == options.IsTitlebarSearchEnabled
+                && wasFocusRequested == focusRequested
+            )
             {
                 return;
             }
 
             version++;
-            state = CreateSnapshot();
+            programmaticStateChanged = ProgrammaticStateChanged;
+            stateChanged = StateChanged;
+            state = programmaticStateChanged is null && stateChanged is null
+                ? null
+                : CreateSnapshot();
         }
 
-        StateChanged?.Invoke(this, new FlourishTitleBarSearchStateChangedEventArgs(state));
+        if (state is null)
+        {
+            return;
+        }
+
+        var args = new FlourishTitleBarSearchStateChangedEventArgs(state);
+        programmaticStateChanged?.Invoke(this, args);
+        stateChanged?.Invoke(this, args);
+    }
+
+    private void CancelDispatch(QueryDispatch? dispatch)
+    {
+        if (dispatch is null)
+        {
+            return;
+        }
+
+        try
+        {
+            dispatch.Cancel();
+        }
+        catch (Exception error)
+        {
+            logger.LogError(error, "Canceling a stale title bar search query failed.");
+        }
+    }
+
+    private void CompleteDispatch(QueryDispatch dispatch)
+    {
+        lock (gate)
+        {
+            if (ReferenceEquals(activeQueryDispatch, dispatch))
+            {
+                activeQueryDispatch = null;
+            }
+        }
+
+        dispatch.Complete();
     }
 
     private FlourishTitleBarSearchState CreateSnapshot()
@@ -216,6 +337,43 @@ internal sealed class TitleBarSearchService(
         public void Dispose()
         {
             Interlocked.Exchange(ref owner, null)?.Unsubscribe(id);
+        }
+    }
+
+    private sealed class QueryDispatch
+    {
+        private readonly Lock gate = new();
+        private CancellationTokenSource? cancellation = new();
+
+        internal CancellationToken Token
+        {
+            get
+            {
+                lock (gate)
+                {
+                    return cancellation?.Token ?? new CancellationToken(canceled: true);
+                }
+            }
+        }
+
+        internal void Cancel()
+        {
+            lock (gate)
+            {
+                cancellation?.Cancel();
+            }
+        }
+
+        internal void Complete()
+        {
+            CancellationTokenSource? completed;
+            lock (gate)
+            {
+                completed = cancellation;
+                cancellation = null;
+            }
+
+            completed?.Dispose();
         }
     }
 }

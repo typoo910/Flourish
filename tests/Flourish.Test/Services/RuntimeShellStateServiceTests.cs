@@ -70,19 +70,21 @@ public sealed class RuntimeShellStateServiceTests
     }
 
     [Fact]
-    public async Task TitleBarSearchService_PublishFromViewUpdatesStateAndCancelsStaleQuery()
+    public async Task TitleBarSearchService_UserQueryPublishesStateAndCancelsStaleWork()
     {
-        var sut = new TitleBarSearchService(
+        using var sut = new TitleBarSearchService(
             new FlourishShellOptions(),
             new Mock<IServiceProvider>().Object,
             NullLogger<TitleBarSearchService>.Instance
         );
         var states = new List<FlourishTitleBarSearchState>();
+        var queries = new List<FlourishTitleBarSearchChangedEventArgs>();
         sut.StateChanged += (_, args) =>
         {
             states.Add(args.State);
             Assert.Equal(args.State, sut.Current);
         };
+        sut.QueryChanged += (_, args) => queries.Add(args);
         var firstStarted = new TaskCompletionSource(
             TaskCreationOptions.RunContinuationsAsynchronously
         );
@@ -129,6 +131,103 @@ public sealed class RuntimeShellStateServiceTests
         Assert.Equal(2, sut.Current.Version);
         Assert.Equal(["first", "second"], states.Select(state => state.Text));
         Assert.Equal([1L, 2L], states.Select(state => state.Version));
+        Assert.Equal(["first", "second"], queries.Select(query => query.Text));
+        Assert.Equal([1L, 2L], queries.Select(query => query.Sequence));
+    }
+
+    [Fact]
+    public void TitleBarSearchService_SynchronousQueryObserversDoNotAllocateCancellationSource()
+    {
+        using var sut = new TitleBarSearchService(
+            new FlourishShellOptions(),
+            new Mock<IServiceProvider>().Object,
+            NullLogger<TitleBarSearchService>.Instance
+        );
+        FlourishTitleBarSearchChangedEventArgs? query = null;
+        sut.QueryChanged += (_, args) => query = args;
+
+        sut.PublishFromView("typed");
+
+        Assert.NotNull(query);
+        Assert.Equal("typed", query.Text);
+        Assert.Null(GetActiveQueryDispatch(sut));
+    }
+
+    [Fact]
+    public async Task TitleBarSearchService_NewQueryCancelsWorkAfterLastSubscriberLeaves()
+    {
+        using var sut = new TitleBarSearchService(
+            new FlourishShellOptions(),
+            new Mock<IServiceProvider>().Object,
+            NullLogger<TitleBarSearchService>.Instance
+        );
+        var started = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var canceled = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var subscription = sut.Subscribe(async (_, token) =>
+        {
+            started.SetResult();
+            try
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+            }
+            catch (OperationCanceledException)
+            {
+                canceled.SetResult();
+                throw;
+            }
+        });
+
+        sut.PublishFromView("first");
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        subscription.Dispose();
+        sut.PublishFromView("second");
+
+        await canceled.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.Equal("second", sut.Current.Text);
+        Assert.Null(GetActiveQueryDispatch(sut));
+    }
+
+    [Fact]
+    public async Task TitleBarSearchService_CancelCallbackFailureDoesNotBlockNewQuery()
+    {
+        using var sut = new TitleBarSearchService(
+            new FlourishShellOptions(),
+            new Mock<IServiceProvider>().Object,
+            NullLogger<TitleBarSearchService>.Instance
+        );
+        var firstStarted = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        var secondHandled = new TaskCompletionSource(
+            TaskCreationOptions.RunContinuationsAsynchronously
+        );
+        using var subscription = sut.Subscribe(async (args, token) =>
+        {
+            if (args.Text == "second")
+            {
+                secondHandled.SetResult();
+                return;
+            }
+
+            using var registration = token.Register(() =>
+                throw new InvalidOperationException("cancel callback failed")
+            );
+            firstStarted.SetResult();
+            await Task.Delay(Timeout.InfiniteTimeSpan, token);
+        });
+
+        sut.PublishFromView("first");
+        await firstStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        var error = Record.Exception(() => sut.PublishFromView("second"));
+
+        Assert.Null(error);
+        await secondHandled.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        Assert.Equal("second", sut.Current.Text);
     }
 
     [Fact]
@@ -140,6 +239,12 @@ public sealed class RuntimeShellStateServiceTests
             NullLogger<TitleBarSearchService>.Instance
         );
         var calls = 0;
+        var stateChanges = 0;
+        var programmaticStateChanges = 0;
+        var queryChanges = 0;
+        sut.StateChanged += (_, _) => stateChanges++;
+        sut.ProgrammaticStateChanged += (_, _) => programmaticStateChanges++;
+        sut.QueryChanged += (_, _) => queryChanges++;
         var subscription = sut.Subscribe((_, _) =>
         {
             calls++;
@@ -155,9 +260,26 @@ public sealed class RuntimeShellStateServiceTests
         sut.PublishFromView("typed");
 
         Assert.Equal(0, calls);
+        Assert.Equal(5, stateChanges);
+        Assert.Equal(4, programmaticStateChanges);
+        Assert.Equal(1, queryChanges);
         Assert.Equal("Find demos", sut.Current.Placeholder);
         Assert.False(sut.Current.FocusRequested);
+        Assert.Equal(5, sut.Current.Version);
         Assert.Throws<ArgumentException>(() => sut.SetPlaceholder(""));
+    }
+
+    private static object? GetActiveQueryDispatch(
+        TitleBarSearchService service
+    )
+    {
+        var field = typeof(TitleBarSearchService).GetField(
+            "activeQueryDispatch",
+            System.Reflection.BindingFlags.Instance
+                | System.Reflection.BindingFlags.NonPublic
+        );
+        Assert.NotNull(field);
+        return field.GetValue(service);
     }
 
     [Fact]

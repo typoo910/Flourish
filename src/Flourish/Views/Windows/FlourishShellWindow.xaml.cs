@@ -315,7 +315,8 @@ internal partial class FlourishShellWindow : Window
         shellRegionService.Changed += ShellRegionService_Changed;
         titleBarService.Changed += TitleBarService_Changed;
         projectService.Changed += ProjectService_Changed;
-        titleBarSearchService.StateChanged += TitleBarSearchService_StateChanged;
+        titleBarSearchService.ProgrammaticStateChanged +=
+            TitleBarSearchService_StateChanged;
         notificationService.NotificationsChanged += NotificationService_NotificationsChanged;
         profileFlyoutService.Changed += ProfileFlyoutService_Changed;
         shellFeatureService.Changed += ShellFeatureService_Changed;
@@ -3305,8 +3306,8 @@ internal partial class FlourishShellWindow : Window
     {
         DispatchRuntimeChange(() =>
         {
-            var current = titleBarSearchService.Current;
-            if (current.Version != e.State.Version)
+            var current = e.State;
+            if (!titleBarSearchService.IsCurrentVersion(current.Version))
             {
                 return;
             }
@@ -4164,7 +4165,8 @@ internal partial class FlourishShellWindow : Window
         titleBarService.Changed -= TitleBarService_Changed;
         projectService.Changed -= ProjectService_Changed;
         titleBarLogoLoadCoordinator.Dispose();
-        titleBarSearchService.StateChanged -= TitleBarSearchService_StateChanged;
+        titleBarSearchService.ProgrammaticStateChanged -=
+            TitleBarSearchService_StateChanged;
         notificationService.NotificationsChanged -= NotificationService_NotificationsChanged;
         profileFlyoutService.Changed -= ProfileFlyoutService_Changed;
         shellFeatureService.Changed -= ShellFeatureService_Changed;
