@@ -1310,7 +1310,12 @@ public sealed class FlourishXamlArchitectureTests
             typeof(IFlourishShellBuilder).GetMethods(),
             method => method.Name == nameof(IFlourishShellBuilder.UseGlobalFont)
         );
-        AssertParameterContract(builderGlobalFont, explicitScaleTypes, explicitScaleNames);
+        AssertOptionalParameterContract(
+            builderGlobalFont,
+            explicitScaleTypes,
+            explicitScaleNames,
+            ["Microsoft Yahei", 12d, 14d, 16d, 16d, 24d, 32d]
+        );
 
         var serviceSetFont = Assert.Single(
             typeof(IFontService).GetMethods(),
@@ -1397,10 +1402,20 @@ public sealed class FlourishXamlArchitectureTests
         Assert.All(
             fontAssemblyApiMethods.Where(method =>
                 method.Name == nameof(IFlourishShellBuilder.UseGlobalFont)
-                    || method.Name == nameof(IFontService.SetFont)
             ),
             method =>
-                AssertParameterContract(method, explicitScaleTypes, explicitScaleNames)
+                AssertOptionalParameterContract(
+                    method,
+                    explicitScaleTypes,
+                    explicitScaleNames,
+                    ["Microsoft Yahei", 12d, 14d, 16d, 16d, 24d, 32d]
+                )
+        );
+        Assert.All(
+            fontAssemblyApiMethods.Where(method =>
+                method.Name == nameof(IFontService.SetFont)
+            ),
+            method => AssertParameterContract(method, explicitScaleTypes, explicitScaleNames)
         );
         Assert.All(
             fontAssemblyApiMethods.Where(method =>
@@ -2158,6 +2173,21 @@ public sealed class FlourishXamlArchitectureTests
         Assert.Equal(expectedTypes, parameters.Select(parameter => parameter.ParameterType));
         Assert.Equal(expectedNames, parameters.Select(parameter => parameter.Name));
         Assert.All(parameters, parameter => Assert.False(parameter.IsOptional));
+    }
+
+    private static void AssertOptionalParameterContract(
+        MethodBase method,
+        IReadOnlyList<Type> expectedTypes,
+        IReadOnlyList<string> expectedNames,
+        IReadOnlyList<object> expectedDefaultValues
+    )
+    {
+        var parameters = method.GetParameters();
+        Assert.Equal(expectedTypes.Count, parameters.Length);
+        Assert.Equal(expectedTypes, parameters.Select(parameter => parameter.ParameterType));
+        Assert.Equal(expectedNames, parameters.Select(parameter => parameter.Name));
+        Assert.Equal(expectedDefaultValues, parameters.Select(parameter => parameter.DefaultValue));
+        Assert.All(parameters, parameter => Assert.True(parameter.IsOptional));
     }
 
     private static string FormatViolation(string file, XObject node)

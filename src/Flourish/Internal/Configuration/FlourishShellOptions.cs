@@ -5,9 +5,9 @@ namespace ArkheideSystem.Flourish.Internal.Configuration;
 
 internal sealed class FlourishShellOptions
 {
-    public string ApplicationTitle { get; set; } = string.Empty;
+    public string ApplicationTitle { get; set; } = "MyApp";
 
-    public string ApplicationSubtitle { get; set; } = "WPF Application";
+    public string ApplicationSubtitle { get; set; } = "MyApp";
 
     public string UnnamedProjectPlaceholder { get; set; } = "Unnamed project";
 
@@ -47,13 +47,13 @@ internal sealed class FlourishShellOptions
 
     public Dictionary<Type, FlourishPageFontOverride> PageFontOverridesByPageType { get; } = [];
 
-    public double WindowWidth { get; set; } = 1100;
+    public double WindowWidth { get; set; } = 1536;
 
-    public double WindowHeight { get; set; } = 720;
+    public double WindowHeight { get; set; } = 864;
 
-    public double WindowMinWidth { get; set; } = 820;
+    public double WindowMinWidth { get; set; } = 1280;
 
-    public double WindowMinHeight { get; set; } = 560;
+    public double WindowMinHeight { get; set; } = 720;
 
     public double WindowMaxWidth { get; set; } = double.PositiveInfinity;
 
@@ -132,13 +132,13 @@ internal sealed class FlourishShellOptions
 
     public BreadcrumbShowOption BreadcrumbShowOption { get; set; } = BreadcrumbShowOption.Auto;
 
-    public double OpenPaneWidth { get; set; } = 220;
+    public double OpenPaneWidth { get; set; } = 250;
 
     public double ClosedPaneWidth { get; set; } = 64;
 
-    public double NavigationPaneMinWidth { get; set; } = 160;
+    public double NavigationPaneMinWidth { get; set; } = 180;
 
-    public double NavigationPaneMaxWidth { get; set; } = 420;
+    public double NavigationPaneMaxWidth { get; set; } = 520;
 
     public string? InitialNavigationKey { get; set; }
 

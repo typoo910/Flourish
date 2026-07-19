@@ -15,7 +15,6 @@ internal static class Program
     {
         flourish = FlourishBuilder
             .CreateDefaultBuilder(args)
-            .ConfigureData(data => data.SetLocale("EN"))
             .ConfigureServices(
                 (_, services) =>
                 {
@@ -42,48 +41,20 @@ internal static class Program
             .ConfigureShell(shell =>
             {
                 shell
-                    .UseTitleBar()
-                    .UseMultiProject(false)
-                    .UseNavigation()
                     .UseCenterContent()
                     .UseDynamicToolbar()
+                    .UseGlobalFont()
+                    .UseMaterialEffect()
                     .UseMotion()
+                    .UseNavigation()
                     .UseStatusBar()
                     .UseTips()
-                    .UseMaterialEffect()
-                    .UseGlobalFont("Segoe UI", 12, 14, 16, 16, 24, 32);
+                    .UseTitleBar();
             })
-            .ConfigureTitleBar(titlebar =>
-            {
-                titlebar
-                    .SetBreadcrumbButton()
-                    .SetNavToggle()
-                    .SetLogo()
-                    .SetApplicationTitle("Flourish Gallery")
-                    .SetApplicationSubTitle("Playground")
-                    .SetUnnamedProjectPlaceholder("Unnamed project")
-                    .SetProfile(NameOrder.FirstLast)
-                    .SetThemeToggle(FlourishTheme.System)
-                    .SetSearch("Type here to search", (_, _) => { });
-            })
-            .ConfigureCustomHandler(custom =>
-            {
-                custom.Add(
-                    FlourishRegion.TitlebarApplicationInfo,
-                    _ => new ArkheideSystem.Flourish.Controls.FlourishTextBlock
-                    {
-                        Role = ArkheideSystem.Flourish.Controls.FlourishTextRole.Description,
-                        Text = "This Body is supplied by the Gallery application.",
-                        TextWrapping = System.Windows.TextWrapping.Wrap,
-                    }
-                );
-            })
+            .ConfigureTitleBar(titlebar => titlebar.SetSearch("Type here to search", (_, _) => { }))
             .ConfigureNavigation(nav =>
             {
-                nav.SetDirection()
-                    .SetInitiallyOpen()
-                    .SetPanelWidth(openWidth: 250, closedWidth: 64, maxWidth: 520, minWidth: 180)
-                    .SetGroup(
+                nav.SetGroup(
                         null,
                         0,
                         group => group.AddNavigableViewItem<HomePage>(isInitial: true)
@@ -140,23 +111,6 @@ internal static class Program
                     new FlourishToolbarItem("Queue task", "\uE895", "demo.background")
                 );
             })
-            .ConfigureStatusBar(statusBar =>
-            {
-                statusBar
-                    .AddStatusItem("Online", "\uE930")
-                    .ShowLANConnectionStatus()
-                    .ShowPowerStatus();
-            })
-            .ConfigureMotion(motion =>
-            {
-                motion
-                    .EnableHoverRevealAnimation()
-                    .EnableNavigationPanelTransition()
-                    .EnablePageTransition();
-            })
-            .ConfigureWindow(window =>
-                window.SetWindowSize().SetWindowMinSize().SetWindowPosition()
-            )
             .Build();
 
         try

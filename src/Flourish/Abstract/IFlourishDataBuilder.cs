@@ -25,7 +25,7 @@ public interface IFlourishDataBuilder
     /// Built-in locale identifiers are <c>CN</c> and <c>EN</c>. Identifiers are
     /// case-insensitive and are normalized when the application is built.
     /// </remarks>
-    IFlourishDataBuilder SetLocale(string locale);
+    IFlourishDataBuilder SetLocale(string locale = "EN");
 
     /// <summary>
     /// Adds a custom locale file that can extend or override built-in translations.

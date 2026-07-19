@@ -7,7 +7,7 @@ namespace ArkheideSystem.Flourish.Test.Internal.Composition;
 public sealed class FlourishTitlebarBuilderTests
 {
     [Fact]
-    public void Elements_AreDisabledUntilConfigured()
+    public void Options_ExposeDefaultValuesButElementsRemainDisabledUntilDefaultsAreApplied()
     {
         var options = new FlourishShellOptions();
 
@@ -16,8 +16,8 @@ public sealed class FlourishTitlebarBuilderTests
         Assert.False(options.IsTitlebarNavigationToggleEnabled);
         Assert.False(options.IsTitlebarLogoEnabled);
         Assert.False(options.IsTitlebarTitleEnabled);
-        Assert.Equal(string.Empty, options.ApplicationTitle);
-        Assert.Equal("WPF Application", options.ApplicationSubtitle);
+        Assert.Equal("MyApp", options.ApplicationTitle);
+        Assert.Equal("MyApp", options.ApplicationSubtitle);
         Assert.Equal("Unnamed project", options.UnnamedProjectPlaceholder);
         Assert.True(options.ShowApplicationTitleInLogoFlyout);
         Assert.True(options.ShowApplicationSubtitleInLogoFlyout);

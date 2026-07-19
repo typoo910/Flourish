@@ -51,14 +51,14 @@ internal sealed class FlourishTitlebarBuilder(FlourishShellOptions options)
         return this;
     }
 
-    public IFlourishTitlebarBuilder SetApplicationTitle(string title)
+    public IFlourishTitlebarBuilder SetApplicationTitle(string title = "MyApp")
     {
         options.ApplicationTitle = ValidateNotBlank(title, nameof(title));
         options.IsTitlebarTitleEnabled = true;
         return this;
     }
 
-    public IFlourishTitlebarBuilder SetApplicationSubTitle(string subTitle)
+    public IFlourishTitlebarBuilder SetApplicationSubTitle(string subTitle = "MyApp")
     {
         options.ApplicationSubtitle = ValidateNotBlank(subTitle, nameof(subTitle));
         return this;

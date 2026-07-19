@@ -4,8 +4,9 @@ namespace ArkheideSystem.Flourish.Abstract;
 /// Configures the elements displayed in the Flourish shell title bar.
 /// </summary>
 /// <remarks>
-/// Calling a configuration method enables its corresponding title bar element.
-/// Elements that are not configured remain hidden.
+/// When the shell title bar is enabled, elements with built-in defaults are enabled automatically.
+/// Calling a configuration method overrides the corresponding default. Input-driven elements such
+/// as search remain hidden until they are configured explicitly.
 /// </remarks>
 /// <example>
 /// <code><![CDATA[
@@ -72,14 +73,14 @@ public interface IFlourishTitlebarBuilder
     /// </summary>
     /// <param name="title">The application title.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishTitlebarBuilder SetApplicationTitle(string title);
+    IFlourishTitlebarBuilder SetApplicationTitle(string title = "MyApp");
 
     /// <summary>
     /// Configures the application subtitle displayed in the logo information surface.
     /// </summary>
     /// <param name="subTitle">The application subtitle.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishTitlebarBuilder SetApplicationSubTitle(string subTitle);
+    IFlourishTitlebarBuilder SetApplicationSubTitle(string subTitle = "MyApp");
 
     /// <summary>
     /// Configures the display name used for a project that has no storage path or when no project is active.
@@ -100,7 +101,5 @@ public interface IFlourishTitlebarBuilder
     /// </summary>
     /// <param name="mode">The theme used when no saved preference is available.</param>
     /// <returns>The current builder for chained configuration.</returns>
-    IFlourishTitlebarBuilder SetThemeToggle(
-        FlourishTheme mode = FlourishTheme.System
-    );
+    IFlourishTitlebarBuilder SetThemeToggle(FlourishTheme mode = FlourishTheme.System);
 }

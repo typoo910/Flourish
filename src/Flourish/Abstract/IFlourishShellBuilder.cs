@@ -122,13 +122,13 @@ public interface IFlourishShellBuilder
     /// <param name="headerSizeFontSize">The header-size font size.</param>
     /// <returns>The current builder for chained configuration.</returns>
     IFlourishShellBuilder UseGlobalFont(
-        string fontFamily,
-        double smallFontSize,
-        double standardFontSize,
-        double iconFontSize,
-        double largeFontSize,
-        double extraLargeFontSize,
-        double headerSizeFontSize
+        string fontFamily = "Microsoft Yahei",
+        double smallFontSize = 12,
+        double standardFontSize = 14,
+        double iconFontSize = 16,
+        double largeFontSize = 16,
+        double extraLargeFontSize = 24,
+        double headerSizeFontSize = 32
     );
 
     /// <summary>

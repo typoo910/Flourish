@@ -75,6 +75,7 @@ internal sealed class FlourishCompositionRoot(
     private void ApplyFlourishConfigurations()
     {
         var dataBuilder = new FlourishDataBuilder(dataOptions);
+        ApplyDataDefaults(dataBuilder);
         foreach (var configureData in dataConfigurations)
         {
             configureData(dataBuilder);
@@ -95,12 +96,14 @@ internal sealed class FlourishCompositionRoot(
         }
 
         var titleBarBuilder = new FlourishTitlebarBuilder(shellOptions);
+        ApplyTitleBarDefaults(titleBarBuilder);
         foreach (var configureTitleBar in titleBarConfigurations)
         {
             configureTitleBar(titleBarBuilder);
         }
 
         var navigationBuilder = new FlourishNavigationBuilder(shellOptions);
+        ApplyNavigationDefaults(navigationBuilder);
         foreach (var configureNavigation in navigationConfigurations)
         {
             configureNavigation(navigationBuilder);
@@ -119,23 +122,63 @@ internal sealed class FlourishCompositionRoot(
         }
 
         var motionBuilder = new FlourishMotionBuilder(shellOptions.Motion);
+        ApplyMotionDefaults(motionBuilder);
         foreach (var configureMotion in motionConfigurations)
         {
             configureMotion(motionBuilder);
         }
 
         var windowBuilder = new FlourishWindowPropertyBuilder(shellOptions);
+        ApplyWindowDefaults(windowBuilder);
         foreach (var configureWindow in windowConfigurations)
         {
             configureWindow(windowBuilder);
         }
 
         var statusBarBuilder = new FlourishStatusBarBuilder(shellOptions);
+        ApplyStatusBarDefaults(statusBarBuilder);
         foreach (var configureStatusBar in statusBarConfigurations)
         {
             configureStatusBar(statusBarBuilder);
         }
     }
+
+    private static void ApplyDataDefaults(IFlourishDataBuilder builder) =>
+        builder.SetLocale();
+
+    private static void ApplyTitleBarDefaults(IFlourishTitlebarBuilder builder) =>
+        builder
+            .SetBreadcrumbButton()
+            .SetNavToggle()
+            .SetLogo()
+            .SetApplicationTitle()
+            .SetApplicationSubTitle()
+            .SetUnnamedProjectPlaceholder()
+            .SetProfile()
+            .SetThemeToggle();
+
+    private static void ApplyNavigationDefaults(IFlourishNavigationBuilder builder) =>
+        builder.SetDirection().SetInitiallyOpen().SetPanelWidth();
+
+    private static void ApplyMotionDefaults(IFlourishMotionBuilder builder) =>
+        builder
+            .EnablePageTransition()
+            .EnableNavigationPanelTransition()
+            .EnableHoverRevealAnimation()
+            .RespectSystemReducedMotion();
+
+    private static void ApplyWindowDefaults(IFlourishWindowPropertyBuilder builder) =>
+        builder
+            .SetWindowSize()
+            .SetWindowMinSize()
+            .SetWindowMaxSize()
+            .SetWindowPosition()
+            .SetWindowState()
+            .SetWindowResizeMode()
+            .ShowInTaskbar();
+
+    private static void ApplyStatusBarDefaults(IFlourishStatusBarBuilder builder) =>
+        builder.AddStatusItem().ShowLANConnectionStatus().ShowPowerStatus();
 
     private void ApplyServiceCollectionRegistrations(IServiceCollection services)
     {

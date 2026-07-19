@@ -88,13 +88,13 @@ internal sealed class FlourishShellBuilder(FlourishShellOptions options) : IFlou
     }
 
     public IFlourishShellBuilder UseGlobalFont(
-        string fontFamily,
-        double smallFontSize,
-        double standardFontSize,
-        double iconFontSize,
-        double largeFontSize,
-        double extraLargeFontSize,
-        double headerSizeFontSize
+        string fontFamily = "Microsoft Yahei",
+        double smallFontSize = 12,
+        double standardFontSize = 14,
+        double iconFontSize = 16,
+        double largeFontSize = 16,
+        double extraLargeFontSize = 24,
+        double headerSizeFontSize = 32
     )
     {
         fontFamily = ValidateNotBlank(fontFamily, nameof(fontFamily));

@@ -6,7 +6,10 @@ namespace ArkheideSystem.Flourish.Internal.Composition;
 internal sealed class FlourishStatusBarBuilder(FlourishShellOptions options)
     : IFlourishStatusBarBuilder
 {
-    public IFlourishStatusBarBuilder AddStatusItem(string displayText, string iconGlyph)
+    public IFlourishStatusBarBuilder AddStatusItem(
+        string displayText = "OK",
+        string iconGlyph = "\uE930"
+    )
     {
         options.StatusItems.Add(new FlourishStatusItem(displayText, iconGlyph));
         return this;

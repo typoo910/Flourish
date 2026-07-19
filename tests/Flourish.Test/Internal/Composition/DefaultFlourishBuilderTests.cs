@@ -120,9 +120,19 @@ public sealed class DefaultFlourishBuilderTests
         Assert.Equal(MaterialEffect.None, options.MaterialEffect);
         Assert.False(options.IsMaterialEffectEnabled);
         Assert.Equal(FlourishTheme.Dark, options.DefaultTheme);
-        var statusItem = Assert.Single(options.StatusItems);
-        Assert.Equal("Ready", statusItem.Text);
-        Assert.Equal("R", statusItem.IconGlyph);
+        Assert.Collection(
+            options.StatusItems,
+            statusItem =>
+            {
+                Assert.Equal("OK", statusItem.Text);
+                Assert.Equal("\uE930", statusItem.IconGlyph);
+            },
+            statusItem =>
+            {
+                Assert.Equal("Ready", statusItem.Text);
+                Assert.Equal("R", statusItem.IconGlyph);
+            }
+        );
     }
 
     [Fact]

@@ -58,10 +58,10 @@ public interface IFlourishNavigationBuilder
     /// width is outside the supplied minimum and maximum range.
     /// </exception>
     IFlourishNavigationBuilder SetPanelWidth(
-        double openWidth = 220,
+        double openWidth = 250,
         double closedWidth = 64,
-        double maxWidth = 420,
-        double minWidth = 160
+        double maxWidth = 520,
+        double minWidth = 180
     );
 
     /// <summary>
